@@ -5,7 +5,7 @@ import {redirect} from "next/navigation";
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {auth, signIn} from "@/lib/auth";
-import {executeAction} from "@/db/executeAction";
+// import {executeAction} from "@/db/executeAction";
 import {GithubSignIn} from "@/components/github-sign-in";
 
 async function SignInPage() {
@@ -21,17 +21,17 @@ async function SignInPage() {
 
       <GithubSignIn />
 
-      <div className="relative">
+      {/* <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <span className="w-full border-t" />
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="bg-background text-muted-foreground px-2">Or continue with email</span>
         </div>
-      </div>
+      </div> */}
 
       {/* Email/Password Sign In */}
-      <form
+      {/* <form
         action={async (formData: FormData) => {
           "use server";
           await executeAction({
@@ -53,13 +53,13 @@ async function SignInPage() {
         <Button className="w-full" type="submit">
           Sign In
         </Button>
-      </form>
+      </form> */}
 
-      <div className="text-center">
+      {/* <div className="text-center">
         <Button asChild variant="link">
           <Link href="/sign-up">Don&apos;t have an account? Sign up</Link>
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

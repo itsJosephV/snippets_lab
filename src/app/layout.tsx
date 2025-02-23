@@ -3,6 +3,8 @@ import type {Metadata} from "next";
 import Link from "next/link";
 
 import "./globals.css";
+import {SignOut} from "@/components/sign-out";
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "snippets_lab",
@@ -13,9 +15,7 @@ export default async function RootLayout({children}: {children: React.ReactNode}
   return (
     <html lang="en">
       <body className="container m-auto grid min-h-screen grid-rows-[auto_1fr_auto] gap-8 px-4 font-sans antialiased">
-        <header className="text-xl font-bold leading-[4rem]">
-          <Link href="/">snippets_lab</Link>
-        </header>
+        <Header />
         {children}
         <footer className="text-center leading-[4rem] opacity-70">snippets_lab</footer>
       </body>

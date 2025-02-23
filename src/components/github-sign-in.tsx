@@ -1,19 +1,29 @@
+"use client";
+import {useActionState} from "react";
+import {Loader} from "lucide-react";
+
 import {Github} from "./ui/github";
 
 import {Button} from "@/components/ui/button";
-import {signIn} from "@/lib/auth";
+import {signInAction} from "@/lib/actions";
 
 function GithubSignIn() {
+  const [error, action, isPending] = useActionState(signInAction, null);
+
   return (
-    <form
-      action={async () => {
-        "use server";
-        await signIn("github");
-      }}
-    >
-      <Button className="w-full" variant="outline">
-        <Github />
-        Continue with GitHub
+    <form action={action}>
+      <Button className="w-full">
+        {isPending ? (
+          <>
+            <Loader className="animate-spin" />
+            Signing in...
+          </>
+        ) : (
+          <>
+            <Github />
+            Sign in with GitHub
+          </>
+        )}
       </Button>
     </form>
   );
