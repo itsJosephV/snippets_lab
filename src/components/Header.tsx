@@ -1,18 +1,28 @@
 import Link from "next/link";
 import React from "react";
+import {Star} from "lucide-react";
 
-import {SignOut} from "./sign-out";
+import UserButton from "./auth/user-btn";
 
-import {auth} from "@/lib/auth";
+import {cn} from "@/lib/utils";
 
 async function Header() {
-  const session = await auth();
-
   return (
-    <header className="flex items-center justify-between border-b text-xl leading-[4rem] font-bold">
-      <Link href="/">snippets_lab</Link>
-      {session ? <SignOut /> : <p>Dashboard</p>}
-    </header>
+    <nav className="sticky top-0 z-20 flex w-full border-b bg-blue-800 text-xl leading-[4rem] font-bold">
+      <div className={cn("flex w-full items-center justify-between", "container")}>
+        <div className="flex items-center">
+          <Link className="text-red-300" href="/">
+            snippets_lab
+          </Link>
+        </div>
+        <div className="flex items-center gap-2">
+          <Star />
+          <Star />
+          <Star />
+          <UserButton />
+        </div>
+      </div>
+    </nav>
   );
 }
 
