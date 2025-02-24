@@ -1,6 +1,7 @@
 "use client";
 import {useActionState} from "react";
 import {Loader} from "lucide-react";
+import {useSearchParams} from "next/navigation";
 
 import {Github} from "./ui/github";
 
@@ -8,11 +9,14 @@ import {Button} from "@/components/ui/button";
 import {signInAction} from "@/lib/actions";
 
 function GithubSignIn() {
-  const [error, action, isPending] = useActionState(signInAction, null);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+
+  const [error, action, isPending] = useActionState(() => signInAction(callbackUrl), null);
 
   return (
     <form action={action}>
-      <Button className="w-full">
+      <Button size="sm">
         {isPending ? (
           <>
             <Loader className="animate-spin" />
