@@ -1,18 +1,23 @@
 "use client";
-import {signOut} from "next-auth/react";
+import {LogOutIcon} from "lucide-react";
+import {toast} from "sonner";
 
-import {Button} from "@/components/ui/button";
+import {DropdownMenuItem} from "./ui/dropdown-menu";
 
-function SignOut() {
+import {signOutAction} from "@/lib/actions";
+
+export function SignOut() {
   const handleSignOut = async () => {
-    await signOut();
+    toast.promise(signOutAction, {
+      loading: "Signing out...",
+      error: "error",
+    });
   };
 
   return (
-    <Button size="default" variant="destructive" onClick={handleSignOut}>
-      Sign Out
-    </Button>
+    <DropdownMenuItem onClick={handleSignOut}>
+      <LogOutIcon size={15} />
+      <span>Log Out</span>
+    </DropdownMenuItem>
   );
 }
-
-export {SignOut};

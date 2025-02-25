@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import {buttonVariants} from "@/components/ui/button";
+import Footer from "@/components/Footer";
 
 export default async function HomePage() {
   return (
@@ -20,9 +21,7 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
-      <footer className="fixed bottom-0 flex w-full justify-center border-t p-4">
-        <div>this is a footer homepage</div>
-      </footer>
+      <Footer />
     </main>
   );
 }
