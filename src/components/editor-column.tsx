@@ -7,7 +7,13 @@ import Settings from "./settings";
 import {ResizablePanel} from "./ui/resizable";
 import Editor from "./editor";
 
+import {useSnippet} from "@/context/useSnippetContext";
+
 function EditorColumn() {
+  const {selectedSnippet} = useSnippet();
+
+  console.log(selectedSnippet?.content);
+
   return (
     <ResizablePanel className="hidden lg:block" defaultSize={65}>
       <section className="grid grid-rows-[auto_1fr]">
@@ -33,7 +39,7 @@ function EditorColumn() {
             </div>
           </div>
         </header>
-        <Editor />
+        <Editor snippetContent={selectedSnippet?.content as string} />
       </section>
     </ResizablePanel>
   );

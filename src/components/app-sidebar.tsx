@@ -9,7 +9,6 @@ import {
   Forward,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
 
 import {Button} from "./ui/button";
 import {
@@ -46,105 +45,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {Collapsible} from "@/components/ui/collapsible";
-
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "PlayGround",
-      url: "#",
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-};
-
-const headerHeight = 65;
+import {
+  getCollectionByUserId,
+  getFoldersByCollectionId,
+} from "@/lib/colletions-mock-data/retrieving-functions";
+import {users} from "@/lib/colletions-mock-data/mock-data-users";
 
 export function AppSidebar() {
+  const user = users[0];
+  const mockUserId = user.id;
+  const getUserCollections = getCollectionByUserId(mockUserId);
+
+  const folders = (folderId: string) => getFoldersByCollectionId(folderId);
+
   return (
     <Sidebar
       style={{
-        paddingTop: headerHeight,
+        paddingTop: "var(--layout-header-height)",
       }}
     >
       <Tabs defaultValue="test1">
@@ -197,26 +114,26 @@ export function AppSidebar() {
             <SidebarGroup>
               <SidebarGroupLabel>Sections</SidebarGroupLabel>
               <SidebarMenu>
-                {data.navMain.map((item) => (
+                {getUserCollections?.map((collection) => (
                   <Collapsible
-                    key={item.title}
+                    key={collection.id}
                     asChild
                     className="group/collapsible"
-                    defaultOpen={item.isActive}
+                    defaultOpen={collection.isDefault}
                   >
                     <SidebarMenuItem>
                       <CollapsibleTrigger asChild>
-                        <SidebarMenuButton tooltip={item.title}>
+                        <SidebarMenuButton tooltip={collection.name}>
                           <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                          <span>{item.title}</span>
+                          <span>{collection.name}</span>
                         </SidebarMenuButton>
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <SidebarMenuSub>
-                          {item.items?.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
+                          {folders(collection.id)?.map((folder) => (
+                            <SidebarMenuSubItem key={folder.name}>
                               <SidebarMenuSubButton asChild>
-                                <span>{subItem.title}</span>
+                                <span>{folder.name}</span>
                               </SidebarMenuSubButton>
                             </SidebarMenuSubItem>
                           ))}

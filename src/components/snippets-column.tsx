@@ -1,5 +1,5 @@
 "use client";
-import {Plus, Search} from "lucide-react";
+import {Bird, Code, Plus, Search} from "lucide-react";
 import useBreakpoint from "use-breakpoint";
 
 // import DrawerEditor from "./drawer-editor";
@@ -21,6 +21,11 @@ import {ModeToggle} from "./theme-toggle";
 import {ScrollArea} from "./ui/scroll-area";
 
 import {cn} from "@/lib/utils";
+import {
+  getSnippetsByFolderId,
+  getTagsForSnippet,
+} from "@/lib/colletions-mock-data/retrieving-functions";
+import {useSnippet} from "@/context/useSnippetContext";
 const BREAKPOINTS = {xl: 1280, xxl: 1536};
 
 function SnippetsColumn() {
@@ -37,7 +42,15 @@ function SnippetsColumn() {
     }
   };
 
-  const headerHeight = 171;
+  /**
+   * JAVASCRIPT FOLDER AS IF IT WAS PASSED RETRIEVED FROM THE SERVER?
+   */
+  const folderId = "f12a3b4c-5d6e-7890-fghi-jk0123456789";
+
+  const snippets = getSnippetsByFolderId(folderId);
+  const tags = (snippetId: string) => getTagsForSnippet(snippetId);
+
+  const {setSelectedSnippet} = useSnippet();
 
   return (
     <ResizablePanel defaultSize={35} maxSize={50} minSize={draftBP(breakpoint)}>
@@ -87,17 +100,32 @@ function SnippetsColumn() {
               "h-[calc(100vh-var(--snippets-header-height))]",
             )}
           >
-            {Array.from({length: 50}, (_, index: number) => {
+            {snippets.map((snippet) => {
               return (
+                // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
                 <li
-                  key={index}
+                  key={snippet.id}
                   className="hover:bg-muted-foreground/10 border-border rounded-sm border p-2 transition-colors"
+                  onClick={() => setSelectedSnippet(snippet)}
                 >
-                  <p className="font-medium">{`Some title: ${index}`}</p>
-                  <p className="text-muted-foreground text-sm">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rerum, voluptatem!
-                  </p>
+                  <h2 className="text-lg font-medium tracking-tight">{snippet.title}</h2>
+                  <div className="mt-1">
+                    <p className="text-muted-foreground text-sm">{snippet.description}</p>
+                  </div>
                   {/* <DrawerEditor /> */}
+                  <div className="mt-3 flex gap-1.5">
+                    {tags(snippet.id).map((tag) => (
+                      <div
+                        key={tag.id}
+                        className="text-primary-background bg-primary-foreground rounded-sm p-0.5 px-1 text-xs"
+                      >
+                        {tag.name}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-muted-foreground mt-3 flex items-center gap-1 text-sm capitalize">
+                    <Bird size={18} /> Collection Name
+                  </div>
                 </li>
               );
             })}
