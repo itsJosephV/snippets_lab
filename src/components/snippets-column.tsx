@@ -19,6 +19,8 @@ import Settings from "./settings";
 import {ResizablePanel} from "./ui/resizable";
 import {ModeToggle} from "./theme-toggle";
 import {ScrollArea} from "./ui/scroll-area";
+
+import {cn} from "@/lib/utils";
 const BREAKPOINTS = {xl: 1280, xxl: 1536};
 
 function SnippetsColumn() {
@@ -80,7 +82,10 @@ function SnippetsColumn() {
         </header>
         <ScrollArea>
           <ul
-            className={`flex h-[calc(100vh-${headerHeight}px)] flex-col gap-3 overflow-y-scroll p-2`}
+            className={cn(
+              "flex flex-col gap-3 overflow-y-scroll p-2",
+              "h-[calc(100vh-var(--snippets-header-height))]",
+            )}
           >
             {Array.from({length: 50}, (_, index: number) => {
               return (

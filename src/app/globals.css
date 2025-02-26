@@ -85,6 +85,11 @@
 
 @layer base {
   :root {
+    /* Header-heights */
+    --layout-header-height: 65px;
+    --snippets-header-height: calc(106px + var(--layout-header-height));
+    --editor-header-height: calc(53px + var(--layout-header-height));
+    /* Colors */
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;

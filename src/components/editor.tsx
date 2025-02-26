@@ -6,8 +6,7 @@ import {githubDark, githubLight} from "@uiw/codemirror-theme-github";
 import {javascript} from "@codemirror/lang-javascript";
 
 import MOCK_CODE_TEST from "@/lib/mock-data";
-
-const headerHeight = 118;
+import {cn} from "@/lib/utils";
 
 function Editor() {
   const [mockData] = useState(MOCK_CODE_TEST);
@@ -17,7 +16,7 @@ function Editor() {
   return (
     <CodeMirror
       basicSetup
-      className={`h-[calc(100vh-${headerHeight}px)] overflow-y-scroll`}
+      className={cn(`overflow-y-scroll`, "h-[calc(100vh-var(--editor-header-height))]")}
       extensions={[javascript({jsx: true})]}
       height="100%"
       theme={codeMirrorTheme}
