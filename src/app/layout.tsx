@@ -37,8 +37,7 @@ export default async function RootLayout({children}: {children: React.ReactNode}
       <body
         className={cn(
           `font-sans ${interVariable.variable} ${geistMonoVariable.variable} antialiased`,
-          // "bg-white dark:bg-neutral-900",
-          // "selection:bg-neutral-200 dark:selection:bg-neutral-700",
+          "grid h-full max-h-screen grid-rows-[auto,1fr]",
         )}
       >
         <ThemeProvider
@@ -49,6 +48,7 @@ export default async function RootLayout({children}: {children: React.ReactNode}
         >
           <Header />
           {children}
+
           <ToasterComponent />
         </ThemeProvider>
       </body>

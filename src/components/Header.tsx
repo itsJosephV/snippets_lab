@@ -8,7 +8,7 @@ import {cn} from "@/lib/utils";
 
 async function Header() {
   return (
-    <nav className="sticky top-0 z-20 flex w-full border-b leading-[4rem]">
+    <nav className="bg-background relative z-20 flex w-full border-b leading-[4rem]">
       <div className={cn("flex w-full items-center justify-between", "container")}>
         <div className="flex items-center">
           <Link className="font-mono font-semibold" href="/">

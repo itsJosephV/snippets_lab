@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 
 export default async function HomePage() {
   return (
-    <main className="relative h-[calc(100vh-65px)]">
+    <main>
       <section className="flex flex-col items-center pt-16 text-center">
         <h1 className="text-4xl">This is the title for home page</h1>
         <p>some content</p>
