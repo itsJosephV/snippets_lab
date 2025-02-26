@@ -2,6 +2,8 @@ import {snippets, folders, snippetTags, tags, collections} from "./mock-data-col
 
 import {Collection, Folder, Snippet, Tag} from "@/types";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export function getCollectionByUserId(userId: string): Collection[] | undefined {
   const collection = collections.filter((collection) => collection.userId === userId);
 
@@ -9,7 +11,9 @@ export function getCollectionByUserId(userId: string): Collection[] | undefined 
 }
 
 // 1. Getting all snippets for a specific folder
-export function getSnippetsByFolderId(folderId: string): Snippet[] {
+export async function getSnippetsByFolderId(folderId: string): Promise<Snippet[]> {
+  await sleep(2000);
+
   return snippets.filter((snippet) => snippet.folderId === folderId);
 }
 

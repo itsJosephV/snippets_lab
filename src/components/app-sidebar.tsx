@@ -1,4 +1,3 @@
-"use client";
 import {
   Plus,
   Star,
@@ -20,6 +19,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import {CollapsibleContent, CollapsibleTrigger} from "./ui/collapsible";
+import FolderItem from "./folder-item";
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {
@@ -131,11 +131,7 @@ export function AppSidebar() {
                       <CollapsibleContent>
                         <SidebarMenuSub>
                           {folders(collection.id)?.map((folder) => (
-                            <SidebarMenuSubItem key={folder.name}>
-                              <SidebarMenuSubButton asChild>
-                                <span>{folder.name}</span>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
+                            <FolderItem key={folder.id} folder={folder} />
                           ))}
                         </SidebarMenuSub>
                       </CollapsibleContent>
