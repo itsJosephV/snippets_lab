@@ -27,8 +27,12 @@ export async function createCollection({collection}: {collection: string}) {
     await db.collection.create({
       data: {
         name: collection,
-        userId: session.user.id,
         isDefault: false,
+        user: {
+          connect: {
+            id: session.user.id,
+          },
+        },
       },
     });
 

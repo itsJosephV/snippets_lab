@@ -5,12 +5,14 @@ import {useRouter, usePathname, useSearchParams} from "next/navigation";
 
 import {SidebarMenuSubItem, SidebarMenuSubButton} from "./ui/sidebar";
 
-import {Folder} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
 
-type FolderItemProps = {
-  folder: Folder;
-};
+interface FolderItemProps {
+  id: string;
+  name: string;
+  description: string | null;
+  collectionId: string;
+}
 
 const createUrl = (pathname: string, params: URLSearchParams) => {
   const paramsString = params.toString();
@@ -19,7 +21,7 @@ const createUrl = (pathname: string, params: URLSearchParams) => {
   return `${pathname}${queryString}`;
 };
 
-function FolderItem({folder}: FolderItemProps) {
+function FolderItem({folder}: {folder: FolderItemProps}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -33,7 +35,7 @@ function FolderItem({folder}: FolderItemProps) {
     }
     const updatedSearchParams = new URLSearchParams(searchParams.toString());
 
-    updatedSearchParams.set("folderId", folder.id);
+    updatedSearchParams.set("folderId", folder.id as string);
     const newUrl = createUrl(pathname, updatedSearchParams);
 
     setSelectedSnippet(null);

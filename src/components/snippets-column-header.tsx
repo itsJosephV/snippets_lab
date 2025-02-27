@@ -1,14 +1,13 @@
 "use server";
-import React from "react";
 
-import {getFolderByFolderId} from "@/lib/colletions-mock-data/retrieving-functions";
+import {getFolderTitle} from "@/lib/db/actions/folders/get-folder-title";
 
 async function SnippetsColumnHeader({folderId}: {folderId: string}) {
-  const folder = await getFolderByFolderId(folderId);
+  const folderTitle = await getFolderTitle(folderId);
 
   return (
     <div className="ml-2 flex flex-1">
-      <p className="text-sm">{folder?.name}</p>
+      <p className="text-sm">{folderTitle}</p>
     </div>
   );
 }

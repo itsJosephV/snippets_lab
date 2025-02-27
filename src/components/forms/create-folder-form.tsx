@@ -84,10 +84,12 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
                   </FormItem>
                 )}
               />
-              <div className="flex justify-end gap-2">
-                <Button type="button" variant="ghost" onClick={() => setDialogOpen(false)}>
+              <div
+              //  className="flex justify-end gap-2"
+              >
+                {/* <Button type="button" variant="ghost" onClick={() => setDialogOpen(false)}>
                   Cancel
-                </Button>
+                </Button> */}
                 <Button disabled={isSubmitting} type="submit">
                   {isSubmitting ? (
                     <>

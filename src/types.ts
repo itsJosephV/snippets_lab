@@ -24,13 +24,24 @@ export type Snippet = {
   updatedAt: Date;
 };
 
+/**
+ * model Folder {
+  id           String    @id @default(uuid())
+  name         String
+  description  String?
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id])
+  snippets     Snippet[]
+}
+ */
+
 export type Folder = {
   id: string;
   name: string;
   collectionId: string;
-  description?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  description: string | null;
+  // createdAt?: Date;
+  // updatedAt?: Date;
 };
 
 export type Collection = {

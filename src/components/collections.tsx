@@ -1,6 +1,6 @@
 "use server";
 import React from "react";
-import {ChevronRight, Folder, Forward, MoreHorizontal, Trash2} from "lucide-react";
+import {ChevronRight, MoreHorizontal, Trash2} from "lucide-react";
 
 import {
   SidebarMenu,
@@ -20,21 +20,10 @@ import {
 } from "./ui/dropdown-menu";
 import {CreateFolderForm} from "./forms/create-folder-form";
 
-import {
-  // getCollectionByUserId,
-  getFoldersByCollectionId,
-} from "@/lib/colletions-mock-data/retrieving-functions";
-// import {users} from "@/lib/colletions-mock-data/mock-data-users";
-// import {auth} from "@/lib/auth";
 import {getCollections} from "@/lib/db/actions/collections/get-collectionts";
 
 async function Collections() {
   const collections = await getCollections();
-  // const user = users[0];
-  // const mockUserId = user.id;
-  // const getUserCollections = await getCollectionByUserId(mockUserId);
-
-  const folders = (folderId: string) => getFoldersByCollectionId(folderId);
 
   return (
     <SidebarMenu>
@@ -54,7 +43,7 @@ async function Collections() {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <SidebarMenuSub>
-                {folders(collection.id)?.map((folder) => (
+                {collection.folders.map((folder) => (
                   <FolderItem key={folder.id} folder={folder} />
                 ))}
               </SidebarMenuSub>
@@ -69,7 +58,7 @@ async function Collections() {
               <DropdownMenuContent align="start" className="w-48 rounded-lg sm:w-56" side="right">
                 {/* <Folder className="text-muted-foreground" />
                   <span>Create folder</span> */}
-                <CreateFolderForm collectionId={collection.id} />
+                <CreateFolderForm collectionId={collection.id as string} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Trash2 className="text-muted-foreground" />
