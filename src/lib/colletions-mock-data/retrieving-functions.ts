@@ -22,6 +22,12 @@ export function getFoldersByCollectionId(collectionId: string): Folder[] {
   return folders.filter((folder) => folder.collectionId === collectionId);
 }
 
+export async function getFolderByFolderId(folderId: string): Promise<Folder | undefined> {
+  await sleep(2000);
+
+  return folders.find((folder) => folder.id === folderId);
+}
+
 // 3. Getting all tags for a specific snippet
 export function getTagsForSnippet(snippetId: string): Tag[] {
   const tagIds = snippetTags.filter((st) => st.snippetId === snippetId).map((st) => st.tagId);

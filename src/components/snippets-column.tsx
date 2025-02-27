@@ -1,7 +1,7 @@
 "use server";
-import {LoaderIcon, Plus, Search} from "lucide-react";
 
 // import DrawerEditor from "./drawer-editor";
+import {LoaderIcon, Plus, Search} from "lucide-react";
 import {Suspense} from "react";
 
 import {SidebarTrigger} from "./ui/sidebar";
@@ -21,19 +21,26 @@ import {ModeToggle} from "./theme-toggle";
 import {ScrollArea} from "./ui/scroll-area";
 import BPResizablePanel from "./BPResizablePanel";
 import SnippetsLits from "./snippets-list";
+import SnippetsColumnHeader from "./snippets-column-header";
+import {Skeleton} from "./ui/skeleton";
 
 async function SnippetsColumn({folderId}: {folderId: string}) {
-  // ASYNC FUNCTION FETCHING SNIPPETS FROM THE SERVER
-
   return (
     <BPResizablePanel>
       <section className="grid grid-rows-[auto_1fr]">
         <header>
           <div className="border-border flex items-center border-b p-2">
-            <div className="flex flex-1 items-center gap-1">
-              <SidebarTrigger />
-              <p className="text-sm">Snippets Header</p>
-            </div>
+            <SidebarTrigger />
+            <Suspense
+              key={folderId}
+              fallback={
+                <div className="ml-2 flex flex-1">
+                  <Skeleton className="h-[20px] w-[120px] rounded-md" />
+                </div>
+              }
+            >
+              <SnippetsColumnHeader folderId={folderId} />
+            </Suspense>
             <div className="flex h-full lg:block">
               <div className="space-x-1.5 lg:hidden">
                 <Settings />
