@@ -1,8 +1,9 @@
-"use client";
-import {Plus, Search} from "lucide-react";
-import useBreakpoint from "use-breakpoint";
+"use server";
 
 // import DrawerEditor from "./drawer-editor";
+import {LoaderIcon, Plus, Search} from "lucide-react";
+import {Suspense} from "react";
+
 import {SidebarTrigger} from "./ui/sidebar";
 import {Input} from "./ui/input";
 import {Button} from "./ui/button";
@@ -16,38 +17,30 @@ import {
 } from "./ui/dialog";
 import {Separator} from "./ui/separator";
 import Settings from "./settings";
-import {ResizablePanel} from "./ui/resizable";
 import {ModeToggle} from "./theme-toggle";
 import {ScrollArea} from "./ui/scroll-area";
+import BPResizablePanel from "./BPResizablePanel";
+import SnippetsLits from "./snippets-list";
+import SnippetsColumnHeader from "./snippets-column-header";
+import {Skeleton} from "./ui/skeleton";
 
-import {cn} from "@/lib/utils";
-const BREAKPOINTS = {xl: 1280, xxl: 1536};
-
-function SnippetsColumn() {
-  const {breakpoint} = useBreakpoint(BREAKPOINTS);
-
-  const draftBP = (bp: "xl" | "xxl" | null) => {
-    switch (bp) {
-      case "xl":
-        return 25;
-      case "xxl":
-        return 20;
-      default:
-        return 35;
-    }
-  };
-
-  const headerHeight = 171;
-
+async function SnippetsColumn({folderId}: {folderId: string}) {
   return (
-    <ResizablePanel defaultSize={35} maxSize={50} minSize={draftBP(breakpoint)}>
+    <BPResizablePanel>
       <section className="grid grid-rows-[auto_1fr]">
         <header>
           <div className="border-border flex items-center border-b p-2">
-            <div className="flex flex-1 items-center gap-1">
-              <SidebarTrigger />
-              <p className="text-sm">Snippets Header</p>
-            </div>
+            <SidebarTrigger />
+            <Suspense
+              key={folderId}
+              fallback={
+                <div className="ml-2 flex flex-1">
+                  <Skeleton className="h-[20px] w-[120px] rounded-md" />
+                </div>
+              }
+            >
+              <SnippetsColumnHeader folderId={folderId} />
+            </Suspense>
             <div className="flex h-full lg:block">
               <div className="space-x-1.5 lg:hidden">
                 <Settings />
@@ -81,30 +74,19 @@ function SnippetsColumn() {
           </div>
         </header>
         <ScrollArea>
-          <ul
-            className={cn(
-              "flex flex-col gap-3 overflow-y-scroll p-2",
-              "h-[calc(100vh-var(--snippets-header-height))]",
-            )}
+          <Suspense
+            key={folderId}
+            fallback={
+              <div className="mt-20 flex w-full justify-center">
+                <LoaderIcon className="animate-spin" />
+              </div>
+            }
           >
-            {Array.from({length: 50}, (_, index: number) => {
-              return (
-                <li
-                  key={index}
-                  className="hover:bg-muted-foreground/10 border-border rounded-sm border p-2 transition-colors"
-                >
-                  <p className="font-medium">{`Some title: ${index}`}</p>
-                  <p className="text-muted-foreground text-sm">
-                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Rerum, voluptatem!
-                  </p>
-                  {/* <DrawerEditor /> */}
-                </li>
-              );
-            })}
-          </ul>
+            <SnippetsLits folderId={folderId} />
+          </Suspense>
         </ScrollArea>
       </section>
-    </ResizablePanel>
+    </BPResizablePanel>
   );
 }
 
