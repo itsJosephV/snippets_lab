@@ -6,7 +6,7 @@ import {Toaster} from "sonner";
 function ToasterComponent() {
   const {theme} = useTheme();
 
-  return <Toaster position="bottom-right" theme={theme === "dark" ? "dark" : "light"} />;
+  return <Toaster richColors position="bottom-right" theme={theme === "dark" ? "dark" : "light"} />;
 }
 
 export default ToasterComponent;

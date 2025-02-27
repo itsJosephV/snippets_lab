@@ -4,7 +4,8 @@ import {Collection, Folder, Snippet, Tag} from "@/types";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export function getCollectionByUserId(userId: string): Collection[] | undefined {
+export async function getCollectionByUserId(userId: string): Promise<Collection[] | undefined> {
+  await sleep(2000);
   const collection = collections.filter((collection) => collection.userId === userId);
 
   return collection || undefined;

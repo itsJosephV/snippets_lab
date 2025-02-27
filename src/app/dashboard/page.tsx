@@ -1,8 +1,6 @@
-import {Suspense} from "react";
-
 import {AppSidebar} from "@/components/app-sidebar";
 import EditorColumn from "@/components/editor-column";
-import SnippetsColumn from "@/components/snippets-column";
+import SnippetsPanel from "@/components/snippets-panel";
 import {ResizableHandle, ResizablePanelGroup} from "@/components/ui/resizable";
 
 interface SearchParams {
@@ -16,7 +14,7 @@ async function DashboardPage({searchParams}: {searchParams: Promise<SearchParams
     <>
       <AppSidebar />
       <ResizablePanelGroup direction="horizontal">
-        <SnippetsColumn folderId={folderId} />
+        <SnippetsPanel folderId={folderId} />
         <ResizableHandle className="hidden lg:block" />
         <EditorColumn />
       </ResizablePanelGroup>

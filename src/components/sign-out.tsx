@@ -4,7 +4,7 @@ import {toast} from "sonner";
 
 import {DropdownMenuItem} from "./ui/dropdown-menu";
 
-import {signOutAction} from "@/lib/actions";
+import {signOutAction} from "@/lib/db/actions/auth/sign-out";
 
 export function SignOut() {
   const handleSignOut = async () => {

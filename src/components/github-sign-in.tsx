@@ -6,7 +6,7 @@ import {useSearchParams} from "next/navigation";
 import {Github} from "./ui/github";
 
 import {Button} from "@/components/ui/button";
-import {signInAction} from "@/lib/actions";
+import {signInAction} from "@/lib/db/actions/auth/sign-in";
 
 function GithubSignIn() {
   const searchParams = useSearchParams();
