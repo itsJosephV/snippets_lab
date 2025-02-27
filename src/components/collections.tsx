@@ -1,10 +1,24 @@
 "use server";
 import React from "react";
-import {ChevronRight} from "lucide-react";
+import {ChevronRight, Folder, Forward, MoreHorizontal, Trash2} from "lucide-react";
 
-import {SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub} from "./ui/sidebar";
+import {
+  SidebarMenu,
+  SidebarMenuAction,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+} from "./ui/sidebar";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "./ui/collapsible";
 import FolderItem from "./folder-item";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import {CreateFolderForm} from "./forms/create-folder-form";
 
 import {
   // getCollectionByUserId,
@@ -45,7 +59,7 @@ async function Collections() {
                 ))}
               </SidebarMenuSub>
             </CollapsibleContent>
-            {/* <DropdownMenu>
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuAction showOnHover>
                   <MoreHorizontal />
@@ -53,21 +67,16 @@ async function Collections() {
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-48 rounded-lg sm:w-56" side="right">
-                <DropdownMenuItem>
-                  <Folder className="text-muted-foreground" />
-                  <span>View Project</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Forward className="text-muted-foreground" />
-                  <span>Share Project</span>
-                </DropdownMenuItem>
+                {/* <Folder className="text-muted-foreground" />
+                  <span>Create folder</span> */}
+                <CreateFolderForm collectionId={collection.id} />
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <Trash2 className="text-muted-foreground" />
                   <span>Delete Project</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu> */}
+            </DropdownMenu>
           </SidebarMenuItem>
         </Collapsible>
       ))}
