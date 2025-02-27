@@ -4,7 +4,6 @@ import db from "@/lib/db";
 
 export async function getFolderTitle(folderId: string) {
   try {
-    // 0. Validar folderId
     if (!folderId || typeof folderId !== "string") {
       return null;
     }
