@@ -20,6 +20,7 @@ import SnippetsLits from "./snippets-list";
 import SnippetsColumnHeader from "./snippets-column-header";
 import {Skeleton} from "./ui/skeleton";
 import SnippetsPanelContainer from "./snippets-panel-container";
+import {CreateSnippetForm} from "./forms/create-snippet-form";
 
 import {cn} from "@/lib/utils";
 
@@ -40,7 +41,7 @@ function SnippetsPanel({folderId}: {folderId: string}) {
             <div className="py-1 lg:hidden">
               <Separator className="mx-2" orientation="vertical" />
             </div>
-            <Dialog>
+            {/* <Dialog>
               <DialogTrigger asChild>
                 <Button size="icon" variant="secondary">
                   <Plus />
@@ -55,7 +56,8 @@ function SnippetsPanel({folderId}: {folderId: string}) {
                   </DialogDescription>
                 </DialogHeader>
               </DialogContent>
-            </Dialog>
+            </Dialog> */}
+            <CreateSnippetForm folderId={folderId} />
           </div>
         </div>
         <div className="border-border relative border-b p-2">

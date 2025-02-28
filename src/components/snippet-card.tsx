@@ -3,10 +3,12 @@ import React from "react";
 import {Bird} from "lucide-react";
 
 import {useSnippet} from "@/context/useSnippetContext";
-import {Snippet, Tag} from "@/types";
+import {Snippet} from "@/types";
 
 function SnippetCard({snippet}: {snippet: Snippet}) {
   const {setSelectedSnippet} = useSnippet();
+
+  const {name: collectionName} = snippet.folder.collection;
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
@@ -15,7 +17,7 @@ function SnippetCard({snippet}: {snippet: Snippet}) {
       className="hover:bg-muted-foreground/10 border-border rounded-sm border p-2 transition-colors"
       onClick={() => setSelectedSnippet(snippet)}
     >
-      <h2 className="text-lg font-medium tracking-tight">{snippet.title}</h2>
+      <h2 className="text-base font-medium tracking-tight capitalize">{snippet.title}</h2>
       <div className="mt-1">
         <p className="text-muted-foreground text-sm">{snippet.description}</p>
       </div>
@@ -35,7 +37,7 @@ function SnippetCard({snippet}: {snippet: Snippet}) {
         ))}
       </div> */}
       <div className="text-muted-foreground mt-3 flex items-center gap-1 text-sm capitalize">
-        <Bird size={18} /> Collection Name
+        <Bird size={18} /> {collectionName}
       </div>
     </li>
   );

@@ -5,8 +5,9 @@ import SnippetCard from "./snippet-card";
 
 import {cn} from "@/lib/utils";
 import {getSnippetsByFolderId} from "@/lib/colletions-mock-data/retrieving-functions";
+import {getSnippets} from "@/lib/db/actions/snippets/get-snippets";
 async function SnippetsLits({folderId}: {folderId: string}) {
-  const snippets = await getSnippetsByFolderId(folderId);
+  const snippets = await getSnippets({folderId});
 
   return (
     <ul
@@ -15,9 +16,10 @@ async function SnippetsLits({folderId}: {folderId: string}) {
         "h-[calc(100vh-var(--snippets-header-height))]",
       )}
     >
-      {snippets.map((snippet) => {
-        return <SnippetCard key={snippet.id} snippet={snippet} />;
-      })}
+      {snippets &&
+        snippets.map((snippet) => {
+          return <SnippetCard key={snippet.id} snippet={snippet} />;
+        })}
     </ul>
   );
 }
