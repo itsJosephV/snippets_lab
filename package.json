@@ -58,6 +58,7 @@
     "embla-carousel-react": "^8.5.2",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.475.0",
+    "mitt": "^3.0.1",
     "next": "15.2.0-canary.64",
     "next-auth": "5.0.0-beta.25",
     "next-themes": "^0.4.4",

@@ -1,7 +1,5 @@
 "use server";
 
-import {unstable_cache} from "next/cache";
-
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
 
@@ -38,7 +36,7 @@ export const getSnippets = async ({folderId}: {folderId: string}) => {
         },
       },
       orderBy: {
-        updatedAt: "desc",
+        createdAt: "desc",
       },
     });
 

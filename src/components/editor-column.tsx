@@ -1,7 +1,7 @@
 "use client";
 
 import {LoaderIcon, Lock, Star, Tag} from "lucide-react";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
 
 import {Button} from "./ui/button";
@@ -10,8 +10,11 @@ import Settings from "./settings";
 import {ResizablePanel} from "./ui/resizable";
 import Editor from "./editor";
 
+import {emitter} from "@/lib/events";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetContent} from "@/lib/db/actions/snippets/update-snippet-content";
+
+const DEBOUNCE_TIME = 1200;
 
 const saveContent = async (snippetId: string, newContent: string, newUpdateDate: Date) => {
   const response = await updateSnippetContent({
@@ -24,7 +27,9 @@ const saveContent = async (snippetId: string, newContent: string, newUpdateDate:
 };
 
 function EditorColumn() {
-  const {selectedSnippet, setSelectedSnippet, isSaving, setIsSaving} = useSnippet();
+  const {selectedSnippet, setSelectedSnippet} = useSnippet();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleContentChange = (value: string) => {
@@ -32,7 +37,14 @@ function EditorColumn() {
 
     const newUpdateDate = new Date();
 
-    // Optimistic update
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      emitter.emit("UNLOCK_EDITOR");
+    }
+
+    emitter.emit("LOCK_EDITOR");
+
+    //? Optimistic update
     if (selectedSnippet) {
       setSelectedSnippet({
         ...selectedSnippet!,
@@ -41,19 +53,16 @@ function EditorColumn() {
       });
     }
 
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-
     saveTimeoutRef.current = setTimeout(async () => {
       try {
         setIsSaving(true);
+        if (value === selectedSnippet.content) return;
 
         await saveContent(selectedSnippet.id, value, newUpdateDate);
 
         toast.success("Cambios guardados");
       } catch (error) {
-        // Revert optimistic update
+        //? Revert optimistic update
         if (selectedSnippet) {
           setSelectedSnippet({
             ...selectedSnippet!,
@@ -64,9 +73,19 @@ function EditorColumn() {
         toast.error(`Error guardando cambios: ${error}`);
       } finally {
         setIsSaving(false);
+        emitter.emit("UNLOCK_EDITOR");
       }
-    }, 500);
+    }, DEBOUNCE_TIME);
   };
+
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        emitter.emit("UNLOCK_EDITOR");
+      }
+    };
+  }, []);
 
   return (
     <ResizablePanel className="hidden lg:block" defaultSize={65}>

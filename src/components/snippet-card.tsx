@@ -6,13 +6,16 @@ import {Bird} from "lucide-react";
 
 import {useSnippet} from "@/context/useSnippetContext";
 import {cn} from "@/lib/utils";
+import {useLocker} from "@/hooks/use-locker";
 
 type SnippetCardProps = {
   snippet: Snippet & {folder: {collection: {name: string}}};
 };
 
 function SnippetCard({snippet}: SnippetCardProps) {
-  const {setSelectedSnippet, selectedSnippet, isSaving} = useSnippet();
+  const {setSelectedSnippet, selectedSnippet} = useSnippet();
+
+  const isLocked = useLocker();
 
   const {name: collectionName} = snippet.folder.collection;
 
@@ -30,7 +33,7 @@ function SnippetCard({snippet}: SnippetCardProps) {
       className={cn(
         "hover:bg-muted-foreground/10 border-border rounded-sm border p-2 transition-colors",
         {
-          "pointer-events-none": isSaving,
+          "pointer-events-none": isLocked,
         },
       )}
       onClick={handleSnippetSelection}
