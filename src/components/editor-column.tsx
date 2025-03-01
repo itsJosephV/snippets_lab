@@ -1,5 +1,7 @@
 "use client";
 
+import type {Snippet} from "@prisma/client";
+
 import {LoaderIcon, Lock, Star, Tag} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
@@ -13,24 +15,18 @@ import Editor from "./editor";
 import {emitter} from "@/lib/events";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetContent} from "@/lib/db/actions/snippets/update-snippet-content";
-
 const DEBOUNCE_TIME = 1200;
-
-const saveContent = async (snippetId: string, newContent: string, newUpdateDate: Date) => {
-  const response = await updateSnippetContent({
-    snippetId,
-    newContent,
-    newUpdateDate,
-  });
-
-  return response;
-};
 
 function EditorColumn() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const updateSnippetState = (callback: (snippet: typeof selectedSnippet) => void) => {
+    if (!selectedSnippet) return;
+    callback(selectedSnippet);
+  };
 
   const handleContentChange = (value: string) => {
     if (!selectedSnippet?.id) return;
@@ -45,30 +41,42 @@ function EditorColumn() {
     emitter.emit("LOCK_EDITOR");
 
     //? Optimistic update
-    if (selectedSnippet) {
+    updateSnippetState((snippet) => {
       setSelectedSnippet({
-        ...selectedSnippet!,
+        ...(snippet as Snippet),
         content: value,
-        updatedAt: newUpdateDate,
       });
-    }
+    });
 
     saveTimeoutRef.current = setTimeout(async () => {
       try {
         setIsSaving(true);
-        if (value === selectedSnippet.content) return;
 
-        await saveContent(selectedSnippet.id, value, newUpdateDate);
+        const response = await updateSnippetContent({
+          snippetId: selectedSnippet.id,
+          newContent: value,
+          newUpdateDate,
+        });
 
-        toast.success("Cambios guardados");
+        updateSnippetState((snippet) => {
+          setSelectedSnippet({
+            ...(snippet as Snippet),
+            content: response.content,
+            updatedAt: response.updatedAt,
+          });
+        });
+
+        // eslint-disable-next-line no-console
+        console.log(`Saved content for snippet: ${selectedSnippet.id}`);
       } catch (error) {
         //? Revert optimistic update
-        if (selectedSnippet) {
+        updateSnippetState((snippet) => {
           setSelectedSnippet({
-            ...selectedSnippet!,
-            content: selectedSnippet.content,
+            ...(snippet as Snippet),
+            content: selectedSnippet?.content,
+            updatedAt: selectedSnippet?.updatedAt,
           });
-        }
+        });
 
         toast.error(`Error guardando cambios: ${error}`);
       } finally {

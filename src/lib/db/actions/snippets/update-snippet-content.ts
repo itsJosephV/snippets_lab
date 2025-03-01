@@ -1,5 +1,6 @@
 "use server";
 import {revalidatePath} from "next/cache";
+import {Snippet} from "@prisma/client";
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
@@ -12,7 +13,7 @@ export async function updateSnippetContent({
   snippetId: string;
   newContent: string;
   newUpdateDate: Date;
-}) {
+}): Promise<Snippet> {
   const session = await auth();
 
   if (!session?.user?.id) {
