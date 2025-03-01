@@ -1,21 +1,42 @@
 "use client";
+import type {Snippet} from "@prisma/client";
+
 import React from "react";
 import {Bird} from "lucide-react";
 
 import {useSnippet} from "@/context/useSnippetContext";
-import {Snippet} from "@/types";
+import {cn} from "@/lib/utils";
+import {useLocker} from "@/hooks/use-locker";
 
-function SnippetCard({snippet}: {snippet: Snippet}) {
-  const {setSelectedSnippet} = useSnippet();
+type SnippetCardProps = {
+  snippet: Snippet & {folder: {collection: {name: string}}};
+};
+
+function SnippetCard({snippet}: SnippetCardProps) {
+  const {setSelectedSnippet, selectedSnippet} = useSnippet();
+
+  const isLocked = useLocker();
 
   const {name: collectionName} = snippet.folder.collection;
+
+  const handleSnippetSelection = () => {
+    if (selectedSnippet?.id === snippet.id) {
+      return;
+    }
+    setSelectedSnippet(snippet);
+  };
 
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <li
       key={snippet.id}
-      className="hover:bg-muted-foreground/10 border-border rounded-sm border p-2 transition-colors"
-      onClick={() => setSelectedSnippet(snippet)}
+      className={cn(
+        "hover:bg-muted-foreground/10 border-border rounded-sm border p-2 transition-colors",
+        {
+          "pointer-events-none": isLocked,
+        },
+      )}
+      onClick={handleSnippetSelection}
     >
       <h2 className="text-base font-medium tracking-tight capitalize">{snippet.title}</h2>
       <div className="mt-1">

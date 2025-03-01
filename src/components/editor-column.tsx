@@ -1,5 +1,8 @@
 "use client";
-import {Lock, Star, Tag} from "lucide-react";
+
+import {LoaderIcon, Lock, Star, Tag} from "lucide-react";
+import {useEffect, useRef, useState} from "react";
+import {toast} from "sonner";
 
 import {Button} from "./ui/button";
 import {Separator} from "./ui/separator";
@@ -7,15 +10,110 @@ import Settings from "./settings";
 import {ResizablePanel} from "./ui/resizable";
 import Editor from "./editor";
 
+import {emitter} from "@/lib/events";
 import {useSnippet} from "@/context/useSnippetContext";
+import {updateSnippetContent} from "@/lib/db/actions/snippets/update-snippet-content";
+
+const DEBOUNCE_TIME = 1200;
+
+const saveContent = async (snippetId: string, newContent: string, newUpdateDate: Date) => {
+  const response = await updateSnippetContent({
+    snippetId,
+    newContent,
+    newUpdateDate,
+  });
+
+  return response;
+};
+
 function EditorColumn() {
-  const {selectedSnippet} = useSnippet();
+  const {selectedSnippet, setSelectedSnippet} = useSnippet();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleContentChange = (value: string) => {
+    if (!selectedSnippet?.id) return;
+
+    const newUpdateDate = new Date();
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      emitter.emit("UNLOCK_EDITOR");
+    }
+
+    emitter.emit("LOCK_EDITOR");
+
+    //? Optimistic update
+    if (selectedSnippet) {
+      setSelectedSnippet({
+        ...selectedSnippet!,
+        content: value,
+        updatedAt: newUpdateDate,
+      });
+    }
+
+    saveTimeoutRef.current = setTimeout(async () => {
+      try {
+        setIsSaving(true);
+        if (value === selectedSnippet.content) return;
+
+        await saveContent(selectedSnippet.id, value, newUpdateDate);
+
+        toast.success("Cambios guardados");
+      } catch (error) {
+        //? Revert optimistic update
+        if (selectedSnippet) {
+          setSelectedSnippet({
+            ...selectedSnippet!,
+            content: selectedSnippet.content,
+          });
+        }
+
+        toast.error(`Error guardando cambios: ${error}`);
+      } finally {
+        setIsSaving(false);
+        emitter.emit("UNLOCK_EDITOR");
+      }
+    }, DEBOUNCE_TIME);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+        emitter.emit("UNLOCK_EDITOR");
+      }
+    };
+  }, []);
 
   return (
     <ResizablePanel className="hidden lg:block" defaultSize={65}>
       <section className="grid grid-rows-[auto_1fr]">
         <header className="border-border flex items-center border-b p-2 backdrop-blur-xl">
           <p className="flex-1 text-sm">{selectedSnippet?.title}</p>
+          {selectedSnippet && (
+            <div className="bg-primary-foreground text-muted-foreground mr-4 rounded-md px-2 py-1.5 text-xs">
+              {isSaving ? (
+                <div className="flex items-center gap-1">
+                  <LoaderIcon className="h-3 w-3 animate-spin" />
+                  <span>Saving...</span>
+                </div>
+              ) : (
+                <div>
+                  {selectedSnippet?.updatedAt && (
+                    <>
+                      Saved at{" "}
+                      {selectedSnippet?.updatedAt?.toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
           <div className="flex h-full items-center">
             <div className="space-x-1.5">
               <Button size="icon" variant="secondary">
@@ -36,7 +134,7 @@ function EditorColumn() {
             </div>
           </div>
         </header>
-        <Editor snippetContent={selectedSnippet?.content as string} />
+        <Editor handleContentChange={handleContentChange} />
       </section>
     </ResizablePanel>
   );

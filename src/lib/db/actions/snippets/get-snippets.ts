@@ -3,7 +3,7 @@
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
 
-export async function getSnippets({folderId}: {folderId: string}) {
+export const getSnippets = async ({folderId}: {folderId: string}) => {
   try {
     const session = await auth();
 
@@ -36,7 +36,7 @@ export async function getSnippets({folderId}: {folderId: string}) {
         },
       },
       orderBy: {
-        updatedAt: "desc",
+        createdAt: "desc",
       },
     });
 
@@ -47,4 +47,4 @@ export async function getSnippets({folderId}: {folderId: string}) {
 
     return null;
   }
-}
+};

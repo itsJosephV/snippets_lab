@@ -16,7 +16,8 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 ## NOTES
 
-- [ ] Save selected snippet in localstorage
+- [ ] Save selected snippet in localstorage?
 - [ ] Create the forms and actions for the CRUD
-- [ ] Hidrate components with real data
+- [x] Hidrate components with real data
 - [ ] User preferences for applications settings as part of the user model?
+- [ ] use optimistic hook on the components triggering an action
