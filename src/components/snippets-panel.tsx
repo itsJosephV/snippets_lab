@@ -1,17 +1,8 @@
-import {Plus, Search} from "lucide-react";
+import {Search} from "lucide-react";
 import {Suspense} from "react";
 
 import {SidebarTrigger} from "./ui/sidebar";
 import {Input} from "./ui/input";
-import {Button} from "./ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
 import {Separator} from "./ui/separator";
 import Settings from "./settings";
 import {ModeToggle} from "./theme-toggle";
@@ -41,22 +32,6 @@ function SnippetsPanel({folderId}: {folderId: string}) {
             <div className="py-1 lg:hidden">
               <Separator className="mx-2" orientation="vertical" />
             </div>
-            {/* <Dialog>
-              <DialogTrigger asChild>
-                <Button size="icon" variant="secondary">
-                  <Plus />
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Are you absolutely sure?</DialogTitle>
-                  <DialogDescription>
-                    This action cannot be undone. This will permanently delete your account and
-                    remove your data from our servers.
-                  </DialogDescription>
-                </DialogHeader>
-              </DialogContent>
-            </Dialog> */}
             <CreateSnippetForm folderId={folderId} />
           </div>
         </div>

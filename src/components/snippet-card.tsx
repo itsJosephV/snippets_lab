@@ -1,11 +1,16 @@
 "use client";
+import type {Snippet} from "@prisma/client";
+
 import React from "react";
 import {Bird} from "lucide-react";
 
 import {useSnippet} from "@/context/useSnippetContext";
-import {Snippet} from "@/types";
 
-function SnippetCard({snippet}: {snippet: Snippet}) {
+type SnippetCardProps = {
+  snippet: Snippet & {folder: {collection: {name: string}}};
+};
+
+function SnippetCard({snippet}: SnippetCardProps) {
   const {setSelectedSnippet} = useSnippet();
 
   const {name: collectionName} = snippet.folder.collection;

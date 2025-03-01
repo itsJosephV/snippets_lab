@@ -1,7 +1,7 @@
 "use client";
-import {createContext, useState, ReactNode} from "react";
+import type {Snippet} from "@prisma/client";
 
-import {Snippet} from "@/types";
+import {createContext, useState, ReactNode} from "react";
 
 interface SnippetContextType {
   selectedSnippet: Snippet | null;
