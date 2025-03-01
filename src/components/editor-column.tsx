@@ -1,9 +1,8 @@
 "use client";
 
 import {LoaderIcon, Lock, Star, Tag} from "lucide-react";
-import {useOptimistic, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import {toast} from "sonner";
-import {Snippet} from "@prisma/client";
 
 import {Button} from "./ui/button";
 import {Separator} from "./ui/separator";
@@ -25,14 +24,7 @@ const saveContent = async (snippetId: string, newContent: string, newUpdateDate:
 };
 
 function EditorColumn() {
-  const {selectedSnippet, setSelectedSnippet} = useSnippet();
-
-  const [optimisticSnippet, addOptimisticSnippet] = useOptimistic(
-    selectedSnippet,
-    (_, newSnippet: Snippet) => newSnippet,
-  );
-
-  const [isSaving, setIsSaving] = useState(false);
+  const {selectedSnippet, setSelectedSnippet, isSaving, setIsSaving} = useSnippet();
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleContentChange = (value: string) => {
