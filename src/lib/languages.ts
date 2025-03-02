@@ -1,6 +1,5 @@
 // CODEMIRROR LANGUAGES
 import {javascript} from "@codemirror/lang-javascript";
-import {typescriptLanguage} from "@codemirror/lang-javascript";
 import {yaml} from "@codemirror/lang-yaml";
 import {python} from "@codemirror/lang-python";
 import {rust} from "@codemirror/lang-rust";
@@ -19,28 +18,37 @@ import {cpp} from "@codemirror/lang-cpp";
 import {sass} from "@codemirror/lang-sass";
 import {svelte} from "@replit/codemirror-lang-svelte";
 
-// library not working
-const angular = javascript;
+type LanguageSupport = ReturnType<typeof javascript>;
 
-export const languages = {
-  javascript,
-  typescript: javascript,
-  yaml,
-  python,
-  rust,
-  go,
-  java,
-  csharp,
-  php,
-  angular,
-  sql,
-  vue,
-  svelte,
-  css,
-  html,
-  markdown,
-  json,
-  xml,
-  cpp,
-  sass,
+const languageExtensions: Record<string, LanguageSupport> = {
+  javascript: javascript({jsx: true}),
+  typescript: javascript({jsx: true, typescript: true}),
+  yaml: yaml(),
+  python: python(),
+  rust: rust(),
+  go: go(),
+  java: java(),
+  csharp: csharp(),
+  php: php(),
+  angular: javascript({typescript: true}),
+  sql: sql(),
+  vue: vue(),
+  css: css(),
+  html: html({
+    autoCloseTags: true,
+    matchClosingTags: true,
+    selfClosingTags: true,
+  }),
+  markdown: markdown({
+    completeHTMLTags: true,
+  }),
+  json: json(),
+  xml: xml(),
+  cpp: cpp(),
+  sass: sass(),
+  svelte: svelte(),
+};
+
+export const extensionFn = (language: string) => {
+  return languageExtensions[language] || languageExtensions.markdown;
 };
