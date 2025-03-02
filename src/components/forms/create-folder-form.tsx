@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, {useState, useTransition} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -30,12 +30,11 @@ const folderSchema = z.object({
 
 export function CreateFolderForm({collectionId}: {collectionId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof folderSchema>>({
     resolver: zodResolver(folderSchema),
     defaultValues: {folder: ""},
   });
-
-  const {isSubmitting} = form.formState;
 
   const handleDropdownSelect = (e: Event) => {
     e.preventDefault();
@@ -43,15 +42,17 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
   };
 
   async function onSubmit(values: z.infer<typeof folderSchema>) {
-    try {
-      await createFolder({folder: values.folder, collectionId: collectionId});
-      form.reset();
-      setDialogOpen(false);
-      toast.success("Folder created!");
-    } catch (error) {
-      form.setError("root", {message: error as string});
-      toast.error((error as Error).message);
-    }
+    startTransition(async () => {
+      try {
+        await createFolder({folder: values.folder, collectionId});
+        form.reset();
+        setDialogOpen(false);
+        toast.success("Folder created!");
+      } catch (error) {
+        form.setError("root", {message: error as string});
+        toast.error((error as Error).message);
+      }
+    });
   }
 
   return (
@@ -90,8 +91,8 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
                 {/* <Button type="button" variant="ghost" onClick={() => setDialogOpen(false)}>
                   Cancel
                 </Button> */}
-                <Button disabled={isSubmitting} type="submit">
-                  {isSubmitting ? (
+                <Button disabled={isPending} type="submit">
+                  {isPending ? (
                     <>
                       <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
                       Creating...

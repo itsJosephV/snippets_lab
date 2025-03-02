@@ -24,7 +24,6 @@ export async function createFolder({folder, collectionId}: {folder: string; coll
       throw new Error("A folder with this name already exists in the collection");
     }
 
-    // Crear el folder
     await db.folder.create({
       data: {
         name: folder,

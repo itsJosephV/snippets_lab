@@ -8,7 +8,7 @@ type CollectionWithFolders = Prisma.CollectionGetPayload<{
   include: {folders: true};
 }>;
 
-export async function getCollections(): Promise<CollectionWithFolders[]> {
+export async function getUserCollections(): Promise<CollectionWithFolders[]> {
   try {
     const session = await auth();
 

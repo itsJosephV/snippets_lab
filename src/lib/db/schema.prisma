@@ -93,7 +93,7 @@ model Folder {
   name         String
   description  String?
   collectionId String
-  collection   Collection @relation(fields: [collectionId], references: [id])
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   snippets     Snippet[]
 }
 
@@ -103,7 +103,7 @@ model Snippet {
   content     String
   language    String
   folderId    String
-  folder      Folder    @relation(fields: [folderId], references: [id])
+  folder      Folder    @relation(fields: [folderId], references: [id], onDelete: Cascade)
   description String?
   isFavorite  Boolean
   createdAt   DateTime  @default(now())

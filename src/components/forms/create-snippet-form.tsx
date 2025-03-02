@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, {useState, useTransition} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -14,55 +14,61 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  // FormDescription,
-  FormControl,
-  FormMessage,
-  FormDescription,
-} from "../ui/form";
+import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from "../ui/form";
 import {Input} from "../ui/input";
-import {Button} from "../ui/button";
+import {Button, buttonVariants} from "../ui/button";
+import {Textarea} from "../ui/textarea";
 
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 
 const snippetSchema = z.object({
-  title: z.string().min(2, {
-    message: "Folder must be at least 2 characters.",
+  title: z.string().min(1, {
+    message: "A title is required.",
   }),
-  language: z.string(),
+  description: z.string().max(150, {
+    message: "Description must be at most 150 characters.",
+  }),
 });
 
 export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof snippetSchema>>({
     resolver: zodResolver(snippetSchema),
-    defaultValues: {title: "", language: ""},
+    defaultValues: {title: "", description: ""},
   });
 
-  const {isSubmitting} = form.formState;
-
   async function onSubmit(values: z.infer<typeof snippetSchema>) {
-    try {
-      await createSnippet({title: values.title, language: values.language, folderId: folderId});
-      form.reset();
-      setDialogOpen(false);
-      toast.success("Snippet created!");
-    } catch (error) {
-      form.setError("root", {message: error as string});
-      toast.error((error as Error).message);
-    }
+    startTransition(async () => {
+      try {
+        await createSnippet({title: values.title, description: values.description, folderId});
+        form.reset();
+        setDialogOpen(false);
+        toast.success("Snippet created!");
+      } catch (error) {
+        form.setError("root", {message: error as string});
+        toast.error((error as Error).message);
+      }
+    });
   }
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setDialogOpen(isOpen);
+    if (!isOpen) {
+      form.reset();
+    }
+  };
+
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger asChild>
-        <Button size="icon" variant="secondary">
-          <Plus />
-        </Button>
+    <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
+      <DialogTrigger
+        className={buttonVariants({
+          size: "icon",
+          variant: "secondary",
+        })}
+        disabled={!folderId}
+      >
+        <Plus />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -76,31 +82,33 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
               name="title"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Snippet name</FormLabel>
+                  <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Debounce function for react" {...field} />
+                    <Input placeholder="e.g. Debounce function for react" {...field} />
                   </FormControl>
-                  <FormDescription>A brief description here</FormDescription>
-                  <FormMessage />
+                  <FormMessage className="text-destructive" />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
-              name="language"
+              name="description"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Language</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="javascript" {...field} />
+                    <Textarea
+                      className="min-h-20 resize-none"
+                      placeholder="e.g. A function to debounce user input in React."
+                      {...field}
+                    />
                   </FormControl>
-                  <FormDescription>A brief description here</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <Button type="submit">
-              {isSubmitting ? (
+            <Button disabled={isPending} type="submit">
+              {isPending ? (
                 <>
                   <LoaderIcon className="animate-spin" /> Creating...
                 </>

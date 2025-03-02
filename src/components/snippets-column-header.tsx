@@ -1,6 +1,6 @@
 "use server";
 
-import {getFolderTitle} from "@/lib/db/actions/folders/get-folder-title";
+import {getFolderTitle} from "@/lib/db/data/get_folder_title";
 
 async function SnippetsColumnHeader({folderId}: {folderId: string}) {
   const folderTitle = await getFolderTitle(folderId);

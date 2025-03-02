@@ -1,6 +1,7 @@
 "use server";
 import React from "react";
-import {ChevronRight, MoreHorizontal, Trash2} from "lucide-react";
+import {ChevronRight, MoreHorizontal} from "lucide-react";
+import {Collection, Folder} from "@prisma/client";
 
 import {
   SidebarMenu,
@@ -14,20 +15,22 @@ import FolderItem from "./folder-item";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import {CreateFolderForm} from "./forms/create-folder-form";
+import {DeleteCollectionButton} from "./delete-collection-btn";
 
-import {getCollections} from "@/lib/db/actions/collections/get-collectionts";
+import {getUserCollections} from "@/lib/db/data/user_collections";
+
+type CollectionWithFolders = (Collection & {folders: Folder[]})[];
 
 async function Collections() {
-  const collections = await getCollections();
+  const collections: CollectionWithFolders = await getUserCollections();
 
   return (
     <SidebarMenu>
-      {collections?.map((collection) => (
+      {collections.map((collection) => (
         <Collapsible
           key={collection.id}
           asChild
@@ -56,14 +59,9 @@ async function Collections() {
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-48 rounded-lg sm:w-56" side="right">
-                {/* <Folder className="text-muted-foreground" />
-                  <span>Create folder</span> */}
-                <CreateFolderForm collectionId={collection.id as string} />
+                <CreateFolderForm collectionId={collection.id} />
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Trash2 className="text-muted-foreground" />
-                  <span>Delete Project</span>
-                </DropdownMenuItem>
+                <DeleteCollectionButton collectionId={collection.id} />
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

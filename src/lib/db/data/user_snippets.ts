@@ -3,7 +3,7 @@
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
 
-export const getSnippets = async ({folderId}: {folderId: string}) => {
+export const getUserSnippets = async ({folderId}: {folderId: string}) => {
   try {
     const session = await auth();
 

@@ -6,11 +6,11 @@ import db from "@/lib/db";
 
 export async function createSnippet({
   title,
-  language,
+  description,
   folderId,
 }: {
   title: string;
-  language: string;
+  description: string;
   folderId: string;
 }) {
   try {
@@ -34,13 +34,14 @@ export async function createSnippet({
     await db.snippet.create({
       data: {
         title: title,
-        language: language,
+        language: "markdown",
+        description: description,
         folder: {
           connect: {
             id: folderId,
           },
         },
-        content: `hello world`,
+        content: `# ${title}`,
         isFavorite: false,
       },
     });

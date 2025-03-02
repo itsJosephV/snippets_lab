@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from "react";
+import React, {useState, useTransition} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -14,27 +14,20 @@ import {
   Dialog,
   DialogTrigger,
 } from "../ui/dialog";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormDescription,
-  FormControl,
-  FormMessage,
-} from "../ui/form";
+import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from "../ui/form";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 
 import {createCollection} from "@/lib/db/actions/collections/create-collection";
 const collectionSchema = z.object({
-  collection: z.string().min(2, {
-    message: "Collection must be at least 2 characters.",
+  collection: z.string().min(1, {
+    message: "Collection name is required",
   }),
 });
 
 function CreateCollectionForm() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
@@ -43,26 +36,29 @@ function CreateCollectionForm() {
     },
   });
 
-  const {isSubmitting} = form.formState;
-
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
-    try {
-      await createCollection({collection: values.collection});
-      form.reset();
-      setDialogOpen(false);
-      toast.success("Collection created!");
-    } catch (error) {
-      form.setError("root", {
-        message: error as string,
-      });
-      const {message} = error as {message: string};
-
-      toast.error(message);
-    }
+    startTransition(async () => {
+      try {
+        await createCollection({collection: values.collection});
+        form.reset();
+        setDialogOpen(false);
+        toast.success("Collection created!");
+      } catch (error) {
+        form.setError("root", {message: error as string});
+        toast.error((error as Error).message);
+      }
+    });
   }
 
+  const handleOpenChange = (isOpen: boolean) => {
+    setDialogOpen(isOpen);
+    if (!isOpen) {
+      form.reset();
+    }
+  };
+
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+    <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button size="icon" variant="secondary">
           <Plus />
@@ -70,8 +66,8 @@ function CreateCollectionForm() {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
-          <DialogDescription>Here will be a form to create a new collection</DialogDescription>
+          <DialogTitle>Create New Collection</DialogTitle>
+          <DialogDescription>Create a new collection to organize your snippets.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
@@ -80,22 +76,21 @@ function CreateCollectionForm() {
               name="collection"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Collection</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="JavaScript Essentials" {...field} />
+                    <Input placeholder="e.g. TypeScript Essentials" {...field} />
                   </FormControl>
-                  <FormDescription>A brief description here</FormDescription>
-                  <FormMessage />
+                  <FormMessage className="text-destructive" />
                 </FormItem>
               )}
             />
             <Button type="submit">
-              {isSubmitting ? (
+              {isPending ? (
                 <>
                   <LoaderIcon className="animate-spin" /> Creating...
                 </>
               ) : (
-                "Create Collection"
+                "Create"
               )}
             </Button>
           </form>

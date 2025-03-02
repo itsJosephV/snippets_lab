@@ -17,25 +17,35 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
+enum SidebarTab {
+  Collections = "collections",
+  Tags = "tags",
+}
+
 export function AppSidebar() {
+  const defaultTab = SidebarTab.Collections;
+
   return (
     <Sidebar
       style={{
         paddingTop: "var(--layout-header-height)",
       }}
     >
-      <Tabs defaultValue="test1">
+      <Tabs defaultValue={defaultTab}>
         <SidebarHeader className="border-b">
           <div className="flex gap-1.5">
             <TabsList className="grid flex-1 grid-cols-2">
-              <TabsTrigger value="test1">Collections</TabsTrigger>
-              <TabsTrigger value="test2">Tags</TabsTrigger>
+              <TabsTrigger value={defaultTab}>Collections</TabsTrigger>
+              <TabsTrigger disabled value={SidebarTab.Tags}>
+                Tags
+              </TabsTrigger>
             </TabsList>
             <CreateCollectionForm />
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <TabsContent value="test1">
+          {/**--COLLECTIONS TAB-- */}
+          <TabsContent value={defaultTab}>
             <SidebarGroup>
               <SidebarGroupLabel>Favorites</SidebarGroupLabel>
               <SidebarMenu>
@@ -53,21 +63,16 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
-            {/**---- */}
-            {/**---- */}
-            {/**---- */}
             <SidebarGroup>
               <SidebarGroupLabel>Sections</SidebarGroupLabel>
               <Suspense fallback={<CollectionsSkeleton />}>
                 <Collections />
               </Suspense>
             </SidebarGroup>
-            {/**---- */}
-            {/**---- */}
-            {/**---- */}
           </TabsContent>
-          <TabsContent value="test2">
-            <SidebarGroup>testing02</SidebarGroup>
+          {/**--TAGS TAB-- */}
+          <TabsContent value={SidebarTab.Tags}>
+            <SidebarGroup>TAGS HERE</SidebarGroup>
           </TabsContent>
         </SidebarContent>
         <SidebarRail />
