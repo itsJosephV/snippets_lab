@@ -15,13 +15,14 @@ import Editor from "./editor";
 import {emitter} from "@/lib/events";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetContent} from "@/lib/db/actions/snippets/update-snippet-content";
-const DEBOUNCE_TIME = 1200;
+const DEBOUNCE_TIME = 1500;
 
 function EditorColumn() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const saveVersionRef = useRef<number>(0);
 
   const updateSnippetState = (callback: (snippet: typeof selectedSnippet) => void) => {
     if (!selectedSnippet) return;
@@ -32,44 +33,39 @@ function EditorColumn() {
     if (!selectedSnippet?.id) return;
 
     const newUpdateDate = new Date();
+    const currentValue = value;
+    const currentSaveVersion = ++saveVersionRef.current;
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
       emitter.emit("UNLOCK_EDITOR");
     }
-
     emitter.emit("LOCK_EDITOR");
 
-    //? Optimistic update
     updateSnippetState((snippet) => {
       setSelectedSnippet({
         ...(snippet as Snippet),
-        content: value,
+        content: currentValue,
       });
     });
 
     saveTimeoutRef.current = setTimeout(async () => {
       try {
         setIsSaving(true);
-
         const response = await updateSnippetContent({
           snippetId: selectedSnippet.id,
-          newContent: value,
+          newContent: currentValue,
           newUpdateDate,
         });
 
-        updateSnippetState((snippet) => {
+        if (saveVersionRef.current === currentSaveVersion) {
           setSelectedSnippet({
-            ...(snippet as Snippet),
+            ...(selectedSnippet as Snippet),
             content: response.content,
             updatedAt: response.updatedAt,
           });
-        });
-
-        // eslint-disable-next-line no-console
-        console.log(`Saved content for snippet: ${selectedSnippet.id}`);
+        }
       } catch (error) {
-        //? Revert optimistic update
         updateSnippetState((snippet) => {
           setSelectedSnippet({
             ...(snippet as Snippet),
@@ -77,10 +73,12 @@ function EditorColumn() {
             updatedAt: selectedSnippet?.updatedAt,
           });
         });
-
-        toast.error(`Error guardando cambios: ${error}`);
-      } finally {
+        toast.error(`Error saving changes: ${error}`);
         setIsSaving(false);
+      } finally {
+        if (saveVersionRef.current === currentSaveVersion) {
+          setIsSaving(false);
+        }
         emitter.emit("UNLOCK_EDITOR");
       }
     }, DEBOUNCE_TIME);
