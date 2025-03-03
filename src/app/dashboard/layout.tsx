@@ -1,6 +1,5 @@
 import React from "react";
 
-import {SidebarProvider} from "@/components/ui/sidebar";
 import {SnippetProvider} from "@/context/SnippetContext";
 
 type DashboardLayoutProps = {
@@ -9,11 +8,11 @@ type DashboardLayoutProps = {
 
 function DashboardLayout({children}: DashboardLayoutProps) {
   return (
-    <main className="h-[calc(100vh-65px)] overflow-hidden">
-      <SnippetProvider>
-        <SidebarProvider>{children}</SidebarProvider>
-      </SnippetProvider>
-    </main>
+    <SnippetProvider>
+      <main className="h-[calc(100vh-var(--layout-header-height))] overflow-y-hidden">
+        {children}
+      </main>
+    </SnippetProvider>
   );
 }
 

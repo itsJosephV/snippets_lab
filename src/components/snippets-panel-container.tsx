@@ -22,7 +22,7 @@ function SnippetsPanelContainer({children}: {children: React.ReactNode}) {
 
   return (
     <ResizablePanel defaultSize={35} maxSize={50} minSize={minSizeBP(breakpoint)}>
-      <section className="grid grid-rows-[auto_1fr]">{children}</section>
+      <section>{children}</section>
     </ResizablePanel>
   );
 }

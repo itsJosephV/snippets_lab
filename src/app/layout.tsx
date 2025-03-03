@@ -37,7 +37,7 @@ export default async function RootLayout({children}: {children: React.ReactNode}
       <body
         className={cn(
           `font-sans ${interVariable.variable} ${geistMonoVariable.variable} antialiased`,
-          "grid h-full max-h-screen grid-rows-[auto,1fr]",
+          "grid grid-rows-[var(--layout-header-height)_1fr]",
         )}
       >
         <ThemeProvider
