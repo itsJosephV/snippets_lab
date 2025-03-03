@@ -146,7 +146,7 @@ function EditorColumn() {
           </div>
         </header>
         <Editor handleContentChange={handleContentChange} />
-        <feConvolveMatrix className="bg-background border-border text-muted-foreground flex w-full items-center justify-between border-t p-2 text-sm leading-none">
+        <footer className="bg-background border-border text-muted-foreground flex w-full items-center justify-between border-t p-2 text-sm leading-none">
           <div>
             Ln {cursorPosition.ln}, Col {cursorPosition.col}
           </div>
@@ -170,7 +170,7 @@ function EditorColumn() {
               </div>
             )}
           </div>
-        </feConvolveMatrix>
+        </footer>
       </section>
     </ResizablePanel>
   );
