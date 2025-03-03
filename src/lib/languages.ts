@@ -18,9 +18,9 @@ import {cpp} from "@codemirror/lang-cpp";
 import {sass} from "@codemirror/lang-sass";
 import {svelte} from "@replit/codemirror-lang-svelte";
 
-type LanguageSupport = ReturnType<typeof javascript>;
+import {Language} from "@/types";
 
-const languageExtensions: Record<string, LanguageSupport> = {
+const languageExtensions = {
   javascript: javascript({jsx: true}),
   typescript: javascript({jsx: true, typescript: true}),
   yaml: yaml(),
@@ -28,7 +28,7 @@ const languageExtensions: Record<string, LanguageSupport> = {
   rust: rust(),
   go: go(),
   java: java(),
-  csharp: csharp(),
+  "c#": csharp(),
   php: php(),
   angular: javascript({typescript: true}),
   sql: sql(),
@@ -44,11 +44,11 @@ const languageExtensions: Record<string, LanguageSupport> = {
   }),
   json: json(),
   xml: xml(),
-  cpp: cpp(),
+  "c++": cpp(),
   sass: sass(),
   svelte: svelte(),
 };
 
-export const extensionFn = (language: string) => {
+export const extensionFn = (language: Language) => {
   return languageExtensions[language] || languageExtensions.markdown;
 };

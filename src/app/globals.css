@@ -86,9 +86,15 @@
 @layer base {
   :root {
     /* Header-heights */
+    /* --layout-header-height: 65px;
+    --snippets-header-height: calc(106px + var(--layout-header-height));
+    --editor-footer-height: 30px;
+    --editor-header-height: calc(53px + var(--layout-header-height) + var(--editor-footer-height)); */
     --layout-header-height: 65px;
     --snippets-header-height: calc(106px + var(--layout-header-height));
-    --editor-header-height: calc(53px + var(--layout-header-height));
+    --editor-footer-height: 31px;
+    --editor-header-height: 53px;
+    --editor-height: calc(100vh - var(--editor-header-height) - var(--editor-footer-height) - var(--layout-header-height));
     /* Colors */
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
