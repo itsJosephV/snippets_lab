@@ -2,16 +2,13 @@
 
 import type {Snippet} from "@prisma/client";
 
-import {LoaderIcon, Lock, Star, Tag} from "lucide-react";
 import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
 
-import {Button} from "./ui/button";
-import {Separator} from "./ui/separator";
-import Settings from "./settings";
 import {ResizablePanel} from "./ui/resizable";
 import Editor from "./editor";
-import {LanguagePicker} from "./language-picker";
+import EditorHeader from "./editor-header";
+import EditorFooter from "./editor-footer";
 
 import {emitter} from "@/lib/events";
 import {useSnippet} from "@/context/useSnippetContext";
@@ -19,7 +16,7 @@ import {updateSnippetContent} from "@/lib/db/actions/snippets/update-snippet-con
 const DEBOUNCE_TIME = 1500;
 
 function EditorColumn() {
-  const {selectedSnippet, setSelectedSnippet, cursorPosition} = useSnippet();
+  const {selectedSnippet, setSelectedSnippet} = useSnippet();
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -97,80 +94,9 @@ function EditorColumn() {
   return (
     <ResizablePanel className="hidden lg:block" defaultSize={65}>
       <section className="grid grid-rows-[auto_1fr_auto]">
-        <header className="border-border flex items-center border-b p-2 backdrop-blur-xl">
-          <p className="flex-1 text-sm">{selectedSnippet?.title}</p>
-          {/* {selectedSnippet && (
-            <div className="bg-primary-foreground text-muted-foreground mr-4 rounded-md px-2 py-1.5 text-xs">
-              {isSaving ? (
-                <div className="flex items-center gap-1">
-                  <LoaderIcon className="h-3 w-3 animate-spin" />
-                  <span>Saving...</span>
-                </div>
-              ) : (
-                <div>
-                  {selectedSnippet?.updatedAt && (
-                    <>
-                      Saved at{" "}
-                      {selectedSnippet?.updatedAt?.toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          )} */}
-          <LanguagePicker />
-          <div className="h-full py-1">
-            <Separator className="mx-2" orientation="vertical" />
-          </div>
-          <div className="flex h-full items-center">
-            <div className="space-x-1.5">
-              <Button size="icon" variant="secondary">
-                <Lock />
-              </Button>
-              <Button size="icon" variant="secondary">
-                <Tag />
-              </Button>
-              <Button size="icon" variant="secondary">
-                <Star />
-              </Button>
-            </div>
-            <div className="h-full py-1">
-              <Separator className="mx-2" orientation="vertical" />
-            </div>
-            <div className="space-x-1.5">
-              <Settings />
-            </div>
-          </div>
-        </header>
+        <EditorHeader />
         <Editor handleContentChange={handleContentChange} />
-        <footer className="bg-background border-border text-muted-foreground flex w-full items-center justify-between border-t p-2 text-sm leading-none">
-          <div>
-            Ln {cursorPosition.ln}, Col {cursorPosition.col}
-          </div>
-          <div>
-            {isSaving ? (
-              <div className="flex items-center gap-1">
-                <LoaderIcon className="size-[0.875rem] animate-spin" />
-                <span>Saving...</span>
-              </div>
-            ) : (
-              <div>
-                {selectedSnippet?.updatedAt && (
-                  <>
-                    Last saved -{" "}
-                    {selectedSnippet?.updatedAt?.toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </footer>
+        <EditorFooter isSaving={isSaving} />
       </section>
     </ResizablePanel>
   );

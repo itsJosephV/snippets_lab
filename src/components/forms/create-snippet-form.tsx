@@ -22,9 +22,14 @@ import {Textarea} from "../ui/textarea";
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 
 const snippetSchema = z.object({
-  title: z.string().min(1, {
-    message: "A title is required.",
-  }),
+  title: z
+    .string()
+    .min(1, {
+      message: "A title is required.",
+    })
+    .max(50, {
+      message: "Title must be at most 35 characters, keep it short!",
+    }),
   description: z.string().max(150, {
     message: "Description must be at most 150 characters.",
   }),

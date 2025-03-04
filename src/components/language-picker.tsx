@@ -36,7 +36,7 @@ export function LanguagePicker() {
         ...selectedSnippet,
         language: response.language,
       });
-      toast.success(`Language updated to ${response.language}`);
+      toast.success(`Language updated to ${response.language.toUpperCase()}`);
     } catch (error) {
       startTransition(() => {
         setOptimisticLanguage(selectedSnippet.language as Language);
@@ -46,7 +46,11 @@ export function LanguagePicker() {
   };
 
   return (
-    <Select value={optimisticLanguage} onValueChange={handleSelectChange}>
+    <Select
+      disabled={!selectedSnippet?.language}
+      value={optimisticLanguage}
+      onValueChange={handleSelectChange}
+    >
       <SelectTrigger className="w-[150px] capitalize">
         <SelectValue placeholder="Language" />
       </SelectTrigger>
