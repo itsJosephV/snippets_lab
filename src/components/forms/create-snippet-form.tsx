@@ -3,7 +3,7 @@ import React, {useState, useTransition} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {LoaderIcon, Plus} from "lucide-react";
+import {Info, LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
 
 import {
@@ -18,8 +18,18 @@ import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from "..
 import {Input} from "../ui/input";
 import {Button, buttonVariants} from "../ui/button";
 import {Textarea} from "../ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "../ui/tooltip";
 
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
+import {Language} from "@/types";
 
 const snippetSchema = z.object({
   title: z
@@ -33,6 +43,7 @@ const snippetSchema = z.object({
   description: z.string().max(150, {
     message: "Description must be at most 150 characters.",
   }),
+  language: z.string(),
 });
 
 export function CreateSnippetForm({folderId}: {folderId: string}) {
@@ -40,13 +51,22 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<z.infer<typeof snippetSchema>>({
     resolver: zodResolver(snippetSchema),
-    defaultValues: {title: "", description: ""},
+    defaultValues: {
+      title: "",
+      description: "",
+      language: "",
+    },
   });
 
   async function onSubmit(values: z.infer<typeof snippetSchema>) {
     startTransition(async () => {
       try {
-        await createSnippet({title: values.title, description: values.description, folderId});
+        await createSnippet({
+          title: values.title,
+          description: values.description,
+          language: values.language,
+          folderId,
+        });
         form.reset();
         setDialogOpen(false);
         toast.success("Snippet created!");
@@ -92,6 +112,44 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                     <Input placeholder="e.g. Debounce function for react" {...field} />
                   </FormControl>
                   <FormMessage className="text-destructive" />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="language"
+              render={({field}) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-1">
+                    {/**TODO: ADD THE TYPESCRIPT BY DEFAULT MESSAGE ON HOVER */}
+                    Language{" "}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="text-muted-foreground relative top-px" size={14} />
+                        </TooltipTrigger>
+                        <TooltipContent className="" side="right">
+                          <p>The default language is TypeScript</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full capitalize">
+                        <SelectValue placeholder="Choose a language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {Object.entries(Language).map(([key, value]) => (
+                            <SelectItem key={key} className="capitalize" value={value}>
+                              {value}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
                 </FormItem>
               )}
             />

@@ -6,15 +6,17 @@ import db from "@/lib/db";
 import {languageTemplateFn} from "@/lib/languages";
 import {Language} from "@/types";
 
-//TODO: THIS WILL BE PART OF THE USER SETTINGS
 const DEFAULT_LANGUAGE = Language["TYPESCRIPT"];
+const DEFAULT_DESCRIPTION = "Add a description here";
 
 export async function createSnippet({
   title,
+  language,
   description,
   folderId,
 }: {
   title: string;
+  language: string;
   description: string;
   folderId: string;
 }) {
@@ -36,17 +38,20 @@ export async function createSnippet({
       throw new Error("Snippet already exists.");
     }
 
+    const languageDraft = (language as Language) || DEFAULT_LANGUAGE;
+    const descriptionDraft: string = description || DEFAULT_DESCRIPTION;
+
     await db.snippet.create({
       data: {
         title: title,
-        language: DEFAULT_LANGUAGE,
-        description: description,
+        language: languageDraft,
+        description: descriptionDraft,
         folder: {
           connect: {
             id: folderId,
           },
         },
-        content: languageTemplateFn(title, description, DEFAULT_LANGUAGE),
+        content: languageTemplateFn(title, descriptionDraft, languageDraft),
         isFavorite: false,
       },
     });

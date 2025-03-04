@@ -13,7 +13,6 @@ import {
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetLanguage} from "@/lib/db/actions/snippets/update-snippet-language";
-import {capitalize} from "@/lib/utils";
 
 export function LanguagePicker() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();
