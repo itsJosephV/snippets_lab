@@ -37,10 +37,10 @@ export function SnippetProvider({children}: SnippetProviderProps) {
   );
 
   const value = {
-    selectedSnippet,
-    setSelectedSnippet,
     editorRef,
+    selectedSnippet,
     cursorPosition,
+    setSelectedSnippet,
     setCursorPosition,
     updateCursorPosition,
   };

@@ -34,6 +34,7 @@ function SnippetCard({snippet}: SnippetCardProps) {
         "hover:bg-muted-foreground/10 border-border rounded-sm border p-3 transition-colors",
         {
           "pointer-events-none": isLocked,
+          "bg-muted-foreground/10": selectedSnippet?.id === snippet.id,
         },
       )}
       onClick={handleSnippetSelection}

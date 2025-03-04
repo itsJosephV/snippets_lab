@@ -30,6 +30,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "../ui/to
 
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 import {Language} from "@/types";
+import {useSnippet} from "@/context/useSnippetContext";
 
 const snippetSchema = z.object({
   title: z
@@ -49,6 +50,7 @@ const snippetSchema = z.object({
 export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const {setSelectedSnippet} = useSnippet();
   const form = useForm<z.infer<typeof snippetSchema>>({
     resolver: zodResolver(snippetSchema),
     defaultValues: {
@@ -61,14 +63,17 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
   async function onSubmit(values: z.infer<typeof snippetSchema>) {
     startTransition(async () => {
       try {
-        await createSnippet({
+        const response = await createSnippet({
           title: values.title,
           description: values.description,
           language: values.language,
           folderId,
         });
-        form.reset();
+
+        if (response.success) setSelectedSnippet(response.snippet);
         setDialogOpen(false);
+        form.reset();
+
         toast.success("Snippet created!");
       } catch (error) {
         form.setError("root", {message: error as string});

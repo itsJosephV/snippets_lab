@@ -41,7 +41,7 @@ export async function createSnippet({
     const languageDraft = (language as Language) || DEFAULT_LANGUAGE;
     const descriptionDraft: string = description || DEFAULT_DESCRIPTION;
 
-    await db.snippet.create({
+    const newSnippet = await db.snippet.create({
       data: {
         title: title,
         language: languageDraft,
@@ -58,7 +58,7 @@ export async function createSnippet({
 
     revalidatePath("/dashboard");
 
-    return {success: true};
+    return {success: true, snippet: newSnippet};
   } catch (error) {
     throw new Error(error as string);
   }
