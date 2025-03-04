@@ -27,8 +27,8 @@ const snippetSchema = z.object({
     .min(1, {
       message: "A title is required.",
     })
-    .max(50, {
-      message: "Title must be at most 35 characters, keep it short!",
+    .max(40, {
+      message: "Title must be at most 40 characters, keep it short!",
     }),
   description: z.string().max(150, {
     message: "Description must be at most 150 characters.",
@@ -100,7 +100,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
               name="description"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Description (optional)</FormLabel>
                   <FormControl>
                     <Textarea
                       className="min-h-20 resize-none"
