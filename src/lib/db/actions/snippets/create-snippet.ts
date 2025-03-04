@@ -3,6 +3,11 @@ import {revalidatePath} from "next/cache";
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
+import {languageTemplateFn} from "@/lib/languages";
+import {Language} from "@/types";
+
+//TODO: THIS WILL BE PART OF THE USER SETTINGS
+const DEFAULT_LANGUAGE = Language["TYPESCRIPT"];
 
 export async function createSnippet({
   title,
@@ -34,14 +39,14 @@ export async function createSnippet({
     await db.snippet.create({
       data: {
         title: title,
-        language: "markdown",
+        language: DEFAULT_LANGUAGE,
         description: description,
         folder: {
           connect: {
             id: folderId,
           },
         },
-        content: `# ${title}`,
+        content: languageTemplateFn(title, description, DEFAULT_LANGUAGE),
         isFavorite: false,
       },
     });

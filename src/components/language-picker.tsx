@@ -13,6 +13,7 @@ import {
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetLanguage} from "@/lib/db/actions/snippets/update-snippet-language";
+import {capitalize} from "@/lib/utils";
 
 export function LanguagePicker() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();
@@ -36,7 +37,7 @@ export function LanguagePicker() {
         ...selectedSnippet,
         language: response.language,
       });
-      toast.success(`Language updated to ${response.language.toUpperCase()}`);
+      toast.success(`Language updated to ${response.language}`);
     } catch (error) {
       startTransition(() => {
         setOptimisticLanguage(selectedSnippet.language as Language);

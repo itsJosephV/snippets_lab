@@ -1,4 +1,3 @@
-// CODEMIRROR LANGUAGES
 import {javascript} from "@codemirror/lang-javascript";
 import {yaml} from "@codemirror/lang-yaml";
 import {python} from "@codemirror/lang-python";
@@ -18,37 +17,75 @@ import {cpp} from "@codemirror/lang-cpp";
 import {sass} from "@codemirror/lang-sass";
 import {svelte} from "@replit/codemirror-lang-svelte";
 
+import {capitalize} from "./utils";
+
 import {Language} from "@/types";
 
-const languageExtensions = {
-  javascript: javascript({jsx: true}),
-  typescript: javascript({jsx: true, typescript: true}),
-  yaml: yaml(),
-  python: python(),
-  rust: rust(),
-  go: go(),
-  java: java(),
-  "c#": csharp(),
-  php: php(),
-  angular: javascript({typescript: true}),
-  sql: sql(),
-  vue: vue(),
-  css: css(),
-  html: html({
+const languageExtension = {
+  JavaScript: javascript({jsx: true}),
+  TypeScript: javascript({jsx: true, typescript: true}),
+  YAML: yaml(),
+  Python: python(),
+  Rust: rust(),
+  Go: go(),
+  Java: java(),
+  "C#": csharp(),
+  PHP: php(),
+  Angular: javascript({typescript: true}),
+  SQL: sql(),
+  Vue: vue(),
+  CSS: css(),
+  HTML: html({
     autoCloseTags: true,
     matchClosingTags: true,
     selfClosingTags: true,
   }),
-  markdown: markdown({
+  Markdown: markdown({
     completeHTMLTags: true,
   }),
-  json: json(),
-  xml: xml(),
-  "c++": cpp(),
-  sass: sass(),
-  svelte: svelte(),
+  JSON: json(),
+  XML: xml(),
+  "C++": cpp(),
+  Sass: sass(),
+  Svelte: svelte(),
+};
+
+const languageTemplate: Record<Language, string> = {
+  [Language.JAVASCRIPT]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.TYPESCRIPT]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.YAML]: `# Title: {title}\n# Description: {description}\n# Language: {language}\n# -----------------------------\n# Add your snippet here 🚀`,
+  [Language.PYTHON]: `# Title: {title}\n# Description: {description}\n# Language: {language}\n# -----------------------------\n# Add your snippet here 🚀`,
+  [Language.RUST]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.GO]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.JAVA]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.CSHARP]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.PHP]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.ANGULAR]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  [Language.SQL]: `-- Title: {title}\n-- Description: {description}\n-- Language: {language}\n-- -----------------------------\n-- Add your snippet here 🚀`,
+  [Language.VUE]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  [Language.CSS]: `/* Title: {title} */\n/* Description: {description} */\n/* Language: {language} */\n/* ----------------------------- */\n/* Add your snippet here 🚀 */`,
+  [Language.HTML]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  [Language.MARKDOWN]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  [Language.JSON]: `{\n  "// Title": "{title}",\n  "// Description": "{description}",\n  "// Language": "{language}",\n  "// -----------------------------": "",\n  "// Add your snippet here 🚀": ""\n}`,
+  [Language.XML]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  [Language.CPP]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.SASS]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  [Language.SVELTE]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+};
+
+export const languageTemplateFn = (
+  title: string,
+  description: string,
+  language: Language,
+): string => {
+  const template = languageTemplate[language];
+
+  return template
+    .replace("{title}", capitalize(title))
+    .replace("{description}", capitalize(description))
+    .replace("{language}", language);
 };
 
 export const extensionFn = (language: Language) => {
-  return languageExtensions[language] || languageExtensions.markdown;
+  return languageExtension[language] || languageExtension.Markdown;
 };
