@@ -2,7 +2,9 @@
 
 import CodeMirror, {ViewUpdate} from "@uiw/react-codemirror";
 import {useTheme} from "next-themes";
-import {githubDark, githubLight} from "@uiw/codemirror-theme-github";
+// import {duotoneDark, duotoneLight} from "@uiw/codemirror-theme-duotone";
+// import {githubDark, githubLight} from "@uiw/codemirror-theme-github";
+import {basicDark, basicLight} from "@uiw/codemirror-theme-basic";
 
 import {cn} from "@/lib/utils";
 import {useSnippet} from "@/context/useSnippetContext";
@@ -16,7 +18,7 @@ type EditorProps = {
 function Editor({handleContentChange}: EditorProps) {
   const {theme} = useTheme();
 
-  const codeMirrorTheme = theme === "dark" ? githubDark : githubLight;
+  const codeMirrorTheme = theme === "dark" ? basicDark : basicLight;
 
   const {selectedSnippet, editorRef, updateCursorPosition} = useSnippet();
 
