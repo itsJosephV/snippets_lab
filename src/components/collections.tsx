@@ -21,12 +21,12 @@ import {
 import {CreateFolderForm} from "./forms/create-folder-form";
 import {DeleteCollectionButton} from "./delete-collection-btn";
 
-import {getUserCollections} from "@/lib/db/data/user_collections";
+import {getCollections} from "@/lib/db/data/get_collections";
 
 type CollectionWithFolders = (Collection & {folders: Folder[]})[];
 
 async function Collections() {
-  const collections: CollectionWithFolders = await getUserCollections();
+  const collections: CollectionWithFolders = await getCollections();
 
   return (
     <SidebarMenu>

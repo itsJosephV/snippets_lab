@@ -4,9 +4,9 @@ import React from "react";
 import SnippetCard from "./snippet-card";
 
 import {cn} from "@/lib/utils";
-import {getUserSnippets} from "@/lib/db/data/user_snippets";
+import {getSnippetsByFolderId} from "@/lib/db/data/get_snippets_by_folderId";
 async function SnippetsLits({folderId}: {folderId: string}) {
-  const snippets = await getUserSnippets({folderId});
+  const snippets = await getSnippetsByFolderId({folderId});
 
   return (
     <ul
