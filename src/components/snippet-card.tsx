@@ -2,22 +2,18 @@
 import type {Snippet} from "@prisma/client";
 
 import React from "react";
-import {Bird} from "lucide-react";
+// import {Bird} from "lucide-react";
 
 import {useSnippet} from "@/context/useSnippetContext";
 import {capitalize, cn} from "@/lib/utils";
 import {useLocker} from "@/hooks/use-locker";
 
-type SnippetCardProps = {
-  snippet: Snippet & {folder: {collection: {name: string}}};
-};
-
-function SnippetCard({snippet}: SnippetCardProps) {
+function SnippetCard({snippet}: {snippet: Snippet}) {
   const {setSelectedSnippet, selectedSnippet} = useSnippet();
 
   const isLocked = useLocker();
 
-  const {name: collectionName} = snippet.folder.collection;
+  // const {name: collectionName} = snippet.folder.collection;
 
   const handleSnippetSelection = () => {
     if (selectedSnippet?.id === snippet.id) {
@@ -48,7 +44,13 @@ function SnippetCard({snippet}: SnippetCardProps) {
       <div className="mt-4">
         <p className="text-muted-foreground text-sm">{capitalize(snippet.description as string)}</p>
       </div>
+      {
+        //TODO: DRAWER EDITOR
+      }
       {/* <DrawerEditor /> */}
+      {
+        //TODO: TAGS
+      }
       {/* <div className="mt-3 flex gap-1.5">
         {tags(snippet.id).map((tag) => (
           <div
@@ -64,9 +66,9 @@ function SnippetCard({snippet}: SnippetCardProps) {
         ))}
       </div> */}
       <div className="text-muted-foreground mt-4 flex items-center justify-between">
-        <div className="flex items-center gap-1 text-sm">
+        {/* <div className="flex items-center gap-1 text-sm">
           <Bird size={16} /> {capitalize(collectionName)}
-        </div>
+        </div> */}
         <div className="text-sm">
           <time suppressHydrationWarning>{snippet.createdAt.toLocaleDateString()}</time>
         </div>

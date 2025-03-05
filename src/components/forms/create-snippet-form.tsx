@@ -1,5 +1,5 @@
 "use client";
-import React, {useState, useTransition} from "react";
+import React, {useOptimistic, useState, useTransition} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -51,6 +51,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const {setSelectedSnippet} = useSnippet();
+  // const [] = useOptimistic();
   const form = useForm<z.infer<typeof snippetSchema>>({
     resolver: zodResolver(snippetSchema),
     defaultValues: {

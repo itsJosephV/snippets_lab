@@ -1,51 +1,22 @@
-import {Search} from "lucide-react";
+import {Folder, Snippet} from "@prisma/client";
 import {Suspense} from "react";
 
-import {SidebarTrigger} from "./ui/sidebar";
-import {Input} from "./ui/input";
-import {Separator} from "./ui/separator";
-import Settings from "./settings";
-import {ModeToggle} from "./theme-toggle";
-import {ScrollArea} from "./ui/scroll-area";
-import SnippetsLits from "./snippets-list";
-import SnippetsColumnHeader from "./snippets-column-header";
-import {Skeleton} from "./ui/skeleton";
 import SnippetsPanelContainer from "./snippets-panel-container";
-import {CreateSnippetForm} from "./forms/create-snippet-form";
+import Draftcomponent from "./Draftcomponent";
+import {Skeleton} from "./ui/skeleton";
 
 import {cn} from "@/lib/utils";
 
-function SnippetsPanel({folderId}: {folderId: string}) {
+export type FolderAndSnippets = Folder & {snippets: Snippet[]};
+
+//TODO: BUILD A PROPER SKELETON FOR THE SNIPPET PANEL AND COLUMN HEADER
+
+async function SnippetsPanel({folderId}: {folderId: string}) {
   return (
     <SnippetsPanelContainer>
-      <header>
-        <div className="border-border flex items-center border-b p-2">
-          <SidebarTrigger />
-          <Suspense key={folderId} fallback={<SnippetColumnHeaderSk />}>
-            <SnippetsColumnHeader folderId={folderId} />
-          </Suspense>
-          <div className="flex h-full lg:block">
-            <div className="space-x-1.5 lg:hidden">
-              <Settings />
-              <ModeToggle />
-            </div>
-            <div className="py-1 lg:hidden">
-              <Separator className="mx-2" orientation="vertical" />
-            </div>
-            <CreateSnippetForm folderId={folderId} />
-          </div>
-        </div>
-        <div className="border-border relative border-b p-2">
-          <Search className="text-muted-foreground absolute top-1/2 left-5 h-4 w-4 -translate-y-1/2" />
-
-          <Input className="pl-8" placeholder="Search for a snippet..." />
-        </div>
-      </header>
-      <ScrollArea>
-        <Suspense key={folderId} fallback={<SnippetCardSkeleton />}>
-          <SnippetsLits folderId={folderId} />
-        </Suspense>
-      </ScrollArea>
+      <Suspense key={folderId} fallback={<SnippetCardSkeleton />}>
+        <Draftcomponent folderId={folderId} />
+      </Suspense>
     </SnippetsPanelContainer>
   );
 }
@@ -68,10 +39,20 @@ function SnippetCardSkeleton() {
   );
 }
 
-function SnippetColumnHeaderSk() {
-  return (
-    <div className="ml-2 flex flex-1">
-      <Skeleton className="h-[20px] w-[120px] rounded-md" />
-    </div>
-  );
+// import {cn} from "@/lib/utils";
+{
+  /* <Suspense key={folderId} fallback={<SnippetColumnHeaderSk />}>
+          </Suspense> */
 }
+{
+  /* <Suspense key={folderId} fallback={<SnippetCardSkeleton />}>
+        </Suspense> */
+}
+
+// function SnippetColumnHeaderSk() {
+//   return (
+//     <div className="ml-2 flex flex-1">
+//       <Skeleton className="h-[20px] w-[120px] rounded-md" />
+//     </div>
+//   );
+// }

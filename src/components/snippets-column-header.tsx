@@ -1,13 +1,13 @@
 "use server";
 
-import {getFolderTitle} from "@/lib/db/data/get_folder_title";
+import {FolderAndSnippets} from "./snippets-panel";
 
-async function SnippetsColumnHeader({folderId}: {folderId: string}) {
-  const folderTitle = await getFolderTitle(folderId);
+async function SnippetsColumnHeader({folder}: {folder: FolderAndSnippets}) {
+  const {name: folderName} = folder;
 
   return (
     <div className="ml-2 flex flex-1">
-      <p className="text-sm">{folderTitle}</p>
+      <p className="text-sm">{folderName}</p>
     </div>
   );
 }

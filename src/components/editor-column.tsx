@@ -22,7 +22,7 @@ function EditorColumn() {
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const saveVersionRef = useRef<number>(0);
 
-  const updateSnippetState = (callback: (snippet: typeof selectedSnippet) => void) => {
+  const updateSnippetState = (callback: (snippet: Snippet) => void) => {
     if (!selectedSnippet) return;
     callback(selectedSnippet);
   };
@@ -42,7 +42,7 @@ function EditorColumn() {
 
     updateSnippetState((snippet) => {
       setSelectedSnippet({
-        ...(snippet as Snippet),
+        ...snippet,
         content: currentValue,
       });
     });
@@ -58,7 +58,7 @@ function EditorColumn() {
 
         if (saveVersionRef.current === currentSaveVersion) {
           setSelectedSnippet({
-            ...(selectedSnippet as Snippet),
+            ...selectedSnippet,
             content: response.content,
             updatedAt: response.updatedAt,
           });
@@ -66,7 +66,7 @@ function EditorColumn() {
       } catch (error) {
         updateSnippetState((snippet) => {
           setSelectedSnippet({
-            ...(snippet as Snippet),
+            ...snippet,
             content: selectedSnippet?.content,
             updatedAt: selectedSnippet?.updatedAt,
           });

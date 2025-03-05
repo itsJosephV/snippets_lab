@@ -1,13 +1,14 @@
 "use server";
+import type {Folder, Snippet} from "@prisma/client";
+
 import React from "react";
 
 import SnippetCard from "./snippet-card";
 
 import {cn} from "@/lib/utils";
-import {getSnippetsByFolderId} from "@/lib/db/data/get_snippets_by_folderId";
-async function SnippetsLits({folderId}: {folderId: string}) {
-  const snippets = await getSnippetsByFolderId({folderId});
 
+type FolderAndSnippets = Folder & {snippets: Snippet[]};
+async function SnippetsLits({folder}: {folder: FolderAndSnippets}) {
   return (
     <ul
       className={cn(
@@ -15,8 +16,8 @@ async function SnippetsLits({folderId}: {folderId: string}) {
         "h-[calc(100vh-var(--snippets-header-height))]",
       )}
     >
-      {snippets &&
-        snippets.map((snippet) => {
+      {folder &&
+        folder.snippets.map((snippet) => {
           return <SnippetCard key={snippet.id} snippet={snippet} />;
         })}
     </ul>
