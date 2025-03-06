@@ -1,10 +1,10 @@
 "use client";
-import {QueryClientProvider, QueryClient} from "@tanstack/react-query";
-import {useState} from "react";
+import {QueryClientProvider} from "@tanstack/react-query";
+
+import {getQueryClient} from "@/lib/get-query-client";
 
 function RQueryProvider({children}: {children: React.ReactNode}) {
-  // eslint-disable-next-line react/hook-use-state
-  const [queryClient] = useState(() => new QueryClient());
+  const queryClient = getQueryClient();
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

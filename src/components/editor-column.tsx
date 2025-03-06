@@ -1,9 +1,10 @@
 "use client";
 
-import type {Snippet} from "@prisma/client";
+import type {Snippet, Folder} from "@prisma/client";
 
 import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 
 import {ResizablePanel} from "./ui/resizable";
 import Editor from "./editor";
@@ -13,19 +14,92 @@ import EditorFooter from "./editor-footer";
 import {emitter} from "@/lib/events";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetContent} from "@/lib/db/actions/snippets/update-snippet-content";
+
 const DEBOUNCE_TIME = 1500;
 
-function EditorColumn() {
-  const {selectedSnippet, setSelectedSnippet} = useSnippet();
-  const [isSaving, setIsSaving] = useState<boolean>(false);
+type FolderWithSnippets = Folder & {snippets: Snippet[]};
 
+function EditorColumn() {
+  const {selectedSnippet} = useSnippet();
+  const queryClient = useQueryClient();
+
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const saveVersionRef = useRef<number>(0);
 
-  const updateSnippetState = (callback: (snippet: Snippet) => void) => {
-    if (!selectedSnippet) return;
-    callback(selectedSnippet);
-  };
+  const mutation = useMutation({
+    mutationFn: ({
+      snippetId,
+      newContent,
+      newUpdateDate,
+    }: {
+      snippetId: string;
+      newContent: string;
+      newUpdateDate: Date;
+      version: number;
+    }) => updateSnippetContent({snippetId, newContent, newUpdateDate}),
+    onMutate: async ({newContent}) => {
+      if (!selectedSnippet) return;
+
+      await queryClient.cancelQueries({
+        queryKey: ["folder", selectedSnippet.folderId],
+      });
+
+      const previousFolder = queryClient.getQueryData<FolderWithSnippets>([
+        "folder",
+        selectedSnippet.folderId,
+      ]);
+
+      queryClient.setQueryData<FolderWithSnippets>(["folder", selectedSnippet.folderId], (old) => {
+        if (!old || !old.snippets) return old;
+
+        return {
+          ...old,
+          snippets: old.snippets.map((snippet) =>
+            snippet.id === selectedSnippet.id ? {...snippet, content: newContent} : snippet,
+          ),
+        };
+      });
+
+      return {previousFolder};
+    },
+    onError: (error, variables, context) => {
+      if (selectedSnippet) {
+        queryClient.setQueryData(["folder", selectedSnippet.folderId], context?.previousFolder);
+      }
+      toast.error(`Error saving changes: ${error}`);
+      setIsSaving(false);
+      emitter.emit("UNLOCK_EDITOR");
+    },
+    onSuccess: (data, variables) => {
+      if (variables.version === saveVersionRef.current && selectedSnippet) {
+        queryClient.setQueryData<FolderWithSnippets>(
+          ["folder", selectedSnippet.folderId],
+          (old) => {
+            if (!old || !old.snippets) return old;
+
+            return {
+              ...old,
+              snippets: old.snippets.map((snippet) =>
+                snippet.id === selectedSnippet.id
+                  ? {...snippet, content: data.content, updatedAt: data.updatedAt}
+                  : snippet,
+              ),
+            };
+          },
+        );
+      }
+    },
+    onSettled: () => {
+      setIsSaving(false);
+      emitter.emit("UNLOCK_EDITOR");
+      if (selectedSnippet) {
+        queryClient.invalidateQueries({
+          queryKey: ["folder", selectedSnippet.folderId],
+        });
+      }
+    },
+  });
 
   const handleContentChange = (value: string) => {
     if (!selectedSnippet?.id) return;
@@ -40,45 +114,14 @@ function EditorColumn() {
     }
     emitter.emit("LOCK_EDITOR");
 
-    updateSnippetState((snippet) => {
-      setSelectedSnippet({
-        ...snippet,
-        content: currentValue,
+    saveTimeoutRef.current = setTimeout(() => {
+      setIsSaving(true);
+      mutation.mutate({
+        snippetId: selectedSnippet.id,
+        newContent: currentValue,
+        newUpdateDate,
+        version: currentSaveVersion,
       });
-    });
-
-    saveTimeoutRef.current = setTimeout(async () => {
-      try {
-        setIsSaving(true);
-        const response = await updateSnippetContent({
-          snippetId: selectedSnippet.id,
-          newContent: currentValue,
-          newUpdateDate,
-        });
-
-        if (saveVersionRef.current === currentSaveVersion) {
-          setSelectedSnippet({
-            ...selectedSnippet,
-            content: response.content,
-            updatedAt: response.updatedAt,
-          });
-        }
-      } catch (error) {
-        updateSnippetState((snippet) => {
-          setSelectedSnippet({
-            ...snippet,
-            content: selectedSnippet?.content,
-            updatedAt: selectedSnippet?.updatedAt,
-          });
-        });
-        toast.error(`Error saving changes: ${error}`);
-        setIsSaving(false);
-      } finally {
-        if (saveVersionRef.current === currentSaveVersion) {
-          setIsSaving(false);
-        }
-        emitter.emit("UNLOCK_EDITOR");
-      }
     }, DEBOUNCE_TIME);
   };
 

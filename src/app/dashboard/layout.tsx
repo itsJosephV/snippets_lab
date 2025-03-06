@@ -1,6 +1,7 @@
 import React from "react";
 
 import {SnippetProvider} from "@/context/SnippetContext";
+import RQueryProvider from "@/components/QueryProvider";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -8,11 +9,13 @@ type DashboardLayoutProps = {
 
 function DashboardLayout({children}: DashboardLayoutProps) {
   return (
-    <SnippetProvider>
-      <main className="h-[calc(100vh-var(--layout-header-height))] overflow-y-hidden">
-        {children}
-      </main>
-    </SnippetProvider>
+    <RQueryProvider>
+      <SnippetProvider>
+        <main className="h-[calc(100vh-var(--layout-header-height))] overflow-y-hidden">
+          {children}
+        </main>
+      </SnippetProvider>
+    </RQueryProvider>
   );
 }
 

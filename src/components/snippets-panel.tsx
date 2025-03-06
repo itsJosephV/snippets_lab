@@ -14,9 +14,9 @@ export type FolderAndSnippets = Folder & {snippets: Snippet[]};
 async function SnippetsPanel({folderId}: {folderId: string}) {
   return (
     <SnippetsPanelContainer>
-      <Suspense key={folderId} fallback={<SnippetCardSkeleton />}>
-        <Draftcomponent folderId={folderId} />
-      </Suspense>
+      {/* <Suspense key={folderId} fallback={<SnippetCardSkeleton />}> */}
+      <Draftcomponent folderId={folderId} />
+      {/* </Suspense> */}
     </SnippetsPanelContainer>
   );
 }

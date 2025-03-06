@@ -1,6 +1,7 @@
-"use server";
+"use client";
 import React from "react";
 import {Search} from "lucide-react";
+import {useQuery} from "@tanstack/react-query";
 
 import {SidebarTrigger} from "./ui/sidebar";
 import Settings from "./settings";
@@ -12,14 +13,30 @@ import {Input} from "./ui/input";
 import {CreateSnippetForm} from "./forms/create-snippet-form";
 
 import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
-import {OptimisticProvider} from "@/context/OptimisticContext";
+// import {OptimisticProvider} from "@/context/OptimisticContext";
 import {cn} from "@/lib/utils";
 
-async function Draftcomponent({folderId}: {folderId: string}) {
-  const folder = await getFolderAndSnippetsById({folderId});
+function Draftcomponent({folderId}: {folderId: string}) {
+  // const folder = await getFolderAndSnippetsById({folderId});
+  const {
+    data: folder,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["folder", folderId],
+    queryFn: () => getFolderAndSnippetsById({folderId}),
+    enabled: !!folderId,
+  });
+
+  if (isLoading) {
+    return <div className="p-4">Cargando snippets...</div>;
+  }
+
+  console.log(folder);
 
   return (
-    <OptimisticProvider initialData={folder?.snippets || []}>
+    // <OptimisticProvider initialData={folder?.snippets || []}>
+    <>
       <header>
         <div className="border-border flex items-center border-b p-2">
           <SidebarTrigger />
@@ -48,8 +65,9 @@ async function Draftcomponent({folderId}: {folderId: string}) {
           <Input className="pl-8" disabled={!folder} placeholder="Search for a snippet..." />
         </div>
       </header>
-      <ScrollArea>{folder && <SnippetsLits />}</ScrollArea>
-    </OptimisticProvider>
+      <ScrollArea>{folder && <SnippetsLits folder={folder} />}</ScrollArea>
+    </>
+    // </OptimisticProvider>
   );
 }
 

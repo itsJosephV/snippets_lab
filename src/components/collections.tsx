@@ -1,7 +1,8 @@
-"use server";
+"use client";
 import React from "react";
 import {ChevronRight, MoreHorizontal} from "lucide-react";
 import {Collection, Folder} from "@prisma/client";
+import {useQuery} from "@tanstack/react-query";
 
 import {
   SidebarMenu,
@@ -23,14 +24,23 @@ import {DeleteCollectionButton} from "./delete-collection-btn";
 
 import {getCollections} from "@/lib/db/data/get_collections";
 
+// import {getCollections} from "@/lib/db/data/get_collections";
+
 type CollectionWithFolders = (Collection & {folders: Folder[]})[];
 
-async function Collections() {
-  const collections: CollectionWithFolders = await getCollections();
+function Collections({initialCollections}: {initialCollections: CollectionWithFolders}) {
+  // const collections: CollectionWithFolders = await getCollections();
+
+  const {data: collectionsRQ} = useQuery({
+    queryKey: ["collections"],
+    queryFn: getCollections,
+    // staleTime: 1000 * 60 * 5,
+    initialData: initialCollections,
+  });
 
   return (
     <SidebarMenu>
-      {collections.map((collection) => (
+      {collectionsRQ.map((collection) => (
         <Collapsible
           key={collection.id}
           asChild

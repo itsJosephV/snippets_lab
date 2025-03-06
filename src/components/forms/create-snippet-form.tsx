@@ -1,12 +1,13 @@
 "use client";
-import type {Snippet} from "@prisma/client";
 
-import React, {useState, useTransition} from "react";
+import React, {useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Info, LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {Folder, Snippet} from "@prisma/client";
 
 import {
   Dialog,
@@ -33,8 +34,9 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "../ui/to
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
-import {useOptimisticContext} from "@/context/useOptimisticContext";
 import {languageTemplateFn} from "@/lib/languages";
+
+type FolderWithSnippets = Folder & {snippets: Snippet[]};
 
 const snippetSchema = z.object({
   title: z
@@ -55,9 +57,8 @@ export const DEFAULT_LANGUAGE = Language["TYPESCRIPT"];
 
 export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const {setSelectedSnippet} = useSnippet();
-  const {addOptimistic} = useOptimisticContext();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof snippetSchema>>({
     resolver: zodResolver(snippetSchema),
@@ -68,47 +69,77 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof snippetSchema>) {
-    const tempId = `temp-${Date.now()}`;
-    const tempFolderId = `temp-${Date.now()}`;
+  const mutation = useMutation({
+    mutationFn: (values: z.infer<typeof snippetSchema>) =>
+      createSnippet({
+        title: values.title,
+        description: values.description,
+        language: values.language,
+        folderId,
+      }),
+    onMutate: async (values) => {
+      await queryClient.cancelQueries({queryKey: ["folder", folderId]});
+      const previousFolder = queryClient.getQueryData(["folder", folderId]);
 
-    const tempSnippet = {
-      id: tempId,
-      title: values.title,
-      folderId: tempFolderId,
-      description: values.description || null,
-      language: values.language || DEFAULT_LANGUAGE,
-      content: languageTemplateFn(
-        values.title,
-        values.description,
-        (values.language as Language) || DEFAULT_LANGUAGE,
-      ),
-      isFavorite: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } satisfies Snippet;
+      const tempId = `temp-${Date.now()}`;
+      const tempSnippet = {
+        id: tempId,
+        title: values.title,
+        description: values.description || null,
+        language: values.language || DEFAULT_LANGUAGE,
+        content: languageTemplateFn(
+          values.title,
+          values.description,
+          (values.language as Language) || DEFAULT_LANGUAGE,
+        ),
+        isFavorite: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        folderId,
+      };
 
-    startTransition(async () => {
-      addOptimistic(tempSnippet);
-      try {
-        const response = await createSnippet({
-          title: values.title,
-          description: values.description,
-          language: values.language,
-          folderId,
-        });
+      // Actualizar el caché optimistamente
+      queryClient.setQueryData(["folder", folderId], (old: FolderWithSnippets) => {
+        if (!old || !old.snippets) return {...old, snippets: [tempSnippet]};
 
-        if (response.success) setSelectedSnippet(response.snippet);
-        setDialogOpen(false);
-        form.reset();
+        // setSelectedSnippet(tempSnippet);
 
-        toast.success("Snippet created!");
-      } catch (error) {
-        form.setError("root", {message: error as string});
-        toast.error((error as Error).message);
-      }
-    });
-  }
+        return {
+          ...old,
+          snippets: [tempSnippet, ...old.snippets],
+        };
+      });
+
+      return {previousFolder};
+    },
+    onError: (err, variables, context) => {
+      queryClient.setQueryData(["folder", folderId], context?.previousFolder);
+      toast.error("Error creating snippet");
+    },
+    onSuccess: (response) => {
+      queryClient.setQueryData(["folder", folderId], (old: FolderWithSnippets) => {
+        if (!old || !old.snippets) return {...old, snippets: [response.snippet]};
+
+        return {
+          ...old,
+          snippets: old.snippets.map((snippet: Snippet) =>
+            snippet.id.startsWith("temp-") ? response.snippet : snippet,
+          ),
+        };
+      });
+      setSelectedSnippet(response.snippet);
+      toast.success("Snippet created!");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({queryKey: ["folder", folderId]});
+    },
+  });
+
+  const handleSubmit = (values: z.infer<typeof snippetSchema>) => {
+    mutation.mutate(values);
+    setDialogOpen(false);
+    form.reset();
+  };
 
   const handleOpenChange = (isOpen: boolean) => {
     setDialogOpen(isOpen);
@@ -134,7 +165,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
           <DialogDescription>Create a new snippet in the current folder.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+          <form className="space-y-8" onSubmit={form.handleSubmit(handleSubmit)}>
             <FormField
               control={form.control}
               name="title"
@@ -202,8 +233,8 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                 </FormItem>
               )}
             />
-            <Button disabled={isPending} type="submit">
-              {isPending ? (
+            <Button disabled={mutation.isPending} type="submit">
+              {mutation.isPending ? (
                 <>
                   <LoaderIcon className="animate-spin" /> Creating...
                 </>
