@@ -13,12 +13,13 @@ import {Input} from "./ui/input";
 import {CreateSnippetForm} from "./forms/create-snippet-form";
 
 import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
+import {OptimisticProvider} from "@/context/OptimisticContext";
 
 async function Draftcomponent({folderId}: {folderId: string}) {
   const folder = await getFolderAndSnippetsById({folderId});
 
   return (
-    <>
+    <OptimisticProvider initialData={folder?.snippets || []}>
       <header>
         <div className="border-border flex items-center border-b p-2">
           <SidebarTrigger />
@@ -40,8 +41,8 @@ async function Draftcomponent({folderId}: {folderId: string}) {
           <Input className="pl-8" placeholder="Search for a snippet..." />
         </div>
       </header>
-      <ScrollArea>{folder && <SnippetsLits folder={folder} />}</ScrollArea>
-    </>
+      <ScrollArea>{folder && <SnippetsLits />}</ScrollArea>
+    </OptimisticProvider>
   );
 }
 

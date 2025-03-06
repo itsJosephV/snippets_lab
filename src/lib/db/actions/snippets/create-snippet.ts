@@ -7,7 +7,6 @@ import {languageTemplateFn} from "@/lib/languages";
 import {Language} from "@/types";
 
 const DEFAULT_LANGUAGE = Language["TYPESCRIPT"];
-const DEFAULT_DESCRIPTION = "Add a description here";
 
 export async function createSnippet({
   title,
@@ -39,13 +38,13 @@ export async function createSnippet({
     }
 
     const languageDraft = (language as Language) || DEFAULT_LANGUAGE;
-    const descriptionDraft: string = description || DEFAULT_DESCRIPTION;
+    const descriptionDraft: string = description || "";
 
     const newSnippet = await db.snippet.create({
       data: {
         title: title,
         language: languageDraft,
-        description: descriptionDraft,
+        description: description || "",
         folder: {
           connect: {
             id: folderId,
@@ -56,10 +55,10 @@ export async function createSnippet({
       },
     });
 
-    revalidatePath("/dashboard");
-
     return {success: true, snippet: newSnippet};
   } catch (error) {
     throw new Error(error as string);
+  } finally {
+    revalidatePath("/dashboard");
   }
 }

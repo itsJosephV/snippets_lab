@@ -1,14 +1,15 @@
-"use server";
-import type {Folder, Snippet} from "@prisma/client";
+"use client";
 
 import React from "react";
 
 import SnippetCard from "./snippet-card";
 
 import {cn} from "@/lib/utils";
+import {useOptimisticContext} from "@/context/useOptimisticContext";
 
-type FolderAndSnippets = Folder & {snippets: Snippet[]};
-async function SnippetsLits({folder}: {folder: FolderAndSnippets}) {
+function SnippetsLits() {
+  const {optimisticData} = useOptimisticContext();
+
   return (
     <ul
       className={cn(
@@ -16,10 +17,9 @@ async function SnippetsLits({folder}: {folder: FolderAndSnippets}) {
         "h-[calc(100vh-var(--snippets-header-height))]",
       )}
     >
-      {folder &&
-        folder.snippets.map((snippet) => {
-          return <SnippetCard key={snippet.id} snippet={snippet} />;
-        })}
+      {optimisticData.map((snippet) => {
+        return <SnippetCard key={snippet.id} snippet={snippet} />;
+      })}
     </ul>
   );
 }

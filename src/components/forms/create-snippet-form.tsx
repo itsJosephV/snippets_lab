@@ -1,5 +1,7 @@
 "use client";
-import React, {useOptimistic, useState, useTransition} from "react";
+import type {Snippet} from "@prisma/client";
+
+import React, {useState, useTransition} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -31,6 +33,8 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "../ui/to
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
+import {useOptimisticContext} from "@/context/useOptimisticContext";
+import {languageTemplateFn} from "@/lib/languages";
 
 const snippetSchema = z.object({
   title: z
@@ -47,11 +51,14 @@ const snippetSchema = z.object({
   language: z.string(),
 });
 
+export const DEFAULT_LANGUAGE = Language["TYPESCRIPT"];
+
 export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const {setSelectedSnippet} = useSnippet();
-  // const [] = useOptimistic();
+  const {addOptimistic} = useOptimisticContext();
+
   const form = useForm<z.infer<typeof snippetSchema>>({
     resolver: zodResolver(snippetSchema),
     defaultValues: {
@@ -62,7 +69,27 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
   });
 
   async function onSubmit(values: z.infer<typeof snippetSchema>) {
+    const tempId = `temp-${Date.now()}`;
+    const tempFolderId = `temp-${Date.now()}`;
+
+    const tempSnippet = {
+      id: tempId,
+      title: values.title,
+      folderId: tempFolderId,
+      description: values.description || null,
+      language: values.language || DEFAULT_LANGUAGE,
+      content: languageTemplateFn(
+        values.title,
+        values.description,
+        (values.language as Language) || DEFAULT_LANGUAGE,
+      ),
+      isFavorite: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } satisfies Snippet;
+
     startTransition(async () => {
+      addOptimistic(tempSnippet);
       try {
         const response = await createSnippet({
           title: values.title,
@@ -127,7 +154,6 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
               render={({field}) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-1">
-                    {/**TODO: ADD THE TYPESCRIPT BY DEFAULT MESSAGE ON HOVER */}
                     Language{" "}
                     <TooltipProvider>
                       <Tooltip>
