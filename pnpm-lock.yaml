@@ -155,6 +155,9 @@ dependencies:
   '@tailwindcss/postcss':
     specifier: 4.0.6
     version: 4.0.6
+  '@tanstack/react-query':
+    specifier: ^5.67.1
+    version: 5.67.1(react@19.0.0)
   '@uiw/codemirror-theme-basic':
     specifier: ^4.23.10
     version: 4.23.10(@codemirror/language@6.10.8)(@codemirror/state@6.5.2)(@codemirror/view@6.36.3)
@@ -3438,6 +3441,19 @@ packages:
       lightningcss: 1.29.1
       postcss: 8.5.3
       tailwindcss: 4.0.6
+    dev: false
+
+  /@tanstack/query-core@5.67.1:
+    resolution: {integrity: sha512-AkFmuukVejyqVIjEQoFhLb3q+xHl7JG8G9cANWTMe3s8iKzD9j1VBSYXgCjy6vm6xM8cUCR9zP2yqWxY9pTWOA==}
+    dev: false
+
+  /@tanstack/react-query@5.67.1(react@19.0.0):
+    resolution: {integrity: sha512-fH5u4JLwB6A+wLFdi8wWBWAYoJV5deYif2OveJ26ktAWjU499uvVFS1wPWnyEyq5LvZX1MZInvv9QRaIZANRaQ==}
+    peerDependencies:
+      react: ^18 || ^19
+    dependencies:
+      '@tanstack/query-core': 5.67.1
+      react: 19.0.0
     dev: false
 
   /@types/cookie@0.6.0:

@@ -22,27 +22,24 @@ export function LanguagePicker() {
     (_, newLanguage: Language) => newLanguage,
   );
 
-  const handleSelectChange = async (value: Language) => {
+  const handleSelectChange = (value: Language) => {
     if (!selectedSnippet) return;
 
-    startTransition(() => {
+    startTransition(async () => {
       setOptimisticLanguage(value);
+
+      try {
+        const response = await updateSnippetLanguage(selectedSnippet.id, value);
+
+        setSelectedSnippet({
+          ...selectedSnippet,
+          language: response.language,
+        });
+        toast.success(`Language updated to ${response.language}`);
+      } catch (error) {
+        toast.error(`Failed to update language: ${error}`);
+      }
     });
-
-    try {
-      const response = await updateSnippetLanguage(selectedSnippet.id, value);
-
-      setSelectedSnippet({
-        ...selectedSnippet,
-        language: response.language,
-      });
-      toast.success(`Language updated to ${response.language}`);
-    } catch (error) {
-      startTransition(() => {
-        setOptimisticLanguage(selectedSnippet.language as Language);
-      });
-      toast.error(`Failed to update language: ${error}`);
-    }
   };
 
   return (

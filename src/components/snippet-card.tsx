@@ -13,8 +13,6 @@ function SnippetCard({snippet}: {snippet: Snippet}) {
 
   const isLocked = useLocker();
 
-  // const {name: collectionName} = snippet.folder.collection;
-
   const handleSnippetSelection = () => {
     if (selectedSnippet?.id === snippet.id) {
       return;
