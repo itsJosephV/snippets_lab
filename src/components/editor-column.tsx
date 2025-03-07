@@ -1,10 +1,10 @@
 "use client";
-
-import type {Snippet, Folder} from "@prisma/client";
+import type {FolderWithSnippets} from "@/types";
 
 import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {Snippet} from "@prisma/client";
 
 import {ResizablePanel} from "./ui/resizable";
 import Editor from "./editor";
@@ -17,15 +17,18 @@ import {updateSnippetContent} from "@/lib/db/actions/snippets/update-snippet-con
 
 const DEBOUNCE_TIME = 1500;
 
-type FolderWithSnippets = Folder & {snippets: Snippet[]};
-
 function EditorColumn() {
-  const {selectedSnippet} = useSnippet();
+  const {selectedSnippet, setSelectedSnippet} = useSnippet();
   const queryClient = useQueryClient();
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const saveVersionRef = useRef<number>(0);
+
+  const updateSnippetState = (callback: (snippet: typeof selectedSnippet) => void) => {
+    if (!selectedSnippet) return;
+    callback(selectedSnippet);
+  };
 
   const mutation = useMutation({
     mutationFn: ({
@@ -88,6 +91,13 @@ function EditorColumn() {
             };
           },
         );
+        updateSnippetState((snippet) => {
+          setSelectedSnippet({
+            ...(snippet as Snippet),
+            content: data.content,
+            updatedAt: data.updatedAt,
+          });
+        });
       }
     },
     onSettled: () => {

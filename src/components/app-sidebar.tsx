@@ -1,5 +1,4 @@
 import {Star, FolderCode} from "lucide-react";
-import {Suspense} from "react";
 import {Collection, Folder} from "@prisma/client";
 
 import CreateCollectionForm from "./forms/create-collection-form";

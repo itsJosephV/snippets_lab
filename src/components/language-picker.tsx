@@ -1,7 +1,9 @@
+import type {FolderWithSnippets} from "@/types";
+import type {Snippet} from "@prisma/client";
+
 import * as React from "react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {Folder, Snippet} from "@prisma/client";
 
 import {
   Select,
@@ -14,8 +16,6 @@ import {
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetLanguage} from "@/lib/db/actions/snippets/update-snippet-language";
-
-type FolderWithSnippets = Folder & {snippets: Snippet[]};
 
 export function LanguagePicker() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();

@@ -11,13 +11,12 @@ import {Separator} from "./ui/separator";
 import {ScrollArea} from "./ui/scroll-area";
 import {Input} from "./ui/input";
 import {CreateSnippetForm} from "./forms/create-snippet-form";
+import {Skeleton} from "./ui/skeleton";
 
 import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
-// import {OptimisticProvider} from "@/context/OptimisticContext";
 import {cn} from "@/lib/utils";
 
 function Draftcomponent({folderId}: {folderId: string}) {
-  // const folder = await getFolderAndSnippetsById({folderId});
   const {
     data: folder,
     isLoading,
@@ -28,26 +27,23 @@ function Draftcomponent({folderId}: {folderId: string}) {
     enabled: !!folderId,
   });
 
-  if (isLoading) {
-    return <div className="p-4">Cargando snippets...</div>;
-  }
-
-  console.log(folder);
-
   return (
-    // <OptimisticProvider initialData={folder?.snippets || []}>
     <>
       <header>
         <div className="border-border flex items-center border-b p-2">
           <SidebarTrigger />
           <div className="ml-2 flex flex-1">
-            <p
-              className={cn("text-sm", {
-                "text-muted-foreground": !folder,
-              })}
-            >
-              {folder?.name ?? "No folder selected"}
-            </p>
+            {isLoading ? (
+              <SnippetColumnHeaderSk />
+            ) : (
+              <p
+                className={cn("text-sm", {
+                  "text-muted-foreground": !folder,
+                })}
+              >
+                {folder?.name ?? "No folder selected"}
+              </p>
+            )}
           </div>
           <div className="flex h-full lg:block">
             <div className="space-x-1.5 lg:hidden">
@@ -65,10 +61,37 @@ function Draftcomponent({folderId}: {folderId: string}) {
           <Input className="pl-8" disabled={!folder} placeholder="Search for a snippet..." />
         </div>
       </header>
-      <ScrollArea>{folder && <SnippetsLits folder={folder} />}</ScrollArea>
+      {isLoading ? (
+        <SnippetCardSkeleton />
+      ) : (
+        <ScrollArea>{folder && <SnippetsLits folder={folder} />}</ScrollArea>
+      )}
     </>
-    // </OptimisticProvider>
   );
 }
 
 export default Draftcomponent;
+
+function SnippetCardSkeleton() {
+  return (
+    <ul
+      className={cn(
+        "flex flex-col gap-3 overflow-y-scroll p-2",
+        "h-[calc(100vh-var(--snippets-header-height))]",
+      )}
+    >
+      {Array.from({length: 6}).map((_, i) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <Skeleton key={`skeleton-${i}`} className="h-[100px] w-full" />
+      ))}
+    </ul>
+  );
+}
+
+function SnippetColumnHeaderSk() {
+  return (
+    <div className="ml-2 flex flex-1">
+      <Skeleton className="h-[20px] w-[120px] rounded-md" />
+    </div>
+  );
+}

@@ -7,7 +7,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Info, LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {Folder, Snippet} from "@prisma/client";
+import {Snippet} from "@prisma/client";
 
 import {
   Dialog,
@@ -31,12 +31,11 @@ import {
 } from "../ui/select";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "../ui/tooltip";
 
+import {FolderWithSnippets} from "@/types";
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
 import {languageTemplateFn} from "@/lib/languages";
-
-type FolderWithSnippets = Folder & {snippets: Snippet[]};
 
 const snippetSchema = z.object({
   title: z

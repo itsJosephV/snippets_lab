@@ -1,22 +1,76 @@
+"use client";
 import {Folder, Snippet} from "@prisma/client";
-import {Suspense} from "react";
+import React from "react";
+import {Search} from "lucide-react";
+import {useQuery} from "@tanstack/react-query";
 
 import SnippetsPanelContainer from "./snippets-panel-container";
-import Draftcomponent from "./Draftcomponent";
+import {SidebarTrigger} from "./ui/sidebar";
+import Settings from "./settings";
+import {ModeToggle} from "./theme-toggle";
+import SnippetsLits from "./snippets-list";
+import {Separator} from "./ui/separator";
+import {ScrollArea} from "./ui/scroll-area";
+import {Input} from "./ui/input";
+import {CreateSnippetForm} from "./forms/create-snippet-form";
 import {Skeleton} from "./ui/skeleton";
 
+import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
 import {cn} from "@/lib/utils";
 
 export type FolderAndSnippets = Folder & {snippets: Snippet[]};
 
-//TODO: BUILD A PROPER SKELETON FOR THE SNIPPET PANEL AND COLUMN HEADER
+function SnippetsPanel({folderId}: {folderId: string}) {
+  const {
+    data: folder,
+    isLoading,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    error,
+  } = useQuery({
+    queryKey: ["folder", folderId],
+    queryFn: () => getFolderAndSnippetsById({folderId}),
+    enabled: !!folderId,
+  });
 
-async function SnippetsPanel({folderId}: {folderId: string}) {
   return (
     <SnippetsPanelContainer>
-      {/* <Suspense key={folderId} fallback={<SnippetCardSkeleton />}> */}
-      <Draftcomponent folderId={folderId} />
-      {/* </Suspense> */}
+      <header>
+        <div className="border-border flex items-center border-b p-2">
+          <SidebarTrigger />
+          <div className="ml-2 flex flex-1">
+            {isLoading ? (
+              <SnippetColumnHeaderSk />
+            ) : (
+              <p
+                className={cn("text-sm", {
+                  "text-muted-foreground": !folder,
+                })}
+              >
+                {folder?.name ?? "No folder selected"}
+              </p>
+            )}
+          </div>
+          <div className="flex h-full lg:block">
+            <div className="space-x-1.5 lg:hidden">
+              <Settings />
+              <ModeToggle />
+            </div>
+            <div className="py-1 lg:hidden">
+              <Separator className="mx-2" orientation="vertical" />
+            </div>
+            <CreateSnippetForm folderId={folderId} />
+          </div>
+        </div>
+        <div className="border-border relative border-b p-2">
+          <Search className="text-muted-foreground absolute top-1/2 left-5 h-4 w-4 -translate-y-1/2" />
+          <Input className="pl-8" disabled={!folder} placeholder="Search for a snippet..." />
+        </div>
+      </header>
+      {isLoading ? (
+        <SnippetCardSkeleton />
+      ) : (
+        <ScrollArea>{folder && <SnippetsLits folder={folder} />}</ScrollArea>
+      )}
     </SnippetsPanelContainer>
   );
 }
@@ -39,20 +93,10 @@ function SnippetCardSkeleton() {
   );
 }
 
-// import {cn} from "@/lib/utils";
-{
-  /* <Suspense key={folderId} fallback={<SnippetColumnHeaderSk />}>
-          </Suspense> */
+function SnippetColumnHeaderSk() {
+  return (
+    <div className="ml-2 flex flex-1">
+      <Skeleton className="h-[20px] w-[120px] rounded-md" />
+    </div>
+  );
 }
-{
-  /* <Suspense key={folderId} fallback={<SnippetCardSkeleton />}>
-        </Suspense> */
-}
-
-// function SnippetColumnHeaderSk() {
-//   return (
-//     <div className="ml-2 flex flex-1">
-//       <Skeleton className="h-[20px] w-[120px] rounded-md" />
-//     </div>
-//   );
-// }
