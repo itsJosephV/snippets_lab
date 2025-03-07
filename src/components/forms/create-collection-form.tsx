@@ -1,10 +1,12 @@
 "use client";
-import React, {useState, useTransition} from "react";
+
+import React, {useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 
 import {
   DialogContent,
@@ -19,6 +21,7 @@ import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 
 import {createCollection} from "@/lib/db/actions/collections/create-collection";
+
 const collectionSchema = z.object({
   collection: z.string().min(1, {
     message: "Collection name is required",
@@ -27,7 +30,7 @@ const collectionSchema = z.object({
 
 function CreateCollectionForm() {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
@@ -36,18 +39,22 @@ function CreateCollectionForm() {
     },
   });
 
+  const {mutate, isPending} = useMutation({
+    mutationFn: (values: z.infer<typeof collectionSchema>) =>
+      createCollection({collection: values.collection}),
+    onError: (error) => {
+      toast.error(`Error creating collection: ${error.message as string}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ["collections"]});
+      form.reset();
+      setDialogOpen(false);
+      toast.success("Collection created! 🎉");
+    },
+  });
+
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
-    startTransition(async () => {
-      try {
-        await createCollection({collection: values.collection});
-        form.reset();
-        setDialogOpen(false);
-        toast.success("Collection created!");
-      } catch (error) {
-        form.setError("root", {message: error as string});
-        toast.error((error as Error).message);
-      }
-    });
+    mutate(values);
   }
 
   const handleOpenChange = (isOpen: boolean) => {

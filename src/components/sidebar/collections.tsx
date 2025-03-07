@@ -1,8 +1,10 @@
 "use client";
+import type {CollectionWithFolders} from "@/types";
+
 import React from "react";
 import {ChevronRight, MoreHorizontal} from "lucide-react";
-import {Collection, Folder} from "@prisma/client";
 import {useQuery} from "@tanstack/react-query";
+import {useSearchParams} from "next/navigation";
 
 import {
   SidebarMenu,
@@ -24,13 +26,10 @@ import {DeleteCollectionButton} from "./delete-collection-btn";
 import FolderItem from "./folder-item";
 
 import {getCollections} from "@/lib/db/data/get_collections";
+import {cn} from "@/lib/utils";
 
-// import {getCollections} from "@/lib/db/data/get_collections";
-
-type CollectionWithFolders = (Collection & {folders: Folder[]})[];
-
-function Collections({initialCollections}: {initialCollections: CollectionWithFolders}) {
-  // const collections: CollectionWithFolders = await getCollections();
+function Collections({initialCollections}: {initialCollections: CollectionWithFolders[]}) {
+  const folderId = useSearchParams().get("folderId");
 
   const {data: collectionsRQ} = useQuery({
     queryKey: ["collections"],
@@ -39,8 +38,12 @@ function Collections({initialCollections}: {initialCollections: CollectionWithFo
     initialData: initialCollections,
   });
 
+  const hasFolder = (collection: CollectionWithFolders) => {
+    return collection.folders.some((folder) => folder.id === folderId);
+  };
+
   return (
-    <SidebarMenu>
+    <SidebarMenu className="">
       {collectionsRQ.map((collection) => (
         <Collapsible
           key={collection.id}
@@ -48,14 +51,19 @@ function Collections({initialCollections}: {initialCollections: CollectionWithFo
           className="group/collapsible"
           defaultOpen={collection.isDefault}
         >
-          <SidebarMenuItem>
+          <SidebarMenuItem className="">
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton tooltip={collection.name}>
+              <SidebarMenuButton
+                className={cn("", {
+                  "bg-muted": hasFolder(collection),
+                })}
+                tooltip={collection.name}
+              >
                 <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                 <span>{collection.name}</span>
               </SidebarMenuButton>
             </CollapsibleTrigger>
-            <CollapsibleContent>
+            <CollapsibleContent className="">
               <SidebarMenuSub>
                 {collection.folders.map((folder) => (
                   <FolderItem key={folder.id} folder={folder} />

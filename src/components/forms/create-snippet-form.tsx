@@ -7,7 +7,6 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Info, LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {Snippet} from "@prisma/client";
 
 import {
   Dialog,
@@ -31,12 +30,9 @@ import {
 } from "../ui/select";
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "../ui/tooltip";
 
-import {FolderWithSnippets} from "@/types";
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
-import {languageTemplateFn} from "@/lib/languages/language-helpers";
-import {EPEmitters} from "@/lib/events";
 
 const snippetSchema = z.object({
   title: z
@@ -53,8 +49,6 @@ const snippetSchema = z.object({
   language: z.string(),
 });
 
-export const DEFAULT_LANGUAGE = Language["TYPESCRIPT"];
-
 export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const {setSelectedSnippet} = useSnippet();
@@ -69,7 +63,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
     },
   });
 
-  const mutation = useMutation({
+  const {mutate, isPending} = useMutation({
     mutationFn: (values: z.infer<typeof snippetSchema>) =>
       createSnippet({
         title: values.title,
@@ -77,70 +71,20 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
         language: values.language,
         folderId,
       }),
-    onMutate: async (values) => {
-      await queryClient.cancelQueries({queryKey: ["folder", folderId]});
-      const previousFolder = queryClient.getQueryData(["folder", folderId]);
-
-      const tempId = `temp-${Date.now()}`;
-      const tempSnippet = {
-        id: tempId,
-        title: values.title,
-        description: values.description || null,
-        language: values.language || DEFAULT_LANGUAGE,
-        content: languageTemplateFn(
-          values.title,
-          values.description,
-          (values.language as Language) || DEFAULT_LANGUAGE,
-        ),
-        isFavorite: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        folderId,
-      };
-
-      EPEmitters.emit("LOCK_EDITOR_PANEL");
-      setSelectedSnippet(tempSnippet);
-      // Actualizar el caché optimistamente
-      queryClient.setQueryData(["folder", folderId], (old: FolderWithSnippets) => {
-        if (!old || !old.snippets) return {...old, snippets: [tempSnippet]};
-
-        return {
-          ...old,
-          snippets: [tempSnippet, ...old.snippets],
-        };
-      });
-
-      return {previousFolder};
-    },
-    onError: (err, variables, context) => {
-      queryClient.setQueryData(["folder", folderId], context?.previousFolder);
-      toast.error("Error creating snippet");
-      EPEmitters.emit("UNLOCK_EDITOR_PANEL");
+    onError: (err) => {
+      toast.error(`Error creating snippet: ${err.message}`);
     },
     onSuccess: (response) => {
-      queryClient.setQueryData(["folder", folderId], (old: FolderWithSnippets) => {
-        if (!old || !old.snippets) return {...old, snippets: [response]};
-
-        return {
-          ...old,
-          snippets: old.snippets.map((snippet: Snippet) =>
-            snippet.id.startsWith("temp-") ? response : snippet,
-          ),
-        };
-      });
-      setSelectedSnippet(response);
-    },
-    onSettled: () => {
       queryClient.invalidateQueries({queryKey: ["folder", folderId]});
-      toast.success("Snippet created!");
-      EPEmitters.emit("UNLOCK_EDITOR_PANEL");
+      form.reset();
+      setSelectedSnippet(response);
+      setDialogOpen(false);
+      toast.success("Snippet created! 🎉");
     },
   });
 
   const handleSubmit = (values: z.infer<typeof snippetSchema>) => {
-    mutation.mutate(values);
-    setDialogOpen(false);
-    form.reset();
+    mutate(values);
   };
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -235,8 +179,8 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                 </FormItem>
               )}
             />
-            <Button disabled={mutation.isPending} type="submit">
-              {mutation.isPending ? (
+            <Button disabled={isPending} type="submit">
+              {isPending ? (
                 <>
                   <LoaderIcon className="animate-spin" /> Creating...
                 </>
