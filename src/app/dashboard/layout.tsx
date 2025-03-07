@@ -1,7 +1,7 @@
 import React from "react";
 
 import {SnippetProvider} from "@/context/SnippetContext";
-import RQueryProvider from "@/components/QueryProvider";
+import RQueryProvider from "@/components/providers/query-provider";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;

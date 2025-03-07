@@ -7,8 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import {Button} from "./ui/button";
+} from "../ui/dropdown-menu";
+import {Button} from "../ui/button";
 
 function Settings({...props}) {
   return (

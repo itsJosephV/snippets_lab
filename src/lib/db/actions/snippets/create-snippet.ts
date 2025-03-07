@@ -1,10 +1,9 @@
 "use server";
-import {revalidatePath} from "next/cache";
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
-import {languageTemplateFn} from "@/lib/languages";
 import {Language} from "@/types";
+import {languageTemplateFn} from "@/lib/languages/language-helpers";
 
 const DEFAULT_LANGUAGE = Language["TYPESCRIPT"];
 
@@ -23,7 +22,7 @@ export async function createSnippet({
     const session = await auth();
 
     if (!session || !session.user?.id) {
-      throw new Error("You must be signed in to create a snippet.");
+      throw new Error("Unauthorized");
     }
 
     const existingSnippet = await db.snippet.findFirst({
@@ -55,10 +54,8 @@ export async function createSnippet({
       },
     });
 
-    return {success: true, snippet: newSnippet};
+    return newSnippet;
   } catch (error) {
     throw new Error(error as string);
-  } finally {
-    revalidatePath("/dashboard");
   }
 }

@@ -25,7 +25,6 @@ export default auth(async (req) => {
     return;
   }
 
-  // ⚙️ Is Auth Route. First, check is authenticated:
   if (isAuthRoute) {
     if (isLoggedIn) {
       return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));

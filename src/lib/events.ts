@@ -1,8 +1,8 @@
 import mitt from "mitt";
 
 type EditorEvents = {
-  LOCK_EDITOR: void;
-  UNLOCK_EDITOR: void;
+  LOCK_SNIPPETS_PANEL: void;
+  UNLOCK_SNIPPETS_PANEL: void;
 };
 
 export const emitter = mitt<EditorEvents>();

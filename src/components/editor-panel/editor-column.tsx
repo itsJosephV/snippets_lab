@@ -6,7 +6,8 @@ import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {Snippet} from "@prisma/client";
 
-import {ResizablePanel} from "./ui/resizable";
+import {ResizablePanel} from "../ui/resizable";
+
 import Editor from "./editor";
 import EditorHeader from "./editor-header";
 import EditorFooter from "./editor-footer";
@@ -72,7 +73,7 @@ function EditorColumn() {
       }
       toast.error(`Error saving changes: ${error}`);
       setIsSaving(false);
-      emitter.emit("UNLOCK_EDITOR");
+      emitter.emit("UNLOCK_SNIPPETS_PANEL");
     },
     onSuccess: (data, variables) => {
       if (variables.version === saveVersionRef.current && selectedSnippet) {
@@ -102,7 +103,7 @@ function EditorColumn() {
     },
     onSettled: () => {
       setIsSaving(false);
-      emitter.emit("UNLOCK_EDITOR");
+      emitter.emit("UNLOCK_SNIPPETS_PANEL");
       if (selectedSnippet) {
         queryClient.invalidateQueries({
           queryKey: ["folder", selectedSnippet.folderId],
@@ -120,9 +121,9 @@ function EditorColumn() {
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
-      emitter.emit("UNLOCK_EDITOR");
+      emitter.emit("UNLOCK_SNIPPETS_PANEL");
     }
-    emitter.emit("LOCK_EDITOR");
+    emitter.emit("LOCK_SNIPPETS_PANEL");
 
     saveTimeoutRef.current = setTimeout(() => {
       setIsSaving(true);
@@ -139,7 +140,7 @@ function EditorColumn() {
     return () => {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
-        emitter.emit("UNLOCK_EDITOR");
+        emitter.emit("UNLOCK_SNIPPETS_PANEL");
       }
     };
   }, []);

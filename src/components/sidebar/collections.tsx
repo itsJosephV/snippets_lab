@@ -10,17 +10,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-} from "./ui/sidebar";
-import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "./ui/collapsible";
-import FolderItem from "./folder-item";
+} from "../ui/sidebar";
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "../ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import {CreateFolderForm} from "./forms/create-folder-form";
+} from "../ui/dropdown-menu";
+import {CreateFolderForm} from "../forms/create-folder-form";
+
 import {DeleteCollectionButton} from "./delete-collection-btn";
+import FolderItem from "./folder-item";
 
 import {getCollections} from "@/lib/db/data/get_collections";
 

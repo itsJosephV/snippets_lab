@@ -1,19 +1,16 @@
 "use server";
-import {Prisma} from "@prisma/client";
+
+import type {CollectionWithFolders} from "@/types";
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
-
-type CollectionWithFolders = Prisma.CollectionGetPayload<{
-  include: {folders: true};
-}>;
 
 export async function getCollections(): Promise<CollectionWithFolders[]> {
   try {
     const session = await auth();
 
     if (!session?.user?.id) {
-      throw new Error("You must be signed in to get collections.");
+      throw new Error("Unauthorized");
     }
 
     const collections = await db.collection.findMany({
@@ -27,6 +24,6 @@ export async function getCollections(): Promise<CollectionWithFolders[]> {
 
     return collections;
   } catch (error) {
-    throw new Error(typeof error === "string" ? error : "Failed to fetch collections");
+    throw new Error(error instanceof Error ? error.message : "Error retrieving collections");
   }
 }

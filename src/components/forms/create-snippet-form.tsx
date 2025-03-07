@@ -35,7 +35,7 @@ import {FolderWithSnippets} from "@/types";
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
-import {languageTemplateFn} from "@/lib/languages";
+import {languageTemplateFn} from "@/lib/languages/language-helpers";
 
 const snippetSchema = z.object({
   title: z
@@ -117,16 +117,16 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
     },
     onSuccess: (response) => {
       queryClient.setQueryData(["folder", folderId], (old: FolderWithSnippets) => {
-        if (!old || !old.snippets) return {...old, snippets: [response.snippet]};
+        if (!old || !old.snippets) return {...old, snippets: [response]};
 
         return {
           ...old,
           snippets: old.snippets.map((snippet: Snippet) =>
-            snippet.id.startsWith("temp-") ? response.snippet : snippet,
+            snippet.id.startsWith("temp-") ? response : snippet,
           ),
         };
       });
-      setSelectedSnippet(response.snippet);
+      setSelectedSnippet(response);
       toast.success("Snippet created!");
     },
     onSettled: () => {

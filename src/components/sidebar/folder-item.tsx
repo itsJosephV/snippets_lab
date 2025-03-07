@@ -3,7 +3,7 @@
 import React from "react";
 import {useRouter, usePathname, useSearchParams} from "next/navigation";
 
-import {SidebarMenuSubItem, SidebarMenuSubButton} from "./ui/sidebar";
+import {SidebarMenuSubItem, SidebarMenuSubButton} from "../ui/sidebar";
 
 import {useSnippet} from "@/context/useSnippetContext";
 

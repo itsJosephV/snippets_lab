@@ -2,7 +2,7 @@
 import React from "react";
 import {useBreakpoint} from "use-breakpoint";
 
-import {ResizablePanel} from "./ui/resizable";
+import {ResizablePanel} from "../ui/resizable";
 
 const BREAKPOINTS = {xl: 1280, xxl: 1536};
 

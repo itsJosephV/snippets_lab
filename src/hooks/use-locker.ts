@@ -9,12 +9,12 @@ export function useLocker() {
     const lock = () => setIsLocked(true);
     const unlock = () => setIsLocked(false);
 
-    emitter.on("LOCK_EDITOR", lock);
-    emitter.on("UNLOCK_EDITOR", unlock);
+    emitter.on("LOCK_SNIPPETS_PANEL", lock);
+    emitter.on("UNLOCK_SNIPPETS_PANEL", unlock);
 
     return () => {
-      emitter.off("LOCK_EDITOR", lock);
-      emitter.off("UNLOCK_EDITOR", unlock);
+      emitter.off("LOCK_SNIPPETS_PANEL", lock);
+      emitter.off("UNLOCK_SNIPPETS_PANEL", unlock);
     };
   }, []);
 

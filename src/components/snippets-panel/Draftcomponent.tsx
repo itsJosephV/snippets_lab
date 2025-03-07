@@ -3,15 +3,16 @@ import React from "react";
 import {Search} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 
-import {SidebarTrigger} from "./ui/sidebar";
-import Settings from "./settings";
-import {ModeToggle} from "./theme-toggle";
+import {SidebarTrigger} from "../ui/sidebar";
+import Settings from "../editor-panel/settings";
+import {ModeToggle} from "../layout/theme-toggle";
+import {Separator} from "../ui/separator";
+import {ScrollArea} from "../ui/scroll-area";
+import {Input} from "../ui/input";
+import {CreateSnippetForm} from "../forms/create-snippet-form";
+import {Skeleton} from "../ui/skeleton";
+
 import SnippetsLits from "./snippets-list";
-import {Separator} from "./ui/separator";
-import {ScrollArea} from "./ui/scroll-area";
-import {Input} from "./ui/input";
-import {CreateSnippetForm} from "./forms/create-snippet-form";
-import {Skeleton} from "./ui/skeleton";
 
 import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
 import {cn} from "@/lib/utils";
@@ -20,6 +21,7 @@ function Draftcomponent({folderId}: {folderId: string}) {
   const {
     data: folder,
     isLoading,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     error,
   } = useQuery({
     queryKey: ["folder", folderId],

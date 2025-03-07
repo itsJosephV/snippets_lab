@@ -1,4 +1,7 @@
+import type {Collection} from "@prisma/client";
 import type {Folder, Snippet} from "@prisma/client";
+
+export type CollectionWithFolders = Collection & {folders: Folder[]};
 
 export type FolderWithSnippets = Folder & {snippets: Snippet[]};
 

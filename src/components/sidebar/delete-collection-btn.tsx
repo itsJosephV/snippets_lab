@@ -2,7 +2,7 @@
 import {useState, useTransition} from "react";
 import {Loader, Trash2} from "lucide-react";
 
-import {buttonVariants} from "./ui/button";
+import {buttonVariants} from "../ui/button";
 
 import {DropdownMenuItem} from "@/components/ui/dropdown-menu";
 import {

@@ -8,8 +8,8 @@ import {basicDark, basicLight} from "@uiw/codemirror-theme-basic";
 
 import {cn} from "@/lib/utils";
 import {useSnippet} from "@/context/useSnippetContext";
-import {extensionFn} from "@/lib/languages";
 import {Language} from "@/types";
+import {extensionFn} from "@/lib/languages/language-helpers";
 
 type EditorProps = {
   handleContentChange: (value: string) => void;

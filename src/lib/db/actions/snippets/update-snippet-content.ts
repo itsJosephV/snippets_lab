@@ -1,5 +1,4 @@
 "use server";
-import {revalidatePath} from "next/cache";
 import {Snippet} from "@prisma/client";
 
 import {auth} from "@/lib/auth";
@@ -14,35 +13,28 @@ export async function updateSnippetContent({
   newContent: string;
   newUpdateDate: Date;
 }): Promise<Snippet> {
-  const session = await auth();
+  try {
+    const session = await auth();
 
-  if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+    if (!session?.user?.id) {
+      throw new Error("Unauthorized");
+    }
+
+    const snippet = await db.snippet.findUnique({
+      where: {id: snippetId},
+    });
+
+    if (!snippet) {
+      throw new Error("Snippet not found or unauthorized");
+    }
+
+    const updatedSnippet = await db.snippet.update({
+      where: {id: snippetId},
+      data: {content: newContent, updatedAt: newUpdateDate},
+    });
+
+    return updatedSnippet;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : "Error updating snippet content");
   }
-
-  const snippet = await db.snippet.findUnique({
-    where: {id: snippetId},
-    include: {
-      folder: {
-        include: {
-          collection: {
-            select: {userId: true},
-          },
-        },
-      },
-    },
-  });
-
-  if (!snippet || snippet.folder.collection.userId !== session.user.id) {
-    throw new Error("Snippet not found or unauthorized");
-  }
-
-  const updatedSnippet = await db.snippet.update({
-    where: {id: snippetId},
-    data: {content: newContent, updatedAt: newUpdateDate},
-  });
-
-  revalidatePath("/dashboard");
-
-  return updatedSnippet;
 }

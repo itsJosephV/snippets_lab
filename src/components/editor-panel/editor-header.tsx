@@ -2,10 +2,11 @@ import React, {RefObject, useEffect, useRef} from "react";
 import {Lock, Star, Tag} from "lucide-react";
 import {useResizeObserver} from "usehooks-ts";
 
-import {LanguagePicker} from "./language-picker";
-import {Separator} from "./ui/separator";
-import {Button} from "./ui/button";
+import {Separator} from "../ui/separator";
+import {Button} from "../ui/button";
 import Settings from "./settings";
+
+import {LanguagePicker} from "./language-picker";
 
 import {useSnippet} from "@/context/useSnippetContext";
 

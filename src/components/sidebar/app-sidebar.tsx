@@ -1,7 +1,8 @@
 import {Star, FolderCode} from "lucide-react";
 import {Collection, Folder} from "@prisma/client";
 
-import CreateCollectionForm from "./forms/create-collection-form";
+import CreateCollectionForm from "../forms/create-collection-form";
+
 import Collections from "./collections";
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
@@ -67,9 +68,7 @@ export function AppSidebar({collections}: {collections: CollectionWithFolders}) 
             </SidebarGroup>
             <SidebarGroup>
               <SidebarGroupLabel>Sections</SidebarGroupLabel>
-              {/* <Suspense fallback={<CollectionsSkeleton />}> */}
               <Collections initialCollections={collections} />
-              {/* </Suspense> */}
             </SidebarGroup>
           </TabsContent>
           {/**--TAGS TAB-- */}
@@ -81,8 +80,4 @@ export function AppSidebar({collections}: {collections: CollectionWithFolders}) 
       </Tabs>
     </Sidebar>
   );
-}
-
-function CollectionsSkeleton() {
-  return <div>loading..</div>;
 }

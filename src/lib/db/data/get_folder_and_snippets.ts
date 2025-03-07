@@ -12,17 +12,11 @@ export const getFolderAndSnippetsById = async ({folderId}: {folderId: string}) =
     }
 
     if (!folderId || typeof folderId !== "string") {
-      return null;
+      throw new Error("Invalid folder ID");
     }
 
     const folderAndSnippets = await db.folder.findFirst({
       where: {
-        // folder: {
-        //   id: folderId,
-        //   collection: {
-        //     userId: session.user.id,
-        //   },
-        // },
         id: folderId,
       },
       include: {
@@ -36,9 +30,8 @@ export const getFolderAndSnippetsById = async ({folderId}: {folderId: string}) =
 
     return folderAndSnippets;
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error("Error retrieving folder and snippets:", error);
-
-    return null;
+    throw new Error(
+      error instanceof Error ? error.message : "Error retrieving folder and snippets",
+    );
   }
 };
