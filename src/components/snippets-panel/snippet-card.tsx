@@ -6,12 +6,12 @@ import React from "react";
 
 import {useSnippet} from "@/context/useSnippetContext";
 import {capitalize, cn} from "@/lib/utils";
-import {useLocker} from "@/hooks/use-locker";
+import {useLockerSP} from "@/hooks/use-locker";
 
 function SnippetCard({snippet}: {snippet: Snippet}) {
   const {setSelectedSnippet, selectedSnippet} = useSnippet();
 
-  const isLocked = useLocker();
+  const isLocked = useLockerSP();
 
   const handleSnippetSelection = () => {
     if (selectedSnippet?.id === snippet.id) {

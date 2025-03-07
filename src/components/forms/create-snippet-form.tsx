@@ -36,6 +36,7 @@ import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
 import {languageTemplateFn} from "@/lib/languages/language-helpers";
+import {EPEmitters} from "@/lib/events";
 
 const snippetSchema = z.object({
   title: z
@@ -97,11 +98,11 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
         folderId,
       };
 
+      EPEmitters.emit("LOCK_EDITOR_PANEL");
+      setSelectedSnippet(tempSnippet);
       // Actualizar el caché optimistamente
       queryClient.setQueryData(["folder", folderId], (old: FolderWithSnippets) => {
         if (!old || !old.snippets) return {...old, snippets: [tempSnippet]};
-
-        // setSelectedSnippet(tempSnippet);
 
         return {
           ...old,
@@ -114,6 +115,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
     onError: (err, variables, context) => {
       queryClient.setQueryData(["folder", folderId], context?.previousFolder);
       toast.error("Error creating snippet");
+      EPEmitters.emit("UNLOCK_EDITOR_PANEL");
     },
     onSuccess: (response) => {
       queryClient.setQueryData(["folder", folderId], (old: FolderWithSnippets) => {
@@ -127,10 +129,11 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
         };
       });
       setSelectedSnippet(response);
-      toast.success("Snippet created!");
     },
     onSettled: () => {
       queryClient.invalidateQueries({queryKey: ["folder", folderId]});
+      toast.success("Snippet created!");
+      EPEmitters.emit("UNLOCK_EDITOR_PANEL");
     },
   });
 

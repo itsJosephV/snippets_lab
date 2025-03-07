@@ -10,6 +10,7 @@ import {cn} from "@/lib/utils";
 import {useSnippet} from "@/context/useSnippetContext";
 import {Language} from "@/types";
 import {extensionFn} from "@/lib/languages/language-helpers";
+import {useLockerEP} from "@/hooks/use-locker";
 
 type EditorProps = {
   handleContentChange: (value: string) => void;
@@ -21,6 +22,8 @@ function Editor({handleContentChange}: EditorProps) {
   const codeMirrorTheme = theme === "dark" ? basicDark : basicLight;
 
   const {selectedSnippet, editorRef, updateCursorPosition} = useSnippet();
+
+  const isLocked = useLockerEP();
 
   const handleEditorUpdate = (viewUpdate: ViewUpdate) => {
     if (!viewUpdate.selectionSet) return;
@@ -41,6 +44,7 @@ function Editor({handleContentChange}: EditorProps) {
       className={cn(`overflow-y-scroll`, "h-[var(--editor-height)]")}
       extensions={[extensionFn(selectedSnippet?.language as Language)]}
       height="100%"
+      readOnly={isLocked}
       theme={codeMirrorTheme}
       value={selectedSnippet?.content}
       onChange={(value) => handleContentChange(value)}
