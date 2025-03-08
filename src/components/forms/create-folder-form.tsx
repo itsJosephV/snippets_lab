@@ -36,11 +36,11 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
     onError: (error) => {
       toast.error(`Error creating folder: ${error.message as string}`);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["collections"]});
-      form.reset();
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: ["collections"]});
       setDialogOpen(false);
       toast.success("Folder created! 🎉");
+      form.reset();
     },
   });
 

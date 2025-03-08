@@ -36,7 +36,6 @@ function SnippetsPanel() {
     queryKey: ["folder", folderId],
     queryFn: () => getFolderAndSnippetsById({folderId}),
     enabled: !!folderId,
-    staleTime: 1000 * 60 * 5,
   });
 
   return (

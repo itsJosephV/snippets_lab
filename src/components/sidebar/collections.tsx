@@ -34,7 +34,6 @@ function Collections({initialCollections}: {initialCollections: CollectionWithFo
   const {data: collectionsRQ} = useQuery({
     queryKey: ["collections"],
     queryFn: getCollections,
-    // staleTime: 1000 * 60 * 5,
     initialData: initialCollections,
   });
 

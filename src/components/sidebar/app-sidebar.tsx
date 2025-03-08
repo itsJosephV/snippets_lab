@@ -1,5 +1,6 @@
+import type {CollectionWithFolders} from "@/types";
+
 import {Star, FolderCode} from "lucide-react";
-import {Collection, Folder} from "@prisma/client";
 
 import CreateCollectionForm from "../forms/create-collection-form";
 
@@ -23,9 +24,7 @@ enum SidebarTab {
   Tags = "tags",
 }
 
-type CollectionWithFolders = (Collection & {folders: Folder[]})[];
-
-export function AppSidebar({collections}: {collections: CollectionWithFolders}) {
+export function AppSidebar({collections}: {collections: CollectionWithFolders[]}) {
   const defaultTab = SidebarTab.Collections;
 
   return (
@@ -34,7 +33,7 @@ export function AppSidebar({collections}: {collections: CollectionWithFolders}) 
         paddingTop: "var(--layout-header-height)",
       }}
     >
-      <Tabs defaultValue={defaultTab}>
+      <Tabs className="h-full" defaultValue={defaultTab}>
         <SidebarHeader className="border-b">
           <div className="flex gap-1.5">
             <TabsList className="grid flex-1 grid-cols-2">
@@ -46,8 +45,8 @@ export function AppSidebar({collections}: {collections: CollectionWithFolders}) 
             <CreateCollectionForm />
           </div>
         </SidebarHeader>
-        <SidebarContent>
-          {/**--COLLECTIONS TAB-- */}
+        <SidebarContent className="">
+          {/**--COLLECTIONS-- */}
           <TabsContent value={defaultTab}>
             <SidebarGroup>
               <SidebarGroupLabel>Favorites</SidebarGroupLabel>
@@ -71,7 +70,7 @@ export function AppSidebar({collections}: {collections: CollectionWithFolders}) 
               <Collections initialCollections={collections} />
             </SidebarGroup>
           </TabsContent>
-          {/**--TAGS TAB-- */}
+          {/**--TAGS-- */}
           <TabsContent value={SidebarTab.Tags}>
             <SidebarGroup>TAGS HERE</SidebarGroup>
           </TabsContent>

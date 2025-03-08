@@ -74,12 +74,12 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
     onError: (err) => {
       toast.error(`Error creating snippet: ${err.message}`);
     },
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({queryKey: ["folder", folderId]});
-      form.reset();
-      setSelectedSnippet(response);
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({queryKey: ["folder", folderId]});
       setDialogOpen(false);
+      setSelectedSnippet(response);
       toast.success("Snippet created! 🎉");
+      form.reset();
     },
   });
 
@@ -119,7 +119,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Debounce function for react" {...field} />
+                    <Input placeholder="e.g. Debounce function for React" {...field} />
                   </FormControl>
                   <FormMessage className="text-destructive" />
                 </FormItem>
@@ -171,7 +171,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                   <FormControl>
                     <Textarea
                       className="min-h-20 resize-none"
-                      placeholder="e.g. A function to debounce user input in React."
+                      placeholder="e.g. A simple debounce function for React hooks"
                       {...field}
                     />
                   </FormControl>

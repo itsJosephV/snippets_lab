@@ -45,13 +45,21 @@ function CreateCollectionForm() {
     onError: (error) => {
       toast.error(`Error creating collection: ${error.message as string}`);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ["collections"]});
-      form.reset();
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: ["collections"]});
       setDialogOpen(false);
       toast.success("Collection created! 🎉");
+      form.reset();
     },
   });
+
+  /**
+   *  await queryClient.invalidateQueries({queryKey: ["folder", folderId]});
+         setDialogOpen(false);
+         setSelectedSnippet(response);
+         toast.success("Snippet created! 🎉");
+         form.reset();
+   */
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
     mutate(values);
