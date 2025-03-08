@@ -18,7 +18,6 @@ export function getQueryClient() {
   } else {
     if (!browserQueryClient) {
       browserQueryClient = makeQueryClient();
-      console.log("QueryClient created");
     }
 
     return browserQueryClient;

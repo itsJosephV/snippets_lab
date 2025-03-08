@@ -3,6 +3,7 @@ import {Folder, Snippet} from "@prisma/client";
 import React from "react";
 import {Search} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
+import {useSearchParams} from "next/navigation";
 
 import {SidebarTrigger} from "../ui/sidebar";
 import Settings from "../editor-panel/settings";
@@ -21,7 +22,11 @@ import {cn} from "@/lib/utils";
 
 export type FolderAndSnippets = Folder & {snippets: Snippet[]};
 
-function SnippetsPanel({folderId}: {folderId: string}) {
+function SnippetsPanel() {
+  const params = useSearchParams();
+
+  const folderId = params.get("folderId") as string;
+
   const {
     data: folder,
     isLoading,
@@ -31,6 +36,7 @@ function SnippetsPanel({folderId}: {folderId: string}) {
     queryKey: ["folder", folderId],
     queryFn: () => getFolderAndSnippetsById({folderId}),
     enabled: !!folderId,
+    staleTime: 1000 * 60 * 5,
   });
 
   return (
