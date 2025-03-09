@@ -2,7 +2,7 @@ import React from "react";
 import {FlaskConical} from "lucide-react";
 
 import {GithubSignIn} from "@/components/github-sign-in";
-import Footer from "@/components/Footer";
+import Footer from "@/components/layout/footer";
 
 function AuthSignInPage() {
   return (

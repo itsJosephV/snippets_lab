@@ -3,12 +3,10 @@ import type {Metadata} from "next";
 import "./globals.css";
 import localFont from "next/font/local";
 
-import Header from "@/components/Header";
-import {ThemeProvider} from "@/components/theme-provider";
 import {cn} from "@/lib/utils";
-import ToasterComponent from "@/components/toaster-component";
-
-// Fonts:
+import ToasterComponent from "@/components/layout/toaster-component";
+import Header from "@/components/layout/header";
+import {ThemeProvider} from "@/components/providers/theme-provider";
 
 const interVariable = localFont({
   variable: "--font-sans",

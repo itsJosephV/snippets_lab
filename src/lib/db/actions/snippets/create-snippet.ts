@@ -1,13 +1,11 @@
 "use server";
-import {revalidatePath} from "next/cache";
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
-import {languageTemplateFn} from "@/lib/languages";
 import {Language} from "@/types";
+import {languageTemplateFn} from "@/lib/languages/language-helpers";
 
 const DEFAULT_LANGUAGE = Language["TYPESCRIPT"];
-const DEFAULT_DESCRIPTION = "Add a description here";
 
 export async function createSnippet({
   title,
@@ -24,7 +22,7 @@ export async function createSnippet({
     const session = await auth();
 
     if (!session || !session.user?.id) {
-      throw new Error("You must be signed in to create a snippet.");
+      throw new Error("Unauthorized");
     }
 
     const existingSnippet = await db.snippet.findFirst({
@@ -39,26 +37,25 @@ export async function createSnippet({
     }
 
     const languageDraft = (language as Language) || DEFAULT_LANGUAGE;
-    const descriptionDraft: string = description || DEFAULT_DESCRIPTION;
+    const descriptionDraft: string = description || "";
 
     const newSnippet = await db.snippet.create({
       data: {
         title: title,
         language: languageDraft,
-        description: descriptionDraft,
+        description: description || "",
         folder: {
           connect: {
             id: folderId,
           },
         },
         content: languageTemplateFn(title, descriptionDraft, languageDraft),
+        isLocked: false,
         isFavorite: false,
       },
     });
 
-    revalidatePath("/dashboard");
-
-    return {success: true, snippet: newSnippet};
+    return newSnippet;
   } catch (error) {
     throw new Error(error as string);
   }

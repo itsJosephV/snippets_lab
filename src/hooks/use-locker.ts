@@ -1,20 +1,20 @@
 import {useState, useEffect} from "react";
 
-import {emitter} from "@/lib/events";
+import {SPEmitters} from "@/lib/events";
 
-export function useLocker() {
+export function useLockerSP() {
   const [isLocked, setIsLocked] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
     const lock = () => setIsLocked(true);
     const unlock = () => setIsLocked(false);
 
-    emitter.on("LOCK_EDITOR", lock);
-    emitter.on("UNLOCK_EDITOR", unlock);
+    SPEmitters.on("LOCK_SNIPPETS_PANEL", lock);
+    SPEmitters.on("UNLOCK_SNIPPETS_PANEL", unlock);
 
     return () => {
-      emitter.off("LOCK_EDITOR", lock);
-      emitter.off("UNLOCK_EDITOR", unlock);
+      SPEmitters.off("LOCK_SNIPPETS_PANEL", lock);
+      SPEmitters.off("UNLOCK_SNIPPETS_PANEL", unlock);
     };
   }, []);
 

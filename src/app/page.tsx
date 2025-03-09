@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import {buttonVariants} from "@/components/ui/button";
-import Footer from "@/components/Footer";
+import Footer from "@/components/layout/footer";
 
 export default async function HomePage() {
   return (

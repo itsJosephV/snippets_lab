@@ -2,7 +2,7 @@
 import {LogOutIcon} from "lucide-react";
 import {toast} from "sonner";
 
-import {DropdownMenuItem} from "./ui/dropdown-menu";
+import {DropdownMenuItem} from "../ui/dropdown-menu";
 
 import {signOutAction} from "@/lib/db/actions/auth/sign-out";
 

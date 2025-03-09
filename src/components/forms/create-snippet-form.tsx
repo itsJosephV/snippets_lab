@@ -1,10 +1,12 @@
 "use client";
-import React, {useState, useTransition} from "react";
+
+import React, {useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Info, LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 
 import {
   Dialog,
@@ -49,8 +51,9 @@ const snippetSchema = z.object({
 
 export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const {setSelectedSnippet} = useSnippet();
+  const queryClient = useQueryClient();
+
   const form = useForm<z.infer<typeof snippetSchema>>({
     resolver: zodResolver(snippetSchema),
     defaultValues: {
@@ -60,27 +63,29 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof snippetSchema>) {
-    startTransition(async () => {
-      try {
-        const response = await createSnippet({
-          title: values.title,
-          description: values.description,
-          language: values.language,
-          folderId,
-        });
+  const {mutate, isPending} = useMutation({
+    mutationFn: (values: z.infer<typeof snippetSchema>) =>
+      createSnippet({
+        title: values.title,
+        description: values.description,
+        language: values.language,
+        folderId,
+      }),
+    onError: (err) => {
+      toast.error(`Error creating snippet: ${err.message}`);
+    },
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({queryKey: ["folder", folderId]});
+      setDialogOpen(false);
+      setSelectedSnippet(response);
+      toast.success("Snippet created! 🎉");
+      form.reset();
+    },
+  });
 
-        if (response.success) setSelectedSnippet(response.snippet);
-        setDialogOpen(false);
-        form.reset();
-
-        toast.success("Snippet created!");
-      } catch (error) {
-        form.setError("root", {message: error as string});
-        toast.error((error as Error).message);
-      }
-    });
-  }
+  const handleSubmit = (values: z.infer<typeof snippetSchema>) => {
+    mutate(values);
+  };
 
   const handleOpenChange = (isOpen: boolean) => {
     setDialogOpen(isOpen);
@@ -106,7 +111,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
           <DialogDescription>Create a new snippet in the current folder.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+          <form className="space-y-8" onSubmit={form.handleSubmit(handleSubmit)}>
             <FormField
               control={form.control}
               name="title"
@@ -114,7 +119,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Debounce function for react" {...field} />
+                    <Input placeholder="e.g. Debounce function for React" {...field} />
                   </FormControl>
                   <FormMessage className="text-destructive" />
                 </FormItem>
@@ -126,7 +131,6 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
               render={({field}) => (
                 <FormItem>
                   <FormLabel className="flex items-center gap-1">
-                    {/**TODO: ADD THE TYPESCRIPT BY DEFAULT MESSAGE ON HOVER */}
                     Language{" "}
                     <TooltipProvider>
                       <Tooltip>
@@ -167,7 +171,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                   <FormControl>
                     <Textarea
                       className="min-h-20 resize-none"
-                      placeholder="e.g. A function to debounce user input in React."
+                      placeholder="e.g. A simple debounce function for React hooks"
                       {...field}
                     />
                   </FormControl>

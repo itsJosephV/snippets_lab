@@ -1,23 +1,16 @@
 "use client";
 import type {Snippet} from "@prisma/client";
 
-import React from "react";
-import {Bird} from "lucide-react";
+import {Bird, Lock} from "lucide-react";
 
 import {useSnippet} from "@/context/useSnippetContext";
 import {capitalize, cn} from "@/lib/utils";
-import {useLocker} from "@/hooks/use-locker";
+import {useLockerSP} from "@/hooks/use-locker";
 
-type SnippetCardProps = {
-  snippet: Snippet & {folder: {collection: {name: string}}};
-};
-
-function SnippetCard({snippet}: SnippetCardProps) {
+function SnippetCard({snippet, folderName}: {snippet: Snippet; folderName: string}) {
   const {setSelectedSnippet, selectedSnippet} = useSnippet();
 
-  const isLocked = useLocker();
-
-  const {name: collectionName} = snippet.folder.collection;
+  const isLocked = useLockerSP();
 
   const handleSnippetSelection = () => {
     if (selectedSnippet?.id === snippet.id) {
@@ -41,14 +34,23 @@ function SnippetCard({snippet}: SnippetCardProps) {
     >
       <div className="flex items-start justify-between gap-2">
         <h2 className="text-base font-medium tracking-tight">{capitalize(snippet.title)}</h2>
-        <div className="bg-primary-foreground text-muted-foreground flex items-center rounded-md p-1 text-xs text-nowrap capitalize">
-          {snippet.language}
+        <div className="flex items-center gap-1">
+          <div className="bg-primary-foreground text-muted-foreground flex items-center rounded-md p-1 text-xs text-nowrap capitalize">
+            {snippet.language}
+          </div>
+          {snippet.isLocked && <Lock className="text-muted-foreground" size={12} />}
         </div>
       </div>
       <div className="mt-4">
         <p className="text-muted-foreground text-sm">{capitalize(snippet.description as string)}</p>
       </div>
+      {
+        //TODO: DRAWER EDITOR
+      }
       {/* <DrawerEditor /> */}
+      {
+        //TODO: TAGS
+      }
       {/* <div className="mt-3 flex gap-1.5">
         {tags(snippet.id).map((tag) => (
           <div
@@ -65,7 +67,7 @@ function SnippetCard({snippet}: SnippetCardProps) {
       </div> */}
       <div className="text-muted-foreground mt-4 flex items-center justify-between">
         <div className="flex items-center gap-1 text-sm">
-          <Bird size={16} /> {capitalize(collectionName)}
+          <Bird size={16} /> {capitalize(folderName)}
         </div>
         <div className="text-sm">
           <time suppressHydrationWarning>{snippet.createdAt.toLocaleDateString()}</time>

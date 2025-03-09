@@ -1,21 +1,14 @@
 "use client";
-import React, {useState, useTransition} from "react";
+import React, {useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Folder, LoaderIcon} from "lucide-react";
 import {toast} from "sonner";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "../ui/dialog";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  // FormDescription,
-  FormControl,
-  FormMessage,
-} from "../ui/form";
+import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from "../ui/form";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 import {DropdownMenuItem} from "../ui/dropdown-menu";
@@ -23,17 +16,32 @@ import {DropdownMenuItem} from "../ui/dropdown-menu";
 import {createFolder} from "@/lib/db/actions/folders/create-folder";
 
 const folderSchema = z.object({
-  folder: z.string().min(2, {
-    message: "Folder must be at least 2 characters.",
+  folder: z.string().min(1, {
+    message: "A name is required",
   }),
 });
 
 export function CreateFolderForm({collectionId}: {collectionId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
+
+  const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof folderSchema>>({
     resolver: zodResolver(folderSchema),
     defaultValues: {folder: ""},
+  });
+
+  const {mutate, isPending} = useMutation({
+    mutationFn: (values: z.infer<typeof folderSchema>) =>
+      createFolder({folder: values.folder, collectionId}),
+    onError: (error) => {
+      toast.error(`Error creating folder: ${error.message as string}`);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: ["collections"]});
+      setDialogOpen(false);
+      toast.success("Folder created! 🎉");
+      form.reset();
+    },
   });
 
   const handleDropdownSelect = (e: Event) => {
@@ -42,17 +50,7 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
   };
 
   async function onSubmit(values: z.infer<typeof folderSchema>) {
-    startTransition(async () => {
-      try {
-        await createFolder({folder: values.folder, collectionId});
-        form.reset();
-        setDialogOpen(false);
-        toast.success("Folder created!");
-      } catch (error) {
-        form.setError("root", {message: error as string});
-        toast.error((error as Error).message);
-      }
-    });
+    mutate(values);
   }
 
   return (
@@ -81,7 +79,7 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
                     <FormControl>
                       <Input placeholder="e.g. JavaScript Utilities" {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-destructive" />
                   </FormItem>
                 )}
               />

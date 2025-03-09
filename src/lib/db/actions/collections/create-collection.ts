@@ -10,7 +10,7 @@ export async function createCollection({collection}: {collection: string}) {
     const session = await auth();
 
     if (!session || !session.user?.id) {
-      throw new Error("You must be signed in to create a collection.");
+      throw new Error("Unauthorized");
     }
 
     const existingCollection = await db.collection.findFirst({
@@ -35,8 +35,6 @@ export async function createCollection({collection}: {collection: string}) {
         },
       },
     });
-
-    revalidatePath("/dashboard");
 
     return {success: true};
   } catch (error) {

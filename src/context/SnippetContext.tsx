@@ -3,7 +3,6 @@ import type {Snippet} from "@prisma/client";
 
 import {ReactCodeMirrorRef} from "@uiw/react-codemirror";
 import {createContext, useState, ReactNode, useRef, RefObject, useCallback} from "react";
-
 interface SnippetContextType {
   selectedSnippet: Snippet | null;
   setSelectedSnippet: (snippet: Snippet | null) => void;

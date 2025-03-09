@@ -1,7 +1,11 @@
-import {Star, FolderCode} from "lucide-react";
-import {Suspense} from "react";
+"use client";
+import type {CollectionWithFolders} from "@/types";
 
-import CreateCollectionForm from "./forms/create-collection-form";
+import {Star, FolderCode} from "lucide-react";
+import {useQuery} from "@tanstack/react-query";
+
+import CreateCollectionForm from "../forms/create-collection-form";
+
 import Collections from "./collections";
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
@@ -16,6 +20,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import {getCollections} from "@/lib/db/data/get_collections";
 
 enum SidebarTab {
   Collections = "collections",
@@ -23,6 +28,10 @@ enum SidebarTab {
 }
 
 export function AppSidebar() {
+  const {data: collections} = useQuery({
+    queryKey: ["collections"],
+    queryFn: getCollections,
+  });
   const defaultTab = SidebarTab.Collections;
 
   return (
@@ -31,7 +40,7 @@ export function AppSidebar() {
         paddingTop: "var(--layout-header-height)",
       }}
     >
-      <Tabs defaultValue={defaultTab}>
+      <Tabs className="h-full" defaultValue={defaultTab}>
         <SidebarHeader className="border-b">
           <div className="flex gap-1.5">
             <TabsList className="grid flex-1 grid-cols-2">
@@ -43,8 +52,8 @@ export function AppSidebar() {
             <CreateCollectionForm />
           </div>
         </SidebarHeader>
-        <SidebarContent>
-          {/**--COLLECTIONS TAB-- */}
+        <SidebarContent className="">
+          {/**--COLLECTIONS-- */}
           <TabsContent value={defaultTab}>
             <SidebarGroup>
               <SidebarGroupLabel>Favorites</SidebarGroupLabel>
@@ -65,12 +74,10 @@ export function AppSidebar() {
             </SidebarGroup>
             <SidebarGroup>
               <SidebarGroupLabel>Sections</SidebarGroupLabel>
-              <Suspense fallback={<CollectionsSkeleton />}>
-                <Collections />
-              </Suspense>
+              <Collections initialCollections={collections as CollectionWithFolders[]} />
             </SidebarGroup>
           </TabsContent>
-          {/**--TAGS TAB-- */}
+          {/**--TAGS-- */}
           <TabsContent value={SidebarTab.Tags}>
             <SidebarGroup>TAGS HERE</SidebarGroup>
           </TabsContent>
@@ -79,8 +86,4 @@ export function AppSidebar() {
       </Tabs>
     </Sidebar>
   );
-}
-
-function CollectionsSkeleton() {
-  return <div>loading..</div>;
 }

@@ -1,15 +1,15 @@
 import Link from "next/link";
 import {ArrowRight} from "lucide-react";
 
-import {buttonVariants} from "../ui/button";
-import {Avatar, AvatarFallback, AvatarImage} from "../ui/avatar";
+import {buttonVariants} from "../../ui/button";
+import {Avatar, AvatarFallback, AvatarImage} from "../../ui/avatar";
 import {
   DropdownMenuContent,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from "../ui/dropdown-menu";
+} from "../../ui/dropdown-menu";
 import {SignOut} from "../sign-out";
 
 import {auth} from "@/lib/auth";

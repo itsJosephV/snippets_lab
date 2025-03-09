@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
-import {useRouter, usePathname, useSearchParams} from "next/navigation";
+import {usePathname, useSearchParams} from "next/navigation";
 
-import {SidebarMenuSubItem, SidebarMenuSubButton} from "./ui/sidebar";
+import {SidebarMenuSubItem, SidebarMenuSubButton} from "../ui/sidebar";
 
 import {useSnippet} from "@/context/useSnippetContext";
+import {cn} from "@/lib/utils";
 
 interface FolderItemProps {
   id: string;
@@ -22,7 +22,6 @@ const createUrl = (pathname: string, params: URLSearchParams) => {
 };
 
 function FolderItem({folder}: {folder: FolderItemProps}) {
-  const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const {setSelectedSnippet} = useSnippet();
@@ -39,13 +38,20 @@ function FolderItem({folder}: {folder: FolderItemProps}) {
     const newUrl = createUrl(pathname, updatedSearchParams);
 
     setSelectedSnippet(null);
-    router.push(newUrl);
+
+    history.pushState(null, "", newUrl);
   };
 
   return (
     <SidebarMenuSubItem onClick={handleFolderClick}>
       <SidebarMenuSubButton asChild>
-        <span>{folder.name}</span>
+        <span
+          className={cn({
+            "bg-muted": searchParams.get("folderId") === folder.id,
+          })}
+        >
+          {folder.name}
+        </span>
       </SidebarMenuSubButton>
     </SidebarMenuSubItem>
   );
