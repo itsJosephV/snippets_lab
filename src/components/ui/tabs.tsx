@@ -5,13 +5,11 @@ import * as TabsPrimitive from "@radix-ui/react-tabs";
 
 import {cn} from "@/lib/utils";
 
+//!removed classes from Tabs [gap-2]
+
 function Tabs({className, ...props}: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return (
-    <TabsPrimitive.Root
-      className={cn("flex flex-col gap-2", className)}
-      data-slot="tabs"
-      {...props}
-    />
+    <TabsPrimitive.Root className={cn("flex flex-col", className)} data-slot="tabs" {...props} />
   );
 }
 

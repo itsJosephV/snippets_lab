@@ -1,6 +1,8 @@
+"use client";
 import type {CollectionWithFolders} from "@/types";
 
 import {Star, FolderCode} from "lucide-react";
+import {useQuery} from "@tanstack/react-query";
 
 import CreateCollectionForm from "../forms/create-collection-form";
 
@@ -18,13 +20,18 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import {getCollections} from "@/lib/db/data/get_collections";
 
 enum SidebarTab {
   Collections = "collections",
   Tags = "tags",
 }
 
-export function AppSidebar({collections}: {collections: CollectionWithFolders[]}) {
+export function AppSidebar() {
+  const {data: collections} = useQuery({
+    queryKey: ["collections"],
+    queryFn: getCollections,
+  });
   const defaultTab = SidebarTab.Collections;
 
   return (
@@ -67,7 +74,7 @@ export function AppSidebar({collections}: {collections: CollectionWithFolders[]}
             </SidebarGroup>
             <SidebarGroup>
               <SidebarGroupLabel>Sections</SidebarGroupLabel>
-              <Collections initialCollections={collections} />
+              <Collections initialCollections={collections as CollectionWithFolders[]} />
             </SidebarGroup>
           </TabsContent>
           {/**--TAGS-- */}

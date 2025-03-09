@@ -50,6 +50,7 @@ export async function createSnippet({
           },
         },
         content: languageTemplateFn(title, descriptionDraft, languageDraft),
+        isLocked: false,
         isFavorite: false,
       },
     });

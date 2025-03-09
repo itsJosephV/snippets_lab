@@ -71,7 +71,7 @@ export function LanguagePicker() {
 
   return (
     <Select
-      disabled={!selectedSnippet?.language}
+      disabled={!selectedSnippet?.language || selectedSnippet.isLocked}
       value={selectedSnippet?.language}
       onValueChange={handleSelectChange}
     >

@@ -35,13 +35,15 @@ function EditorColumn() {
     mutationFn: ({
       snippetId,
       newContent,
-      newUpdateDate,
     }: {
       snippetId: string;
       newContent: string;
-      newUpdateDate: Date;
       version: number;
-    }) => updateSnippetContent({snippetId, newContent, newUpdateDate}),
+    }) =>
+      updateSnippetContent({
+        snippetId,
+        newContent,
+      }),
     onMutate: async ({newContent}) => {
       if (!selectedSnippet) return;
 
@@ -115,7 +117,6 @@ function EditorColumn() {
   const handleContentChange = (value: string) => {
     if (!selectedSnippet?.id) return;
 
-    const newUpdateDate = new Date();
     const currentValue = value;
     const currentSaveVersion = ++saveVersionRef.current;
 
@@ -130,7 +131,6 @@ function EditorColumn() {
       mutation.mutate({
         snippetId: selectedSnippet.id,
         newContent: currentValue,
-        newUpdateDate,
         version: currentSaveVersion,
       });
     }, DEBOUNCE_TIME);

@@ -41,6 +41,7 @@ function Editor({handleContentChange}: EditorProps) {
       className={cn(`overflow-y-scroll`, "h-[var(--editor-height)]")}
       extensions={[extensionFn(selectedSnippet?.language as Language)]}
       height="100%"
+      readOnly={selectedSnippet?.isLocked}
       theme={codeMirrorTheme}
       value={selectedSnippet?.content}
       onChange={(value) => handleContentChange(value)}

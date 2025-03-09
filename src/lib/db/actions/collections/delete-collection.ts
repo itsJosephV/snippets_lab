@@ -32,7 +32,6 @@ export async function deleteCollection({collectionId}: {collectionId: string}) {
         id: collectionId,
       },
     });
-    revalidatePath("/dashboard");
 
     return collection;
   } catch (error) {

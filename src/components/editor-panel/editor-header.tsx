@@ -1,12 +1,14 @@
 import React, {RefObject, useEffect, useRef} from "react";
-import {Lock, Star, Tag} from "lucide-react";
+import {Lock, Star, Tag, Unlock} from "lucide-react";
 import {useResizeObserver} from "usehooks-ts";
 
 import {Separator} from "../ui/separator";
-import {Button} from "../ui/button";
-import Settings from "./settings";
+import {Button, buttonVariants} from "../ui/button";
+import {Toggle} from "../ui/toggle";
 
+import Settings from "./settings";
 import {LanguagePicker} from "./language-picker";
+import LockToggle from "./lock-toggle";
 
 import {useSnippet} from "@/context/useSnippetContext";
 
@@ -38,9 +40,7 @@ function EditorHeader() {
         <LanguagePicker />
         <Separator className="mx-2" orientation="vertical" />
         <div className="space-x-2">
-          <Button size="icon" variant="secondary">
-            <Lock />
-          </Button>
+          <LockToggle />
           <Button size="icon" variant="secondary">
             <Tag />
           </Button>

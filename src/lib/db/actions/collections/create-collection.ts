@@ -36,8 +36,6 @@ export async function createCollection({collection}: {collection: string}) {
       },
     });
 
-    revalidatePath("/dashboard");
-
     return {success: true};
   } catch (error) {
     throw new Error(error as string);

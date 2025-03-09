@@ -108,6 +108,7 @@ model Snippet {
   folder      Folder    @relation(fields: [folderId], references: [id], onDelete: Cascade)
   description String?
   isFavorite  Boolean
+  isLocked    Boolean // NEW
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   tags        Tag[]

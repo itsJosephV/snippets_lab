@@ -7,11 +7,9 @@ import db from "@/lib/db";
 export async function updateSnippetContent({
   snippetId,
   newContent,
-  newUpdateDate,
 }: {
   snippetId: string;
   newContent: string;
-  newUpdateDate: Date;
 }): Promise<Snippet> {
   try {
     const session = await auth();
@@ -30,7 +28,9 @@ export async function updateSnippetContent({
 
     const updatedSnippet = await db.snippet.update({
       where: {id: snippetId},
-      data: {content: newContent, updatedAt: newUpdateDate},
+      data: {
+        content: newContent,
+      },
     });
 
     return updatedSnippet;

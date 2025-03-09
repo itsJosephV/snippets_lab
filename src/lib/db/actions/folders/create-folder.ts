@@ -35,8 +35,6 @@ export async function createFolder({folder, collectionId}: {folder: string; coll
       },
     });
 
-    revalidatePath("/dashboard");
-
     return {success: true};
   } catch (error) {
     // eslint-disable-next-line no-console
