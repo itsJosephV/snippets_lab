@@ -15,7 +15,9 @@ function SnippetsLits({folder}: {folder: Folder & {snippets: Snippet[]}}) {
       )}
     >
       {folder?.snippets.map((snippet) => {
-        return <SnippetCard key={snippet.id} snippet={snippet} />;
+        const folderName = folder?.name;
+
+        return <SnippetCard key={snippet.id} folderName={folderName} snippet={snippet} />;
       })}
     </ul>
   );
