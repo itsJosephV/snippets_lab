@@ -20,6 +20,7 @@ import {updateSnippetLanguage} from "@/lib/db/actions/snippets/update-snippet-la
 export function LanguagePicker() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();
   const queryClient = useQueryClient();
+  const key = "folder";
 
   const mutation = useMutation({
     mutationFn: ({snippetId, language}: {snippetId: string; language: Language}) =>
@@ -27,13 +28,13 @@ export function LanguagePicker() {
     onMutate: async ({language}) => {
       if (!selectedSnippet) return;
 
-      await queryClient.cancelQueries({queryKey: ["folder", selectedSnippet.folderId]});
+      await queryClient.cancelQueries({queryKey: [key, selectedSnippet.folderId]});
 
-      const previousFolder = queryClient.getQueryData(["folder", selectedSnippet.folderId]);
+      const previousFolder = queryClient.getQueryData([key, selectedSnippet.folderId]);
 
       const updatedSnippet = {...selectedSnippet, language};
 
-      queryClient.setQueryData(["folder", selectedSnippet.folderId], (old: FolderWithSnippets) => {
+      queryClient.setQueryData([key, selectedSnippet.folderId], (old: FolderWithSnippets) => {
         if (!old || !old.snippets) return old;
 
         return {
@@ -49,7 +50,7 @@ export function LanguagePicker() {
       return {previousFolder, previousSnippet: selectedSnippet};
     },
     onError: (err, variables, context) => {
-      queryClient.setQueryData(["folder", selectedSnippet?.folderId], context?.previousFolder);
+      queryClient.setQueryData([key, selectedSnippet?.folderId], context?.previousFolder);
       setSelectedSnippet(context?.previousSnippet as Snippet);
       toast.error("Failed to update language");
     },
@@ -59,7 +60,7 @@ export function LanguagePicker() {
     },
     onSettled: () => {
       if (selectedSnippet) {
-        queryClient.invalidateQueries({queryKey: ["folder", selectedSnippet.folderId]});
+        queryClient.invalidateQueries({queryKey: [key, selectedSnippet.folderId]});
       }
     },
   });

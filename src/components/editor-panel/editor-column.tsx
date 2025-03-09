@@ -5,6 +5,7 @@ import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {Snippet} from "@prisma/client";
+import debounce from "lodash.debounce";
 
 import {ResizablePanel} from "../ui/resizable";
 
@@ -23,7 +24,6 @@ function EditorColumn() {
   const queryClient = useQueryClient();
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const saveVersionRef = useRef<number>(0);
 
   const updateSnippetState = (callback: (snippet: typeof selectedSnippet) => void) => {
@@ -114,36 +114,35 @@ function EditorColumn() {
     },
   });
 
+  const debouncedSaveRef = useRef(
+    debounce((newContent: string, version: number, snippetId: string) => {
+      setIsSaving(true);
+
+      mutation.mutate({
+        snippetId,
+        newContent,
+        version,
+      });
+    }, DEBOUNCE_TIME),
+  ).current;
+
   const handleContentChange = (value: string) => {
     if (!selectedSnippet?.id) return;
 
     const currentValue = value;
     const currentSaveVersion = ++saveVersionRef.current;
 
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-      SPEmitters.emit("UNLOCK_SNIPPETS_PANEL");
-    }
     SPEmitters.emit("LOCK_SNIPPETS_PANEL");
 
-    saveTimeoutRef.current = setTimeout(() => {
-      setIsSaving(true);
-      mutation.mutate({
-        snippetId: selectedSnippet.id,
-        newContent: currentValue,
-        version: currentSaveVersion,
-      });
-    }, DEBOUNCE_TIME);
+    debouncedSaveRef(currentValue, currentSaveVersion, selectedSnippet.id);
   };
 
   useEffect(() => {
     return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-        SPEmitters.emit("UNLOCK_SNIPPETS_PANEL");
-      }
+      debouncedSaveRef.cancel();
+      SPEmitters.emit("UNLOCK_SNIPPETS_PANEL");
     };
-  }, []);
+  }, [debouncedSaveRef]);
 
   return (
     <ResizablePanel className="hidden lg:block" defaultSize={65}>

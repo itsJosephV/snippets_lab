@@ -18,6 +18,8 @@ function LockToggle() {
 
   const queryClient = useQueryClient();
 
+  const key = "folder";
+
   const mutation = useMutation({
     mutationFn: async ({snippetId, isLocked}: {snippetId: string; isLocked: boolean}) => {
       if (!selectedSnippet) return;
@@ -29,11 +31,11 @@ function LockToggle() {
     },
     onMutate: async ({isLocked}) => {
       if (!selectedSnippet) return;
-      await queryClient.cancelQueries({queryKey: ["folder", selectedSnippet.folderId]});
-      const previousFolder = queryClient.getQueryData(["folder", selectedSnippet.folderId]);
+      await queryClient.cancelQueries({queryKey: [key, selectedSnippet.folderId]});
+      const previousFolder = queryClient.getQueryData([key, selectedSnippet.folderId]);
       const updatedSnippet = {...selectedSnippet, isLocked};
 
-      queryClient.setQueryData(["folder", selectedSnippet.folderId], (old: FolderWithSnippets) => {
+      queryClient.setQueryData([key, selectedSnippet.folderId], (old: FolderWithSnippets) => {
         if (!old || !old.snippets) return old;
 
         return {
@@ -48,7 +50,7 @@ function LockToggle() {
       return {previousFolder, previousSnippet: selectedSnippet};
     },
     onError: (err, variables, context) => {
-      queryClient.setQueryData(["folder", selectedSnippet?.folderId], context?.previousFolder);
+      queryClient.setQueryData([key, selectedSnippet?.folderId], context?.previousFolder);
       setSelectedSnippet(context?.previousSnippet as Snippet);
       toast.error("Failed to update lock");
     },
@@ -59,7 +61,7 @@ function LockToggle() {
     },
     onSettled: () => {
       if (selectedSnippet) {
-        queryClient.invalidateQueries({queryKey: ["folder", selectedSnippet.folderId]});
+        queryClient.invalidateQueries({queryKey: [key, selectedSnippet.folderId]});
       }
     },
   });
@@ -78,6 +80,7 @@ function LockToggle() {
         variant: "secondary",
         size: "icon",
       })}
+      disabled={!selectedSnippet}
       pressed={selectedSnippet?.isLocked}
       onPressedChange={() =>
         debouncedMutate({
