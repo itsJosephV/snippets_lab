@@ -124,7 +124,7 @@ function EditorColumn() {
         version,
       });
     }, DEBOUNCE_TIME),
-  ).current;
+  );
 
   const handleContentChange = (value: string) => {
     if (!selectedSnippet?.id) return;
@@ -134,12 +134,14 @@ function EditorColumn() {
 
     SPEmitters.emit("LOCK_SNIPPETS_PANEL");
 
-    debouncedSaveRef(currentValue, currentSaveVersion, selectedSnippet.id);
+    debouncedSaveRef.current(currentValue, currentSaveVersion, selectedSnippet.id);
   };
 
   useEffect(() => {
+    const debouncedSave = debouncedSaveRef.current;
+
     return () => {
-      debouncedSaveRef.cancel();
+      debouncedSave.cancel();
       SPEmitters.emit("UNLOCK_SNIPPETS_PANEL");
     };
   }, [debouncedSaveRef]);

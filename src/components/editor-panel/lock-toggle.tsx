@@ -1,11 +1,9 @@
 import type {FolderWithSnippets} from "@/types";
 import type {Snippet} from "@prisma/client";
 
-import React, {useMemo} from "react";
 import {Lock, Unlock} from "lucide-react";
 import {useQueryClient, useMutation} from "@tanstack/react-query";
 import {toast} from "sonner";
-import debounce from "lodash.debounce";
 
 import {Toggle} from "../ui/toggle";
 import {buttonVariants} from "../ui/button";
@@ -66,24 +64,16 @@ function LockToggle() {
     },
   });
 
-  const debouncedMutate = useMemo(
-    () =>
-      debounce((params) => {
-        mutation.mutate(params);
-      }, 300),
-    [mutation],
-  );
-
   return (
     <Toggle
       className={buttonVariants({
         variant: "secondary",
         size: "icon",
       })}
-      disabled={!selectedSnippet}
+      disabled={mutation.isPending || !selectedSnippet}
       pressed={selectedSnippet?.isLocked}
       onPressedChange={() =>
-        debouncedMutate({
+        mutation.mutate({
           snippetId: selectedSnippet?.id as string,
           isLocked: !selectedSnippet?.isLocked,
         })
