@@ -33,7 +33,9 @@ function SnippetCard({snippet, folderName}: {snippet: Snippet; folderName: strin
       onClick={handleSnippetSelection}
     >
       <div className="flex items-start justify-between gap-2">
-        <h2 className="text-base font-medium tracking-tight">{capitalize(snippet.title)}</h2>
+        <h2 className="text-base font-medium break-words" style={{overflowWrap: "anywhere"}}>
+          {capitalize(snippet.title)}
+        </h2>
         <div className="flex items-center gap-1">
           <div className="bg-primary-foreground text-muted-foreground flex items-center rounded-md p-1 text-xs text-nowrap capitalize">
             {snippet.language}
