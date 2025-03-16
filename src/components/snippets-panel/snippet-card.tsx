@@ -7,7 +7,7 @@ import {useSnippet} from "@/context/useSnippetContext";
 import {capitalize, cn} from "@/lib/utils";
 import {useLockerSP} from "@/hooks/use-locker";
 
-function SnippetCard({snippet, folderName}: {snippet: Snippet; folderName: string}) {
+function SnippetCard({snippet, collectionName}: {snippet: Snippet; collectionName: string}) {
   const {setSelectedSnippet, selectedSnippet, setCursorPosition} = useSnippet();
 
   const isLocked = useLockerSP();
@@ -70,7 +70,7 @@ function SnippetCard({snippet, folderName}: {snippet: Snippet; folderName: strin
       </div> */}
       <div className="text-muted-foreground mt-4 flex items-center justify-between">
         <div className="flex items-center gap-1 text-sm">
-          <Bird size={16} /> {capitalize(folderName)}
+          <Bird size={16} /> {capitalize(collectionName)}
         </div>
         <div className="text-sm">
           <time suppressHydrationWarning>{snippet.createdAt.toLocaleDateString()}</time>

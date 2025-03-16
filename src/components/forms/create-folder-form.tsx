@@ -1,19 +1,20 @@
 "use client";
 import React, {useState} from "react";
-import {useForm} from "react-hook-form";
+import {set, useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Folder, LoaderIcon} from "lucide-react";
+import {LoaderIcon} from "lucide-react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {usePathname} from "next/navigation";
 
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "../ui/dialog";
 import {Form, FormField, FormItem, FormLabel, FormControl, FormMessage} from "../ui/form";
 import {Input} from "../ui/input";
 import {Button} from "../ui/button";
-import {DropdownMenuItem} from "../ui/dropdown-menu";
 
 import {createFolder} from "@/lib/db/actions/folders/create-folder";
+import {useSnippet} from "@/context/useSnippetContext";
 
 const folderSchema = z.object({
   folder: z.string().min(1, {
@@ -21,10 +22,18 @@ const folderSchema = z.object({
   }),
 });
 
-export function CreateFolderForm({collectionId}: {collectionId: string}) {
+export function CreateFolderForm({
+  collectionId,
+  renderTrigger,
+}: {
+  collectionId: string;
+  renderTrigger: (props: {openDialog: () => void}) => React.ReactNode;
+}) {
   const [dialogOpen, setDialogOpen] = useState(false);
-
   const queryClient = useQueryClient();
+  const pathname = usePathname();
+  const {setSelectedSnippet} = useSnippet();
+
   const form = useForm<z.infer<typeof folderSchema>>({
     resolver: zodResolver(folderSchema),
     defaultValues: {folder: ""},
@@ -34,20 +43,26 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
     mutationFn: (values: z.infer<typeof folderSchema>) =>
       createFolder({folder: values.folder, collectionId}),
     onError: (error) => {
-      toast.error(`Error creating folder: ${error.message as string}`);
+      toast.error(`Error creating folder: ${error.message}`);
     },
-    onSuccess: async () => {
+    onSuccess: async (newFolder) => {
       await queryClient.invalidateQueries({queryKey: ["collections"]});
+      const params = new URLSearchParams();
+
+      params.delete("collectionId");
+      params.set("folderId", newFolder.id);
+
+      const newUrl = `${pathname}?${params.toString()}`;
+
+      history.pushState(null, "", newUrl);
       setDialogOpen(false);
+      setSelectedSnippet(null);
       toast.success("Folder created! 🎉");
       form.reset();
     },
   });
 
-  const handleDropdownSelect = (e: Event) => {
-    e.preventDefault();
-    setDialogOpen(true);
-  };
+  const openDialog = () => setDialogOpen(true);
 
   async function onSubmit(values: z.infer<typeof folderSchema>) {
     mutate(values);
@@ -55,13 +70,7 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
 
   return (
     <>
-      <DropdownMenuItem onSelect={handleDropdownSelect}>
-        <div className="flex items-center gap-2">
-          <Folder className="text-muted-foreground h-4 w-4" />
-          <span>Create folder</span>
-        </div>
-      </DropdownMenuItem>
-
+      {renderTrigger({openDialog})}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -83,12 +92,7 @@ export function CreateFolderForm({collectionId}: {collectionId: string}) {
                   </FormItem>
                 )}
               />
-              <div
-              //  className="flex justify-end gap-2"
-              >
-                {/* <Button type="button" variant="ghost" onClick={() => setDialogOpen(false)}>
-                  Cancel
-                </Button> */}
+              <div className="flex justify-end">
                 <Button disabled={isPending} type="submit">
                   {isPending ? (
                     <>

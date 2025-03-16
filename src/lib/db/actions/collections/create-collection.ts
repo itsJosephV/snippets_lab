@@ -22,7 +22,7 @@ export async function createCollection({collection}: {collection: string}) {
       throw new Error("Collection already exists.");
     }
 
-    await db.collection.create({
+    const newCollection = await db.collection.create({
       data: {
         name: collection,
         isDefault: false,
@@ -34,7 +34,7 @@ export async function createCollection({collection}: {collection: string}) {
       },
     });
 
-    return {success: true};
+    return newCollection;
   } catch (error) {
     throw new Error(error as string);
   }

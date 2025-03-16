@@ -1,12 +1,11 @@
 import React from "react";
-import {Folder, Snippet} from "@prisma/client";
 
 import SnippetCard from "./snippet-card";
+import {FolderAndSnippets} from "./snippets-panel";
 
 import {cn} from "@/lib/utils";
-// import {useOptimisticContext} from "@/context/useOptimisticContext";
 
-function SnippetsLits({folder}: {folder: Folder & {snippets: Snippet[]}}) {
+function SnippetsLits({folder}: {folder: FolderAndSnippets}) {
   return (
     <ul
       className={cn(
@@ -15,9 +14,9 @@ function SnippetsLits({folder}: {folder: Folder & {snippets: Snippet[]}}) {
       )}
     >
       {folder?.snippets.map((snippet) => {
-        const folderName = folder?.name;
+        const collectionName = folder?.collection.name;
 
-        return <SnippetCard key={snippet.id} folderName={folderName} snippet={snippet} />;
+        return <SnippetCard key={snippet.id} collectionName={collectionName} snippet={snippet} />;
       })}
     </ul>
   );

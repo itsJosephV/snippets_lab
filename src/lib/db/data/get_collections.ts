@@ -20,6 +20,9 @@ export async function getCollections(): Promise<CollectionWithFolders[]> {
       include: {
         folders: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return collections;

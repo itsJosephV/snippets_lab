@@ -24,7 +24,7 @@ export async function createFolder({folder, collectionId}: {folder: string; coll
       throw new Error("A folder with this name already exists in the collection");
     }
 
-    await db.folder.create({
+    const newFolder = await db.folder.create({
       data: {
         name: folder,
         collection: {
@@ -35,7 +35,7 @@ export async function createFolder({folder, collectionId}: {folder: string; coll
       },
     });
 
-    return {success: true};
+    return newFolder;
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error("Database Error:", error);

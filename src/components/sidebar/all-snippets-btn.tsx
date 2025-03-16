@@ -1,5 +1,5 @@
 import React from "react";
-import {FolderCode} from "lucide-react";
+import {Code} from "lucide-react";
 import {usePathname, useSearchParams} from "next/navigation";
 
 import {SidebarMenuButton} from "../ui/sidebar";
@@ -30,7 +30,7 @@ function AllSnippetsButton() {
 
   return (
     <SidebarMenuButton className="pl-3" tooltip="test" onClick={handleClick}>
-      <FolderCode />
+      <Code />
       <span>All Snippets</span>
     </SidebarMenuButton>
   );

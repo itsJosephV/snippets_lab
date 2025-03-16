@@ -2,7 +2,7 @@
 import type {CollectionWithFolders} from "@/types";
 
 import React from "react";
-import {ChevronRight, MoreHorizontal} from "lucide-react";
+import {ChevronRight, MoreHorizontal, Plus} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 import {useSearchParams} from "next/navigation";
 
@@ -12,11 +12,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from "../ui/sidebar";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "../ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
@@ -29,7 +32,10 @@ import {getCollections} from "@/lib/db/data/get_collections";
 import {cn} from "@/lib/utils";
 
 function Collections({initialCollections}: {initialCollections: CollectionWithFolders[]}) {
-  const folderId = useSearchParams().get("folderId");
+  const params = useSearchParams();
+
+  const folderId = params.get("folderId");
+  const collectionId = params.get("collectionId");
 
   const {data: collectionsRQ} = useQuery({
     queryKey: ["collections"],
@@ -48,13 +54,13 @@ function Collections({initialCollections}: {initialCollections: CollectionWithFo
           key={collection.id}
           asChild
           className="group/collapsible"
-          defaultOpen={collection.isDefault}
+          defaultOpen={collectionId === collection.id}
         >
           <SidebarMenuItem className="">
             <CollapsibleTrigger asChild>
               <SidebarMenuButton
                 className={cn("", {
-                  "bg-muted": hasFolder(collection),
+                  "bg-muted": hasFolder(collection) || collection.id === collectionId,
                 })}
                 tooltip={collection.name}
               >
@@ -62,11 +68,29 @@ function Collections({initialCollections}: {initialCollections: CollectionWithFo
                 <span>{collection.name}</span>
               </SidebarMenuButton>
             </CollapsibleTrigger>
-            <CollapsibleContent className="">
+            <CollapsibleContent>
               <SidebarMenuSub>
-                {collection.folders.map((folder) => (
-                  <FolderItem key={folder.id} folder={folder} />
-                ))}
+                {collection.folders.length ? (
+                  collection.folders.map((folder) => <FolderItem key={folder.id} folder={folder} />)
+                ) : (
+                  <SidebarMenuSubItem>
+                    <CreateFolderForm
+                      collectionId={collection.id}
+                      renderTrigger={({openDialog}) => (
+                        <SidebarMenuSubButton
+                          className="text-muted-foreground [&>svg]:text-muted-foreground"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            openDialog();
+                          }}
+                        >
+                          <Plus />
+                          Create folder
+                        </SidebarMenuSubButton>
+                      )}
+                    />
+                  </SidebarMenuSubItem>
+                )}
               </SidebarMenuSub>
             </CollapsibleContent>
             <DropdownMenu>
@@ -77,7 +101,22 @@ function Collections({initialCollections}: {initialCollections: CollectionWithFo
                 </SidebarMenuAction>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-48 rounded-lg sm:w-56" side="right">
-                <CreateFolderForm collectionId={collection.id} />
+                <CreateFolderForm
+                  collectionId={collection.id}
+                  renderTrigger={({openDialog}) => (
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        openDialog();
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Plus className="text-muted-foreground" />
+                        <span>Create folder</span>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                />
                 <DropdownMenuSeparator />
                 <DeleteCollectionButton collectionId={collection.id} />
               </DropdownMenuContent>

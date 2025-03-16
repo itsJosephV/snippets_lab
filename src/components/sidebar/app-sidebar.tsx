@@ -1,7 +1,7 @@
 "use client";
 import type {CollectionWithFolders} from "@/types";
 
-import {Star, FolderCode, Pin, PinIcon, Library} from "lucide-react";
+import {Star, Pin, Library} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 
 import CreateCollectionForm from "../forms/create-collection-form";
@@ -80,7 +80,7 @@ export function AppSidebar() {
             <SidebarGroup>
               <SidebarGroupLabel className="flex items-center gap-1">
                 <Library className="relative" />
-                Libraries
+                Collections
               </SidebarGroupLabel>
               <Collections initialCollections={collections as CollectionWithFolders[]} />
             </SidebarGroup>

@@ -7,6 +7,8 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {usePathname, useRouter} from "next/navigation";
+import {Collection} from "@prisma/client";
 
 import {
   DialogContent,
@@ -31,6 +33,7 @@ const collectionSchema = z.object({
 function CreateCollectionForm() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const queryClient = useQueryClient();
+  const pathname = usePathname();
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
@@ -45,21 +48,26 @@ function CreateCollectionForm() {
     onError: (error) => {
       toast.error(`Error creating collection: ${error.message as string}`);
     },
-    onSuccess: async () => {
+    onSuccess: async (newCollection) => {
+      if (!newCollection?.id) {
+        toast.error("Failed to get new collection ID");
+
+        return;
+      }
       await queryClient.invalidateQueries({queryKey: ["collections"]});
+      const params = new URLSearchParams();
+
+      params.delete("folderId");
+      params.set("collectionId", newCollection.id);
+
+      const newUrl = `${pathname}?${params.toString()}`;
+
+      history.pushState(null, "", newUrl);
       setDialogOpen(false);
       toast.success("Collection created! 🎉");
       form.reset();
     },
   });
-
-  /**
-   *  await queryClient.invalidateQueries({queryKey: ["folder", folderId]});
-         setDialogOpen(false);
-         setSelectedSnippet(response);
-         toast.success("Snippet created! 🎉");
-         form.reset();
-   */
 
   async function onSubmit(values: z.infer<typeof collectionSchema>) {
     mutate(values);

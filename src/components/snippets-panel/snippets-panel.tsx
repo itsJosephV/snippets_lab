@@ -20,7 +20,7 @@ import ResizablePanelBP from "./resizable-panel-bp";
 import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
 import {cn} from "@/lib/utils";
 
-export type FolderAndSnippets = Folder & {snippets: Snippet[]};
+export type FolderAndSnippets = Folder & {collection: {name: string}; snippets: Snippet[]};
 
 function SnippetsPanel() {
   const params = useSearchParams();
@@ -42,7 +42,7 @@ function SnippetsPanel() {
     if (!folderId) {
       return (
         <div className="mt-10 flex items-center justify-center">
-          <p className="text-muted-foreground">Select a folder to view snippets</p>
+          <p className="text-muted-foreground">Select or create a new folder</p>
         </div>
       );
     }
@@ -59,7 +59,7 @@ function SnippetsPanel() {
 
     return (
       <div className="mt-10 flex items-center justify-center">
-        <p className="text-muted-foreground">No snippets found</p>
+        <p className="text-muted-foreground">Folder is empty, create snippets</p>
       </div>
     );
   };

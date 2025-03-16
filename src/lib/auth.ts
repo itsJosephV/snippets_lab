@@ -14,6 +14,9 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
     signIn: "/auth",
     error: "/auth/error",
   },
+  events: {
+    async createUser({user}) {},
+  },
   callbacks: {
     async jwt({token, user}) {
       if (user) {

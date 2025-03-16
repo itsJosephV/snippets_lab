@@ -1,6 +1,7 @@
 "use client";
 
 import {usePathname, useSearchParams} from "next/navigation";
+import {FolderCode} from "lucide-react";
 
 import {SidebarMenuSubItem, SidebarMenuSubButton} from "../ui/sidebar";
 
@@ -14,13 +15,6 @@ interface FolderItemProps {
   collectionId: string;
 }
 
-const createUrl = (pathname: string, params: URLSearchParams) => {
-  const paramsString = params.toString();
-  const queryString = `${paramsString.length ? "?" : ""}${paramsString}`;
-
-  return `${pathname}${queryString}`;
-};
-
 function FolderItem({folder}: {folder: FolderItemProps}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -32,10 +26,13 @@ function FolderItem({folder}: {folder: FolderItemProps}) {
     if (currentFolderId === folder.id) {
       return;
     }
+
     const updatedSearchParams = new URLSearchParams(searchParams.toString());
 
-    updatedSearchParams.set("folderId", folder.id as string);
-    const newUrl = createUrl(pathname, updatedSearchParams);
+    updatedSearchParams.delete("collectionId");
+    updatedSearchParams.set("folderId", folder.id);
+
+    const newUrl = `${pathname}?${updatedSearchParams.toString()}`;
 
     setSelectedSnippet(null);
     setCursorPosition({ln: 0, col: 0});
@@ -45,14 +42,13 @@ function FolderItem({folder}: {folder: FolderItemProps}) {
 
   return (
     <SidebarMenuSubItem onClick={handleFolderClick}>
-      <SidebarMenuSubButton asChild>
-        <span
-          className={cn({
-            "bg-muted": searchParams.get("folderId") === folder.id,
-          })}
-        >
-          {folder.name}
-        </span>
+      <SidebarMenuSubButton
+        className={cn({
+          "bg-muted": searchParams.get("folderId") === folder.id,
+        })}
+      >
+        <FolderCode />
+        {folder.name}
       </SidebarMenuSubButton>
     </SidebarMenuSubItem>
   );
