@@ -2,11 +2,13 @@ import type {Metadata} from "next";
 
 import "./globals.css";
 import localFont from "next/font/local";
+import {SessionProvider} from "next-auth/react";
 
 import {cn} from "@/lib/utils";
 import ToasterComponent from "@/components/layout/toaster-component";
 import Header from "@/components/layout/header";
 import {ThemeProvider} from "@/components/providers/theme-provider";
+import {auth} from "@/lib/auth";
 
 const interVariable = localFont({
   variable: "--font-sans",
@@ -30,6 +32,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({children}: {children: React.ReactNode}) {
+  const session = await auth();
+
   return (
     <html suppressHydrationWarning lang="en">
       <body
@@ -38,17 +42,19 @@ export default async function RootLayout({children}: {children: React.ReactNode}
           "grid grid-rows-[var(--layout-header-height)_1fr]",
         )}
       >
-        <ThemeProvider
-          disableTransitionOnChange
-          enableSystem
-          attribute="class"
-          defaultTheme="system"
-        >
-          <Header />
-          {children}
+        <SessionProvider session={session}>
+          <ThemeProvider
+            disableTransitionOnChange
+            enableSystem
+            attribute="class"
+            defaultTheme="system"
+          >
+            <Header />
+            {children}
 
-          <ToasterComponent />
-        </ThemeProvider>
+            <ToasterComponent />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

@@ -8,7 +8,7 @@ import {capitalize, cn} from "@/lib/utils";
 import {useLockerSP} from "@/hooks/use-locker";
 
 function SnippetCard({snippet, folderName}: {snippet: Snippet; folderName: string}) {
-  const {setSelectedSnippet, selectedSnippet} = useSnippet();
+  const {setSelectedSnippet, selectedSnippet, setCursorPosition} = useSnippet();
 
   const isLocked = useLockerSP();
 
@@ -17,6 +17,7 @@ function SnippetCard({snippet, folderName}: {snippet: Snippet; folderName: strin
       return;
     }
     setSelectedSnippet(snippet);
+    setCursorPosition({ln: 0, col: 0});
   };
 
   return (

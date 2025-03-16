@@ -1,12 +1,13 @@
 "use client";
 import type {CollectionWithFolders} from "@/types";
 
-import {Star, FolderCode} from "lucide-react";
+import {Star, FolderCode, Pin, PinIcon, Library} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 
 import CreateCollectionForm from "../forms/create-collection-form";
 
 import Collections from "./collections";
+import AllSnippetsButton from "./all-snippets-btn";
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {
@@ -56,13 +57,17 @@ export function AppSidebar() {
           {/**--COLLECTIONS-- */}
           <TabsContent value={defaultTab}>
             <SidebarGroup>
-              <SidebarGroupLabel>Favorites</SidebarGroupLabel>
+              <SidebarGroupLabel className="flex items-center gap-1">
+                <Pin />
+                Pinned folders
+              </SidebarGroupLabel>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton className="pl-3" tooltip="test">
+                  {/* <SidebarMenuButton className="pl-3" tooltip="test">
                     <FolderCode />
                     <span>All Snippets</span>
-                  </SidebarMenuButton>
+                  </SidebarMenuButton> */}
+                  <AllSnippetsButton />
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton className="pl-3" tooltip="test">
@@ -73,7 +78,10 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroup>
             <SidebarGroup>
-              <SidebarGroupLabel>Sections</SidebarGroupLabel>
+              <SidebarGroupLabel className="flex items-center gap-1">
+                <Library className="relative" />
+                Libraries
+              </SidebarGroupLabel>
               <Collections initialCollections={collections as CollectionWithFolders[]} />
             </SidebarGroup>
           </TabsContent>

@@ -20,6 +20,11 @@ export const getFolderAndSnippetsById = async ({folderId}: {folderId: string}) =
         id: folderId,
       },
       include: {
+        collection: {
+          select: {
+            name: true,
+          },
+        },
         snippets: {
           orderBy: {
             createdAt: "desc",

@@ -24,7 +24,7 @@ const createUrl = (pathname: string, params: URLSearchParams) => {
 function FolderItem({folder}: {folder: FolderItemProps}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const {setSelectedSnippet} = useSnippet();
+  const {setSelectedSnippet, setCursorPosition} = useSnippet();
 
   const handleFolderClick = () => {
     const currentFolderId = searchParams.get("folderId");
@@ -38,6 +38,7 @@ function FolderItem({folder}: {folder: FolderItemProps}) {
     const newUrl = createUrl(pathname, updatedSearchParams);
 
     setSelectedSnippet(null);
+    setCursorPosition({ln: 0, col: 0});
 
     history.pushState(null, "", newUrl);
   };

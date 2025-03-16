@@ -9,7 +9,6 @@ import {getCollections} from "@/lib/db/data/get_collections";
 import {getQueryClient} from "@/lib/get-query-client";
 
 async function DashboardPage() {
-  // const collections = await getCollections();
   const queryClient = getQueryClient();
 
   await queryClient.prefetchQuery({

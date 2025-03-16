@@ -8,9 +8,12 @@ function EditorFooter({isSaving}: {isSaving: boolean}) {
 
   return (
     <footer className="bg-background border-border text-muted-foreground flex w-full items-center justify-between border-t p-2 text-sm leading-none">
-      <div>
+      {/* <div className="space-x-2"> */}
+      <span>
         Ln {cursorPosition.ln}, Col {cursorPosition.col}
-      </div>
+      </span>
+      {/* <span>{docLength}</span> */}
+      {/* </div> */}
       <div>
         {isSaving ? (
           <div className="flex items-center gap-1">

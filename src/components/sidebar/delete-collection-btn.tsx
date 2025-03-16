@@ -1,6 +1,8 @@
 "use client";
-import {useState, useTransition} from "react";
+import {useState} from "react";
 import {Loader, Trash2} from "lucide-react";
+import {useQueryClient, useMutation} from "@tanstack/react-query";
+import {toast} from "sonner";
 
 import {buttonVariants} from "../ui/button";
 
@@ -20,19 +22,24 @@ import {deleteCollection} from "@/lib/db/actions/collections/delete-collection";
 
 export function DeleteCollectionButton({collectionId}: {collectionId: string}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
 
-  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const queryClient = useQueryClient();
+
+  const {mutate, isPending} = useMutation({
+    mutationFn: ({collectionId}: {collectionId: string}) => deleteCollection({collectionId}),
+    onError: (error) => {
+      toast.error(`Error deleting collection: ${error.message as string}`);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({queryKey: ["collections"]});
+      setIsDialogOpen(false);
+      toast.success("Collection deleted! 🎉");
+    },
+  });
+
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    startTransition(async () => {
-      try {
-        await deleteCollection({collectionId});
-        setIsDialogOpen(false);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error("Delete failed:", error);
-      }
-    });
+    mutate({collectionId});
   };
 
   return (

@@ -10,6 +10,8 @@ interface SnippetContextType {
   setCursorPosition: (state: {ln: number; col: number}) => void;
   cursorPosition: {ln: number; col: number};
   updateCursorPosition: (ln: number, col: number) => void;
+  docLength: number;
+  setDocLength: (length: number) => void;
 }
 
 export const SnippetContext = createContext<SnippetContextType | undefined>(undefined);
@@ -24,6 +26,7 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     ln: 0,
     col: 0,
   });
+  const [docLength, setDocLength] = useState(0);
   const editorRef = useRef<ReactCodeMirrorRef>(null);
 
   const updateCursorPosition = useCallback(
@@ -39,9 +42,11 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     editorRef,
     selectedSnippet,
     cursorPosition,
+    docLength,
     setSelectedSnippet,
     setCursorPosition,
     updateCursorPosition,
+    setDocLength,
   };
 
   return <SnippetContext.Provider value={value}>{children}</SnippetContext.Provider>;

@@ -6,10 +6,10 @@ import {ResizablePanel} from "../ui/resizable";
 
 const BREAKPOINTS = {xl: 1280, xxl: 1536};
 
-function SnippetsPanelContainer({children}: {children: React.ReactNode}) {
+function ResizablePanelBP({children}: {children: React.ReactNode}) {
   const {breakpoint} = useBreakpoint(BREAKPOINTS);
 
-  const minSizeBP = (bp: "xl" | "xxl" | null) => {
+  const minSizes = (bp: "xl" | "xxl" | null) => {
     switch (bp) {
       case "xl":
         return 25;
@@ -21,10 +21,10 @@ function SnippetsPanelContainer({children}: {children: React.ReactNode}) {
   };
 
   return (
-    <ResizablePanel defaultSize={35} maxSize={50} minSize={minSizeBP(breakpoint)}>
+    <ResizablePanel defaultSize={35} maxSize={50} minSize={minSizes(breakpoint)}>
       <section>{children}</section>
     </ResizablePanel>
   );
 }
 
-export default SnippetsPanelContainer;
+export default ResizablePanelBP;

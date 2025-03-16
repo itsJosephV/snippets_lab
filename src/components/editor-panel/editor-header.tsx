@@ -1,10 +1,9 @@
 import React, {RefObject, useEffect, useRef} from "react";
-import {Lock, Star, Tag, Unlock} from "lucide-react";
+import {Star, Tag} from "lucide-react";
 import {useResizeObserver} from "usehooks-ts";
 
 import {Separator} from "../ui/separator";
-import {Button, buttonVariants} from "../ui/button";
-import {Toggle} from "../ui/toggle";
+import {Button} from "../ui/button";
 
 import Settings from "./settings";
 import {LanguagePicker} from "./language-picker";

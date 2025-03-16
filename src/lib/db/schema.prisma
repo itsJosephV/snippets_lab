@@ -82,10 +82,13 @@ model Collection {
   id          String    @id @default(uuid())
   name        String
   description String?
-  isDefault   Boolean
+  isDefault   Boolean   @default(false)
   userId      String
   user        User      @relation(fields: [userId], references: [id])
   folders     Folder[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@index([userId])
 }
 
 model Folder {
@@ -97,30 +100,38 @@ model Folder {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   snippets     Snippet[]
+  isDefault    Boolean @default(false)
+  @@index([collectionId])
+  @@index([collectionId, name])
 }
 
 model Snippet {
   id          String    @id @default(uuid())
   title       String
-  content     String
+  content     String    @db.Text
   language    String
   folderId    String
   folder      Folder    @relation(fields: [folderId], references: [id], onDelete: Cascade)
   description String?
   isFavorite  Boolean
-  isLocked    Boolean // NEW
+  isLocked    Boolean
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  tags        Tag[]
+  @@index([folderId])
+  @@index([folderId, isFavorite])
+  @@index([folderId, language])
+  // tags        Tag[]
 }
 
-model Tag {
-  id        String    @id @default(uuid())
-  name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  snippets  Snippet[]
-}
+//? TAGS WILL BE IMPLEMENTED LATER
+
+// model Tag {
+//   id        String    @id @default(uuid())
+//   name      String
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   snippets  Snippet[]
+// }
 
 // For explicit many-to-many (if needed)
 // model SnippetTag {

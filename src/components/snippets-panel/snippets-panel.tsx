@@ -15,7 +15,7 @@ import {CreateSnippetForm} from "../forms/create-snippet-form";
 import {Skeleton} from "../ui/skeleton";
 
 import SnippetsLits from "./snippets-list";
-import SnippetsPanelContainer from "./snippets-panel-container";
+import ResizablePanelBP from "./resizable-panel-bp";
 
 import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
 import {cn} from "@/lib/utils";
@@ -38,8 +38,34 @@ function SnippetsPanel() {
     enabled: !!folderId,
   });
 
+  const renderContent = () => {
+    if (!folderId) {
+      return (
+        <div className="mt-10 flex items-center justify-center">
+          <p className="text-muted-foreground">Select a folder to view snippets</p>
+        </div>
+      );
+    }
+
+    if (isLoading) return <SnippetCardSkeleton />;
+
+    if (folder?.snippets?.length) {
+      return (
+        <ScrollArea>
+          <SnippetsLits folder={folder} />
+        </ScrollArea>
+      );
+    }
+
+    return (
+      <div className="mt-10 flex items-center justify-center">
+        <p className="text-muted-foreground">No snippets found</p>
+      </div>
+    );
+  };
+
   return (
-    <SnippetsPanelContainer>
+    <ResizablePanelBP>
       <header>
         <div className="border-border flex items-center border-b p-2">
           <SidebarTrigger />
@@ -72,12 +98,8 @@ function SnippetsPanel() {
           <Input className="pl-8" disabled={!folder} placeholder="Search for a snippet..." />
         </div>
       </header>
-      {isLoading ? (
-        <SnippetCardSkeleton />
-      ) : (
-        <ScrollArea>{folder && <SnippetsLits folder={folder} />}</ScrollArea>
-      )}
-    </SnippetsPanelContainer>
+      {renderContent()}
+    </ResizablePanelBP>
   );
 }
 
