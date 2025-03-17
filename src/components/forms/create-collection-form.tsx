@@ -7,8 +7,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {usePathname, useRouter} from "next/navigation";
-import {Collection} from "@prisma/client";
+import {usePathname} from "next/navigation";
 
 import {
   DialogContent,
@@ -23,6 +22,7 @@ import {Input} from "../ui/input";
 import {Button} from "../ui/button";
 
 import {createCollection} from "@/lib/db/actions/collections/create-collection";
+import {useSnippet} from "@/context/useSnippetContext";
 
 const collectionSchema = z.object({
   collection: z.string().min(1, {
@@ -34,6 +34,7 @@ function CreateCollectionForm() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const pathname = usePathname();
+  const {setSelectedSnippet, setCursorPosition} = useSnippet();
 
   const form = useForm<z.infer<typeof collectionSchema>>({
     resolver: zodResolver(collectionSchema),
@@ -49,11 +50,6 @@ function CreateCollectionForm() {
       toast.error(`Error creating collection: ${error.message as string}`);
     },
     onSuccess: async (newCollection) => {
-      if (!newCollection?.id) {
-        toast.error("Failed to get new collection ID");
-
-        return;
-      }
       await queryClient.invalidateQueries({queryKey: ["collections"]});
       const params = new URLSearchParams();
 
@@ -64,6 +60,8 @@ function CreateCollectionForm() {
 
       history.pushState(null, "", newUrl);
       setDialogOpen(false);
+      setSelectedSnippet(null);
+      setCursorPosition({ln: 0, col: 0});
       toast.success("Collection created! 🎉");
       form.reset();
     },

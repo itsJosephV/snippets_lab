@@ -32,7 +32,7 @@ export function CreateFolderForm({
   const [dialogOpen, setDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const pathname = usePathname();
-  const {setSelectedSnippet} = useSnippet();
+  const {setSelectedSnippet, setCursorPosition} = useSnippet();
 
   const form = useForm<z.infer<typeof folderSchema>>({
     resolver: zodResolver(folderSchema),
@@ -57,6 +57,7 @@ export function CreateFolderForm({
       history.pushState(null, "", newUrl);
       setDialogOpen(false);
       setSelectedSnippet(null);
+      setCursorPosition({ln: 0, col: 0});
       toast.success("Folder created! 🎉");
       form.reset();
     },

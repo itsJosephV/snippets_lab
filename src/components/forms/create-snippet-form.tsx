@@ -51,7 +51,7 @@ const snippetSchema = z.object({
 
 export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const {setSelectedSnippet} = useSnippet();
+  const {setSelectedSnippet, setCursorPosition} = useSnippet();
   const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof snippetSchema>>({
@@ -78,6 +78,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
       await queryClient.invalidateQueries({queryKey: ["folder", folderId]});
       setDialogOpen(false);
       setSelectedSnippet(response);
+      setCursorPosition({ln: 0, col: 0});
       toast.success("Snippet created! 🎉");
       form.reset();
     },
