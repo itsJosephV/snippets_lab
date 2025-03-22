@@ -22,7 +22,7 @@ function ResizablePanelBP({children}: {children: React.ReactNode}) {
 
   return (
     <ResizablePanel defaultSize={35} maxSize={50} minSize={minSizes(breakpoint)}>
-      <section>{children}</section>
+      {children}
     </ResizablePanel>
   );
 }

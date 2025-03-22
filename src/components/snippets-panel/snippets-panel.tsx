@@ -1,7 +1,7 @@
 "use client";
 import {Folder, Snippet} from "@prisma/client";
 import React from "react";
-import {Search} from "lucide-react";
+import {FolderOpen, MousePointerClick, Search} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 import {useSearchParams} from "next/navigation";
 
@@ -27,6 +27,8 @@ function SnippetsPanel() {
 
   const folderId = params.get("folderId") as string;
 
+  const panelHeight = "h-[calc(100vh-var(--snippets-header-height))]";
+
   const {
     data: folder,
     isLoading,
@@ -41,8 +43,13 @@ function SnippetsPanel() {
   const renderContent = () => {
     if (!folderId) {
       return (
-        <div className="mt-10 flex items-center justify-center">
-          <p className="text-muted-foreground">Select or create a new folder</p>
+        <div className={cn("text-muted-foreground grid place-items-center", panelHeight)}>
+          <div className="flex flex-col items-center gap-2">
+            <MousePointerClick className="size-18" />
+            <div className="text-center">
+              <p>Select or create a new folder</p>
+            </div>
+          </div>
         </div>
       );
     }
@@ -51,15 +58,21 @@ function SnippetsPanel() {
 
     if (folder?.snippets?.length) {
       return (
-        <ScrollArea>
+        <ScrollArea className={panelHeight}>
           <SnippetsLits folder={folder} />
         </ScrollArea>
       );
     }
 
     return (
-      <div className="mt-10 flex items-center justify-center">
-        <p className="text-muted-foreground">Folder is empty, create snippets</p>
+      <div className={cn("text-muted-foreground grid place-items-center", panelHeight)}>
+        <div className="flex flex-col items-center gap-2">
+          <FolderOpen className="size-18" />
+          <div className="text-center">
+            <p>Folder is empty</p>
+            <p>Add new snippets</p>
+          </div>
+        </div>
       </div>
     );
   };
