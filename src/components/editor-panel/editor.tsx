@@ -15,6 +15,8 @@ type EditorProps = {
   handleContentChange: (value: string) => void;
 };
 
+const defaultValue = `<- SELECT A SNIPPET TO START EDITING`;
+
 function Editor({handleContentChange}: EditorProps) {
   const {theme} = useTheme();
 
@@ -41,9 +43,9 @@ function Editor({handleContentChange}: EditorProps) {
       className={cn(`overflow-y-scroll`, "h-[var(--editor-height)]")}
       extensions={[extensionFn(selectedSnippet?.language as Language)]}
       height="100%"
-      readOnly={selectedSnippet?.isLocked}
+      readOnly={selectedSnippet?.isLocked || !selectedSnippet}
       theme={codeMirrorTheme}
-      value={selectedSnippet?.content}
+      value={selectedSnippet?.content || defaultValue}
       onChange={(value) => handleContentChange(value)}
       onUpdate={handleEditorUpdate}
     />
