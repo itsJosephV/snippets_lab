@@ -1,48 +1,33 @@
+"use client";
 import React from "react";
 import {FolderCode, Star} from "lucide-react";
-import {usePathname, useSearchParams} from "next/navigation";
-import {SavedView, ViewType} from "@prisma/client";
+import {SavedView} from "@prisma/client";
+import {useSearchParams} from "next/navigation";
 
-import {SidebarMenuButton} from "../ui/sidebar";
+import {SidebarMenuButton, SidebarMenuSubItem} from "../ui/sidebar";
 
 import {useSnippet} from "@/context/useSnippetContext";
-
-// const createUrl = (pathname: string, params: URLSearchParams) => {
-//   const paramsString = params.toString();
-//   const queryString = `${paramsString.length ? "?" : ""}${paramsString}`;
-
-//   return `${pathname}${queryString}`;
-// };
+import {cn} from "@/lib/utils";
 
 function SavedViewButton({view}: {view: SavedView}) {
-  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const {clearEditor} = useSnippet();
+  const viewId = searchParams.get("viewId");
 
-  const handleViewClick = () => {
-    const viewId = searchParams.get("viewId");
-
-    if (viewId === view.id) {
-      return;
-    }
-
-    const newParams = new URLSearchParams();
-
-    newParams.set("viewId", view.id);
-
-    const newUrl = `${pathname}?${newParams.toString()}`;
-
-    history.pushState(null, "", newUrl);
-
-    clearEditor();
-  };
+  const {handleFolderClick} = useSnippet();
 
   return (
-    <SidebarMenuButton className="pl-3" tooltip="test" onClick={handleViewClick}>
-      {view.type === "ALL" && <FolderCode />}
-      {view.type === "FAVORITES" && <Star />}
-      <span>{view.name}</span>
-    </SidebarMenuButton>
+    <SidebarMenuSubItem>
+      <SidebarMenuButton
+        className={cn({
+          "bg-muted": viewId === view.id,
+        })}
+        onClick={() => handleFolderClick(view, "viewId")}
+      >
+        {view.type === "ALL" && <FolderCode />}
+        {view.type === "FAVORITES" && <Star />}
+        {view.name}
+      </SidebarMenuButton>
+    </SidebarMenuSubItem>
   );
 }
 

@@ -1,5 +1,5 @@
 "use client";
-import type {Snippet} from "@prisma/client";
+import type {SnippetsWithCollectionName} from "@/types";
 
 import {Bird, Lock} from "lucide-react";
 
@@ -7,16 +7,11 @@ import {useSnippet} from "@/context/useSnippetContext";
 import {capitalize, cn} from "@/lib/utils";
 import {useLockerSP} from "@/hooks/use-locker";
 
-function SnippetCard({
-  snippet,
-  //  collectionName
-}: {
-  snippet: Snippet;
-  //  collectionName: string
-}) {
+function SnippetCard({snippet}: {snippet: SnippetsWithCollectionName}) {
   const {setSelectedSnippet, selectedSnippet, setCursorPosition} = useSnippet();
 
   const isLocked = useLockerSP();
+  const collectionName = snippet.folder.collection?.name;
 
   const handleSnippetSelection = () => {
     if (selectedSnippet?.id === snippet.id) {
@@ -76,7 +71,7 @@ function SnippetCard({
       </div> */}
       <div className="text-muted-foreground mt-4 flex items-center justify-between">
         <div className="flex items-center gap-1 text-sm">
-          <Bird size={16} /> {capitalize(snippet.folder.collection?.name)}
+          <Bird size={16} /> {capitalize(collectionName)}
         </div>
         <div className="text-sm">
           <time suppressHydrationWarning>{snippet.createdAt.toLocaleDateString()}</time>

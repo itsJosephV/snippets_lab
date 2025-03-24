@@ -1,9 +1,11 @@
 "use client";
-import type {Snippet} from "@prisma/client";
+import type {Snippet, Folder, SavedView} from "@prisma/client";
 
 import {ReactCodeMirrorRef} from "@uiw/react-codemirror";
 import {usePathname, useSearchParams} from "next/navigation";
 import {createContext, useState, ReactNode, useRef, RefObject, useCallback} from "react";
+
+type folderCtx = Folder | SavedView;
 interface SnippetContextType {
   selectedSnippet: Snippet | null;
   setSelectedSnippet: (snippet: Snippet | null) => void;
@@ -14,7 +16,7 @@ interface SnippetContextType {
   docLength: number;
   setDocLength: (length: number) => void;
   clearEditor: () => void;
-  // handleViewClick: (ctx: any, ctxParam: string) => void;
+  handleFolderClick: (folderCtx: folderCtx, ctxParam: string) => void;
 }
 
 export const SnippetContext = createContext<SnippetContextType | undefined>(undefined);
@@ -31,8 +33,8 @@ export function SnippetProvider({children}: SnippetProviderProps) {
   });
   const [docLength, setDocLength] = useState(0);
   const editorRef = useRef<ReactCodeMirrorRef>(null);
-  // const pathname = usePathname();
-  // const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const updateCursorPosition = useCallback(
     (ln: number, col: number) => {
@@ -43,27 +45,26 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     [cursorPosition.ln, cursorPosition.col],
   );
 
-  // const handleViewClick = (folderCtx: any, paramCtx: string) => {
-  //   const viewDraft = searchParams.get(paramCtx);
-
-  //   if (viewDraft === folderCtx.type) {
-  //     return;
-  //   }
-
-  //   const newParams = new URLSearchParams();
-
-  //   newParams.set(paramCtx, folderCtx.type);
-
-  //   const newUrl = `${pathname}?${newParams.toString()}`;
-
-  //   history.pushState(null, "", newUrl);
-
-  //   clearEditor();
-  // };
-
   const clearEditor = () => {
     setSelectedSnippet(null);
     setCursorPosition({ln: 0, col: 0});
+  };
+
+  const handleFolderClick = (folderCtx: folderCtx, paramCtx: string) => {
+    const viewDraft = searchParams.get(paramCtx);
+
+    if (viewDraft === folderCtx.id) {
+      return;
+    }
+
+    const newParams = new URLSearchParams();
+
+    newParams.set(paramCtx, folderCtx.id);
+    const newUrl = `${pathname}?${newParams.toString()}`;
+
+    history.pushState(null, "", newUrl);
+
+    clearEditor();
   };
 
   const value = {
@@ -76,7 +77,7 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     updateCursorPosition,
     setDocLength,
     clearEditor,
-    // handleViewClick,
+    handleFolderClick,
   };
 
   return <SnippetContext.Provider value={value}>{children}</SnippetContext.Provider>;
