@@ -17,7 +17,6 @@ model User {
   sessions      Session[]
   Authenticator Authenticator[]
   collections Collection[]
-  savedViews  SavedView[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,6 +101,9 @@ model Folder {
   updatedAt   DateTime  @updatedAt
   snippets     Snippet[]
   isDefault    Boolean @default(false)
+  type        ViewType @default(NORMAL)
+  filters     Json?
+  isPinned    Boolean   @default(false)
   @@index([collectionId])
   @@index([collectionId, name])
 }
@@ -125,23 +127,24 @@ model Snippet {
 }
 
 // TESTING
-model SavedView {
-  id          String       @id @default(uuid())
-  name        String
-  type        ViewType
-  filters     Json
-  isPinned    Boolean   @default(false)
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
+// model SavedView {
+//   id          String       @id @default(uuid())
+//   name        String
+//   type        ViewType
+//   filters     Json
+//   isPinned    Boolean   @default(false)
+//   userId      String
+//   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   createdAt   DateTime  @default(now())
+//   updatedAt   DateTime  @default(now()) @updatedAt
 
-  @@unique([userId, type], name: "unique_predefined_views")
-  @@index([userId, isPinned])
-}
+//   @@unique([userId, type], name: "unique_predefined_views")
+//   @@index([userId, isPinned])
+// }
 
 // TESTING
 enum ViewType {
+  NORMAL
   ALL
   FAVORITES
 }
