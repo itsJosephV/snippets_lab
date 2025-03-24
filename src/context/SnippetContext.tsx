@@ -2,6 +2,7 @@
 import type {Snippet} from "@prisma/client";
 
 import {ReactCodeMirrorRef} from "@uiw/react-codemirror";
+import {usePathname, useSearchParams} from "next/navigation";
 import {createContext, useState, ReactNode, useRef, RefObject, useCallback} from "react";
 interface SnippetContextType {
   selectedSnippet: Snippet | null;
@@ -12,6 +13,8 @@ interface SnippetContextType {
   updateCursorPosition: (ln: number, col: number) => void;
   docLength: number;
   setDocLength: (length: number) => void;
+  clearEditor: () => void;
+  // handleViewClick: (ctx: any, ctxParam: string) => void;
 }
 
 export const SnippetContext = createContext<SnippetContextType | undefined>(undefined);
@@ -28,6 +31,8 @@ export function SnippetProvider({children}: SnippetProviderProps) {
   });
   const [docLength, setDocLength] = useState(0);
   const editorRef = useRef<ReactCodeMirrorRef>(null);
+  // const pathname = usePathname();
+  // const searchParams = useSearchParams();
 
   const updateCursorPosition = useCallback(
     (ln: number, col: number) => {
@@ -38,6 +43,29 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     [cursorPosition.ln, cursorPosition.col],
   );
 
+  // const handleViewClick = (folderCtx: any, paramCtx: string) => {
+  //   const viewDraft = searchParams.get(paramCtx);
+
+  //   if (viewDraft === folderCtx.type) {
+  //     return;
+  //   }
+
+  //   const newParams = new URLSearchParams();
+
+  //   newParams.set(paramCtx, folderCtx.type);
+
+  //   const newUrl = `${pathname}?${newParams.toString()}`;
+
+  //   history.pushState(null, "", newUrl);
+
+  //   clearEditor();
+  // };
+
+  const clearEditor = () => {
+    setSelectedSnippet(null);
+    setCursorPosition({ln: 0, col: 0});
+  };
+
   const value = {
     editorRef,
     selectedSnippet,
@@ -47,6 +75,8 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     setCursorPosition,
     updateCursorPosition,
     setDocLength,
+    clearEditor,
+    // handleViewClick,
   };
 
   return <SnippetContext.Provider value={value}>{children}</SnippetContext.Provider>;

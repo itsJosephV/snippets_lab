@@ -1,10 +1,10 @@
-import type {FolderWithSnippets} from "@/types";
 import type {Snippet} from "@prisma/client";
 
 import * as React from "react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 
+import {FolderAndSnippets} from "@/types";
 import {
   Select,
   SelectContent,
@@ -34,7 +34,7 @@ export function LanguagePicker() {
 
       const updatedSnippet = {...selectedSnippet, language};
 
-      queryClient.setQueryData([key, selectedSnippet.folderId], (old: FolderWithSnippets) => {
+      queryClient.setQueryData([key, selectedSnippet.folderId], (old: FolderAndSnippets) => {
         if (!old || !old.snippets) return old;
 
         return {
@@ -61,6 +61,7 @@ export function LanguagePicker() {
     onSettled: () => {
       if (selectedSnippet) {
         queryClient.invalidateQueries({queryKey: [key, selectedSnippet.folderId]});
+        // queryClient.invalidateQueries({queryKey: ["view"]});
       }
     },
   });

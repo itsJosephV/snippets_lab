@@ -17,6 +17,7 @@ model User {
   sessions      Session[]
   Authenticator Authenticator[]
   collections Collection[]
+  savedViews  SavedView[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -121,6 +122,28 @@ model Snippet {
   @@index([folderId, isFavorite])
   @@index([folderId, language])
   // tags        Tag[]
+}
+
+// TESTING
+model SavedView {
+  id          String       @id @default(uuid())
+  name        String
+  type        ViewType
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filters     Json
+  isPinned    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+
+  @@unique([userId, type], name: "unique_predefined_views")
+  @@index([userId, isPinned])
+}
+
+// TESTING
+enum ViewType {
+  ALL
+  FAVORITES
 }
 //? TAGS WILL BE IMPLEMENTED LATER
 

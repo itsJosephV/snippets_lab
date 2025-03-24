@@ -1,15 +1,16 @@
+import type {FolderAndSnippets} from "@/types";
+
 import React from "react";
 
 import SnippetCard from "./snippet-card";
-import {FolderAndSnippets} from "./snippets-panel";
+
+// import {FolderWithSnippets} from "@/types";
 
 function SnippetsLits({folder}: {folder: FolderAndSnippets}) {
   return (
     <ul className="space-y-3 p-2">
       {folder?.snippets.map((snippet) => {
-        const collectionName = folder?.collection.name;
-
-        return <SnippetCard key={snippet.id} collectionName={collectionName} snippet={snippet} />;
+        return <SnippetCard key={snippet.id} snippet={snippet} />;
       })}
     </ul>
   );

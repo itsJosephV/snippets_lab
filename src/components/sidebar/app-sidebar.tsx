@@ -1,13 +1,13 @@
 "use client";
 import type {CollectionWithFolders} from "@/types";
 
-import {Star, Pin, Library} from "lucide-react";
+import {Pin, Library} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 
 import CreateCollectionForm from "../forms/create-collection-form";
 
 import Collections from "./collections";
-import AllSnippetsButton from "./all-snippets-btn";
+import SavedViewButton from "./saved-view-button";
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {
@@ -17,11 +17,10 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {getCollections} from "@/lib/db/data/get_collections";
+import {getAllViews} from "@/lib/db/data/get_all_views";
 
 enum SidebarTab {
   Collections = "collections",
@@ -33,6 +32,12 @@ export function AppSidebar() {
     queryKey: ["collections"],
     queryFn: getCollections,
   });
+
+  const {data: savedViews} = useQuery({
+    queryKey: ["savedViews"],
+    queryFn: getAllViews,
+  });
+
   const defaultTab = SidebarTab.Collections;
 
   return (
@@ -62,19 +67,9 @@ export function AppSidebar() {
                 Pinned folders
               </SidebarGroupLabel>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  {/* <SidebarMenuButton className="pl-3" tooltip="test">
-                    <FolderCode />
-                    <span>All Snippets</span>
-                  </SidebarMenuButton> */}
-                  <AllSnippetsButton />
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="pl-3" tooltip="test">
-                    <Star />
-                    <span>Favorites</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {savedViews?.map((view) => {
+                  return <SavedViewButton key={view.id} view={view} />;
+                })}
               </SidebarMenu>
             </SidebarGroup>
             <SidebarGroup>
@@ -94,4 +89,8 @@ export function AppSidebar() {
       </Tabs>
     </Sidebar>
   );
+}
+
+{
+  /* <AllSnippetsButton /> */
 }

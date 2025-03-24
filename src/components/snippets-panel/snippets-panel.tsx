@@ -1,9 +1,9 @@
 "use client";
-import {Folder, Snippet} from "@prisma/client";
 import React from "react";
 import {FolderOpen, MousePointerClick, Search} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 import {useSearchParams} from "next/navigation";
+import {ViewType} from "@prisma/client";
 
 import {SidebarTrigger} from "../ui/sidebar";
 import Settings from "../editor-panel/settings";
@@ -19,29 +19,41 @@ import ResizablePanelBP from "./resizable-panel-bp";
 
 import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
 import {cn} from "@/lib/utils";
-
-export type FolderAndSnippets = Folder & {collection: {name: string}; snippets: Snippet[]};
+import {getViewAndSnippets} from "@/lib/db/data/get_view_and_snippets";
 
 function SnippetsPanel() {
   const params = useSearchParams();
 
   const folderId = params.get("folderId") as string;
+  // const viewId = params.get("viewId") as string;
+  const viewId = params.get("viewId") as ViewType;
 
   const panelHeight = "h-[calc(100vh-var(--snippets-header-height))]";
 
   const {
-    data: folder,
-    isLoading,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    error,
+    data: folderWithSnippets,
+    isLoading: isFolderLoading,
+    // error: folderError,
   } = useQuery({
     queryKey: ["folder", folderId],
     queryFn: () => getFolderAndSnippetsById({folderId}),
     enabled: !!folderId,
   });
 
+  const {
+    data: folderWithAllSnippets,
+    isLoading: isAllSnippetsLoading,
+    // error: allSnippetsError,
+  } = useQuery({
+    queryKey: ["view", viewId],
+    queryFn: () => getViewAndSnippets({viewId}),
+    enabled: !!viewId,
+  });
+  const isLoading = isFolderLoading || isAllSnippetsLoading;
+
   const renderContent = () => {
-    if (!folderId) {
+    //TODO: IMRPOVE THIS CONDITION
+    if (!folderId && !viewId) {
       return (
         <div className={cn("text-muted-foreground grid place-items-center", panelHeight)}>
           <div className="flex flex-col items-center gap-2">
@@ -56,10 +68,18 @@ function SnippetsPanel() {
 
     if (isLoading) return <SnippetCardSkeleton />;
 
-    if (folder?.snippets?.length) {
+    if (folderWithSnippets?.snippets?.length) {
       return (
         <ScrollArea className={panelHeight}>
-          <SnippetsLits folder={folder} />
+          <SnippetsLits folder={folderWithSnippets} />
+        </ScrollArea>
+      );
+    }
+
+    if (folderWithAllSnippets?.snippets?.length) {
+      return (
+        <ScrollArea className={panelHeight}>
+          <SnippetsLits folder={folderWithAllSnippets} />
         </ScrollArea>
       );
     }
@@ -88,10 +108,10 @@ function SnippetsPanel() {
             ) : (
               <p
                 className={cn("text-sm", {
-                  "text-muted-foreground": !folder,
+                  "text-muted-foreground": !folderWithSnippets || !folderWithAllSnippets,
                 })}
               >
-                {folder?.name ?? "No folder selected"}
+                {folderWithSnippets?.name || folderWithAllSnippets?.name || "No folder selected"}
               </p>
             )}
           </div>
@@ -108,7 +128,11 @@ function SnippetsPanel() {
         </div>
         <div className="border-border relative border-b p-2">
           <Search className="text-muted-foreground absolute top-1/2 left-5 h-4 w-4 -translate-y-1/2" />
-          <Input className="pl-8" disabled={!folder} placeholder="Search for a snippet..." />
+          <Input
+            className="pl-8"
+            disabled={!folderWithSnippets && !folderWithAllSnippets}
+            placeholder="Search for a snippet..."
+          />
         </div>
       </header>
       {renderContent()}

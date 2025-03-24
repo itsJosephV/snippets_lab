@@ -18,7 +18,7 @@ interface FolderItemProps {
 function FolderItem({folder}: {folder: FolderItemProps}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const {setSelectedSnippet, setCursorPosition} = useSnippet();
+  const {clearEditor} = useSnippet();
 
   const handleFolderClick = () => {
     const currentFolderId = searchParams.get("folderId");
@@ -27,17 +27,14 @@ function FolderItem({folder}: {folder: FolderItemProps}) {
       return;
     }
 
-    const updatedSearchParams = new URLSearchParams(searchParams.toString());
+    const newParams = new URLSearchParams();
 
-    updatedSearchParams.delete("collectionId");
-    updatedSearchParams.set("folderId", folder.id);
+    newParams.set("folderId", folder.id);
 
-    const newUrl = `${pathname}?${updatedSearchParams.toString()}`;
-
-    setSelectedSnippet(null);
-    setCursorPosition({ln: 0, col: 0});
+    const newUrl = `${pathname}?${newParams.toString()}`;
 
     history.pushState(null, "", newUrl);
+    clearEditor();
   };
 
   return (
