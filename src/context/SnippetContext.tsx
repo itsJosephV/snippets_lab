@@ -7,16 +7,16 @@ import {createContext, useState, ReactNode, useRef, RefObject, useCallback} from
 
 type folderCtx = Folder | SavedView;
 interface SnippetContextType {
-  selectedSnippet: Snippet | null;
-  setSelectedSnippet: (snippet: Snippet | null) => void;
   editorRef: RefObject<ReactCodeMirrorRef | null>;
-  setCursorPosition: (state: {ln: number; col: number}) => void;
+  selectedSnippet: Snippet | null;
   cursorPosition: {ln: number; col: number};
-  updateCursorPosition: (ln: number, col: number) => void;
   docLength: number;
+  setSelectedSnippet: (snippet: Snippet | null) => void;
+  setCursorPosition: (state: {ln: number; col: number}) => void;
   setDocLength: (length: number) => void;
-  clearEditor: () => void;
   handleFolderClick: (folderCtx: folderCtx, ctxParam: string) => void;
+  updateCursorPosition: (ln: number, col: number) => void;
+  clearEditor: () => void;
 }
 
 export const SnippetContext = createContext<SnippetContextType | undefined>(undefined);

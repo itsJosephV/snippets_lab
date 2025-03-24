@@ -1,5 +1,5 @@
 "use client";
-import type {FolderWithSnippets} from "@/types";
+import type {FolderAndSnippets} from "@/types";
 
 import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
@@ -51,12 +51,12 @@ function EditorColumn() {
         queryKey: ["folder", selectedSnippet.folderId],
       });
 
-      const previousFolder = queryClient.getQueryData<FolderWithSnippets>([
+      const previousFolder = queryClient.getQueryData<FolderAndSnippets>([
         "folder",
         selectedSnippet.folderId,
       ]);
 
-      queryClient.setQueryData<FolderWithSnippets>(["folder", selectedSnippet.folderId], (old) => {
+      queryClient.setQueryData<FolderAndSnippets>(["folder", selectedSnippet.folderId], (old) => {
         if (!old || !old.snippets) return old;
 
         return {
@@ -79,21 +79,18 @@ function EditorColumn() {
     },
     onSuccess: (data, variables) => {
       if (variables.version === saveVersionRef.current && selectedSnippet) {
-        queryClient.setQueryData<FolderWithSnippets>(
-          ["folder", selectedSnippet.folderId],
-          (old) => {
-            if (!old || !old.snippets) return old;
+        queryClient.setQueryData<FolderAndSnippets>(["folder", selectedSnippet.folderId], (old) => {
+          if (!old || !old.snippets) return old;
 
-            return {
-              ...old,
-              snippets: old.snippets.map((snippet) =>
-                snippet.id === selectedSnippet.id
-                  ? {...snippet, content: data.content, updatedAt: data.updatedAt}
-                  : snippet,
-              ),
-            };
-          },
-        );
+          return {
+            ...old,
+            snippets: old.snippets.map((snippet) =>
+              snippet.id === selectedSnippet.id
+                ? {...snippet, content: data.content, updatedAt: data.updatedAt}
+                : snippet,
+            ),
+          };
+        });
         updateSnippetState((snippet) => {
           setSelectedSnippet({
             ...(snippet as Snippet),

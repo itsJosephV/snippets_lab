@@ -1,4 +1,4 @@
-import type {FolderWithSnippets} from "@/types";
+import type {FolderAndSnippets} from "@/types";
 import type {Snippet} from "@prisma/client";
 
 import {Lock, Unlock} from "lucide-react";
@@ -33,7 +33,7 @@ function LockToggle() {
       const previousFolder = queryClient.getQueryData([key, selectedSnippet.folderId]);
       const updatedSnippet = {...selectedSnippet, isLocked};
 
-      queryClient.setQueryData([key, selectedSnippet.folderId], (old: FolderWithSnippets) => {
+      queryClient.setQueryData([key, selectedSnippet.folderId], (old: FolderAndSnippets) => {
         if (!old || !old.snippets) return old;
 
         return {
