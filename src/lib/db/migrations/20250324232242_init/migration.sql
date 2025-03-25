@@ -13,7 +13,7 @@ ALTER TABLE "SavedView" DROP CONSTRAINT "SavedView_userId_fkey";
 -- AlterTable
 ALTER TABLE "Folder" ADD COLUMN     "filters" JSONB,
 ADD COLUMN     "isPinned" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "type" "ViewType" NOT NULL DEFAULT 'NORMAL';
+ADD COLUMN     "type" "ViewType" NOT NULL;
 
 -- DropTable
 DROP TABLE "SavedView";

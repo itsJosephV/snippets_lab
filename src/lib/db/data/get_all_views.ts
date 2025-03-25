@@ -1,11 +1,11 @@
 "use server";
 
-import {SavedView} from "@prisma/client";
+import {Collection, Folder} from "@prisma/client";
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
 
-export async function getAllViews(): Promise<SavedView[]> {
+export async function draftCollection(): Promise<Collection & {folders: Folder[]}> {
   try {
     const session = await auth();
 
@@ -13,17 +13,22 @@ export async function getAllViews(): Promise<SavedView[]> {
       throw new Error("Unauthorized");
     }
 
-    const savedViews = await db.savedView.findMany({
+    const collection = await db.collection.findFirst({
       where: {
         userId: session.user.id,
+        name: "virtual folders",
       },
-      orderBy: {
-        createdAt: "desc",
+      include: {
+        folders: true,
       },
     });
 
-    return savedViews;
+    if (!collection) {
+      throw new Error("No Collection found");
+    }
+
+    return collection;
   } catch (error) {
-    throw new Error(error instanceof Error ? error.message : "Error retrieving views");
+    throw new Error(error instanceof Error ? error.message : "Error retrieving Collection");
   }
 }

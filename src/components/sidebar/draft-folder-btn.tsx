@@ -1,17 +1,17 @@
 "use client";
 import React from "react";
 import {FolderCode, Star} from "lucide-react";
-import {SavedView} from "@prisma/client";
 import {useSearchParams} from "next/navigation";
+import {Folder} from "@prisma/client";
 
 import {SidebarMenuButton, SidebarMenuSubItem} from "../ui/sidebar";
 
 import {useSnippet} from "@/context/useSnippetContext";
 import {cn} from "@/lib/utils";
 
-function SavedViewButton({view}: {view: SavedView}) {
+function DraftFolderBtn({folder}: {folder: Folder}) {
   const searchParams = useSearchParams();
-  const viewId = searchParams.get("viewId");
+  const draftFolderId = searchParams.get("draftId");
 
   const {handleFolderClick} = useSnippet();
 
@@ -19,16 +19,16 @@ function SavedViewButton({view}: {view: SavedView}) {
     <SidebarMenuSubItem>
       <SidebarMenuButton
         className={cn({
-          "bg-muted": viewId === view.id,
+          "bg-muted": draftFolderId === folder.id,
         })}
-        onClick={() => handleFolderClick(view, "viewId")}
+        onClick={() => handleFolderClick(folder, "draftId")}
       >
-        {view.type === "ALL" && <FolderCode />}
-        {view.type === "FAVORITES" && <Star />}
-        {view.name}
+        {folder.type === "ALL" && <FolderCode />}
+        {folder.type === "FAVORITES" && <Star />}
+        {folder.name}
       </SidebarMenuButton>
     </SidebarMenuSubItem>
   );
 }
 
-export default SavedViewButton;
+export default DraftFolderBtn;

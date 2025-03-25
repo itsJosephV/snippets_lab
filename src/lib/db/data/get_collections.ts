@@ -16,6 +16,9 @@ export async function getCollections(): Promise<CollectionWithFolders[]> {
     const collections = await db.collection.findMany({
       where: {
         userId: session.user.id,
+        name: {
+          not: "virtual folders",
+        },
       },
       include: {
         folders: true,

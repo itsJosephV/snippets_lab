@@ -6,24 +6,36 @@ import {ViewType} from "@prisma/client";
 import db from "./db";
 
 /**
- * model SavedView {
-  id          Int       @id @default(autoincrement())
+ * model Collection {
+  id          String    @id @default(uuid())
   name        String
-  type        ViewType
+  description String?
+  isDefault   Boolean   @default(false)
   userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  filters     Json
-  isPinned    Boolean   @default(false)
+  user        User      @relation(fields: [userId], references: [id])
+  folders     Folder[]
   createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
-
-  @@unique([userId, type], name: "unique_predefined_views")
-  @@index([userId, isPinned])
+  updatedAt   DateTime  @updatedAt
+  @@index([userId])
 }
+ */
 
-enum ViewType {
-  ALL
-  FAVORITES
+/**
+ * model Folder {
+  id           String    @id @default(uuid())
+  name         String
+  description  String?
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  snippets     Snippet[]
+  isDefault    Boolean @default(false)
+  type        ViewType @default(NORMAL)
+  filters     Json?
+  isPinned    Boolean   @default(false)
+  @@index([collectionId])
+  @@index([collectionId, name])
 }
  */
 
@@ -39,21 +51,32 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
   },
   events: {
     async createUser({user}) {
-      await db.savedView.createMany({
+      const collection = await db.collection.create({
+        data: {
+          name: "virtual folders",
+          description: "virtual folders",
+          isDefault: false,
+          userId: user.id as string,
+        },
+      });
+
+      await db.folder.createMany({
         data: [
           {
             name: "All Snippets",
+            collectionId: collection.id,
+            isDefault: false,
             type: ViewType.ALL,
-            userId: user.id as string,
             filters: {},
-            isPinned: true,
+            isPinned: false,
           },
           {
             name: "Favorites",
+            collectionId: collection.id,
+            isDefault: false,
             type: ViewType.FAVORITES,
-            userId: user.id as string,
             filters: {isFavorite: true},
-            isPinned: true,
+            isPinned: false,
           },
         ],
       });
@@ -78,3 +101,18 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
     },
   },
 });
+
+/** // {
+          //   name: "All Snippets",
+          //   type: ViewType.ALL,
+          //   userId: user.id as string,
+          //   filters: {},
+          //   isPinned: true,
+          // },
+          // {
+          //   name: "Favorites",
+          //   type: ViewType.FAVORITES,
+          //   userId: user.id as string,
+          //   filters: {isFavorite: true},
+          //   isPinned: true,
+          // }, */

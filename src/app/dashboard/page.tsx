@@ -7,19 +7,20 @@ import {ResizableHandle, ResizablePanelGroup} from "@/components/ui/resizable";
 import {SidebarProvider} from "@/components/ui/sidebar";
 import {getCollections} from "@/lib/db/data/get_collections";
 import {getQueryClient} from "@/lib/get-query-client";
-import {getAllViews} from "@/lib/db/data/get_all_views";
+import {draftCollection} from "@/lib/db/data/get_all_views";
+// import {getAllViews} from "@/lib/db/data/get_all_views";
 
 async function DashboardPage() {
   const queryClient = getQueryClient();
 
   await Promise.all([
-    queryClient.prefetchQuery({
+    await queryClient.prefetchQuery({
       queryKey: ["collections"],
       queryFn: getCollections,
     }),
     queryClient.prefetchQuery({
-      queryKey: ["savedViews"],
-      queryFn: getAllViews,
+      queryKey: ["draft"],
+      queryFn: draftCollection,
     }),
   ]);
 

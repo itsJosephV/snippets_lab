@@ -3,7 +3,6 @@ import React from "react";
 import {FolderOpen, MousePointerClick, Search} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 import {useSearchParams} from "next/navigation";
-import {ViewType} from "@prisma/client";
 
 import {SidebarTrigger} from "../ui/sidebar";
 import Settings from "../editor-panel/settings";
@@ -19,14 +18,13 @@ import ResizablePanelBP from "./resizable-panel-bp";
 
 import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
 import {cn} from "@/lib/utils";
-import {getViewAndSnippets} from "@/lib/db/data/get_view_and_snippets";
+import {getDraftFolderAndSnippets} from "@/lib/db/data/get_draft_folder_and_snippets";
 
 function SnippetsPanel() {
   const params = useSearchParams();
 
   const folderId = params.get("folderId") as string;
-  // const viewId = params.get("viewId") as string;
-  const viewId = params.get("viewId") as ViewType;
+  const draftId = params.get("draftId") as string;
 
   const panelHeight = "h-[calc(100vh-var(--snippets-header-height))]";
 
@@ -45,15 +43,15 @@ function SnippetsPanel() {
     isLoading: isAllSnippetsLoading,
     // error: allSnippetsError,
   } = useQuery({
-    queryKey: ["view", viewId],
-    queryFn: () => getViewAndSnippets({viewId}),
-    enabled: !!viewId,
+    queryKey: ["draft", draftId],
+    queryFn: () => getDraftFolderAndSnippets({draftId}),
+    enabled: !!draftId,
   });
   const isLoading = isFolderLoading || isAllSnippetsLoading;
 
   const renderContent = () => {
     //TODO: IMRPOVE THIS CONDITION
-    if (!folderId && !viewId) {
+    if (!folderId && !draftId) {
       return (
         <div className={cn("text-muted-foreground grid place-items-center", panelHeight)}>
           <div className="flex flex-col items-center gap-2">

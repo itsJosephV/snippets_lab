@@ -4,10 +4,11 @@ import type {FolderAndSnippets} from "@/types";
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
 
-export async function getViewAndSnippets({
-  viewId,
+export async function getDraftFolderAndSnippets({
+  draftId,
+  // type,
 }: {
-  viewId: string;
+  draftId: string;
 }): Promise<FolderAndSnippets | null> {
   try {
     const session = await auth();
@@ -15,7 +16,7 @@ export async function getViewAndSnippets({
     const baseConditions = {
       folder: {
         collection: {
-          userId: userId,
+          userId,
         },
       },
     };
@@ -24,17 +25,29 @@ export async function getViewAndSnippets({
       throw new Error("Unauthorized");
     }
 
-    const viewSelected = await db.savedView.findUnique({
+    const draftFolderSelected = await db.folder.findFirst({
       where: {
-        id: viewId,
+        id: draftId,
+        // type: type,
+      },
+      include: {
+        collection: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
-    const viewType = viewSelected?.type;
-    const viewFilters = viewSelected?.filters as object;
+    if (!draftFolderSelected) {
+      return null;
+    }
 
-    const getSnippetsQuery = () => {
-      switch (viewType) {
+    const folderType = draftFolderSelected.type;
+    const folderFilters = draftFolderSelected.filters as object;
+
+    const getSnippetsQuery = async () => {
+      switch (folderType) {
         case "ALL":
           return db.snippet.findMany({
             where: baseConditions,
@@ -58,7 +71,7 @@ export async function getViewAndSnippets({
           return db.snippet.findMany({
             where: {
               ...baseConditions,
-              ...viewFilters,
+              ...folderFilters,
             },
             include: {
               folder: {
@@ -83,22 +96,11 @@ export async function getViewAndSnippets({
 
     const snippets = await getSnippetsQuery();
 
-    const folder = {
-      id: viewSelected?.id as string,
-      name: viewSelected?.name as string,
-      description: `virtual folder for ${viewSelected?.name}`,
-      createdAt: viewSelected?.createdAt as Date,
-      updatedAt: viewSelected?.updatedAt as Date,
-      collectionId: crypto.randomUUID(),
-      isDefault: false,
-      collection: {
-        name: viewSelected?.name as string,
-      },
-      snippets: snippets,
+    return {
+      ...draftFolderSelected,
+      snippets,
     };
-
-    return folder;
   } catch (error) {
-    throw new Error(error as string);
+    throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
 }

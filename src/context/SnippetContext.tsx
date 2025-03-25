@@ -1,11 +1,11 @@
 "use client";
-import type {Snippet, Folder, SavedView} from "@prisma/client";
+import type {Snippet, Folder} from "@prisma/client";
 
 import {ReactCodeMirrorRef} from "@uiw/react-codemirror";
 import {usePathname, useSearchParams} from "next/navigation";
 import {createContext, useState, ReactNode, useRef, RefObject, useCallback} from "react";
 
-type folderCtx = Folder | SavedView;
+type folderCtx = Folder;
 interface SnippetContextType {
   editorRef: RefObject<ReactCodeMirrorRef | null>;
   selectedSnippet: Snippet | null;
@@ -50,16 +50,16 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     setCursorPosition({ln: 0, col: 0});
   };
 
-  const handleFolderClick = (folderCtx: folderCtx, paramCtx: string) => {
-    const viewDraft = searchParams.get(paramCtx);
+  const handleFolderClick = (folder: Folder, param: string) => {
+    const folderId = searchParams.get(param);
 
-    if (viewDraft === folderCtx.id) {
+    if (folderId === folder.id) {
       return;
     }
 
     const newParams = new URLSearchParams();
 
-    newParams.set(paramCtx, folderCtx.id);
+    newParams.set(param, folder.id);
     const newUrl = `${pathname}?${newParams.toString()}`;
 
     history.pushState(null, "", newUrl);

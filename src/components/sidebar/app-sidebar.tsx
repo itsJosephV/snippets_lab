@@ -1,26 +1,24 @@
 "use client";
 import type {CollectionWithFolders} from "@/types";
 
-import {Pin, Library} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
+import {Collection, Folder} from "@prisma/client";
 
 import CreateCollectionForm from "../forms/create-collection-form";
 
 import Collections from "./collections";
-import SavedViewButton from "./saved-view-button";
+import DraftFolders from "./draft-folders";
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {getCollections} from "@/lib/db/data/get_collections";
-import {getAllViews} from "@/lib/db/data/get_all_views";
+import {draftCollection} from "@/lib/db/data/get_all_views";
 
 enum SidebarTab {
   Collections = "collections",
@@ -33,9 +31,9 @@ export function AppSidebar() {
     queryFn: getCollections,
   });
 
-  const {data: savedViews} = useQuery({
-    queryKey: ["savedViews"],
-    queryFn: getAllViews,
+  const {data: draft} = useQuery({
+    queryKey: ["draft"],
+    queryFn: draftCollection,
   });
 
   const defaultTab = SidebarTab.Collections;
@@ -61,24 +59,19 @@ export function AppSidebar() {
         <SidebarContent className="">
           {/**--COLLECTIONS-- */}
           <TabsContent value={defaultTab}>
-            <SidebarGroup>
+            {/* <SidebarGroup>
               <SidebarGroupLabel className="flex items-center gap-1">
                 <Pin />
                 Pinned folders
               </SidebarGroupLabel>
               <SidebarMenu>
-                {savedViews?.map((view) => {
+                {draft?.folders?.map((view) => {
                   return <SavedViewButton key={view.id} view={view} />;
                 })}
               </SidebarMenu>
-            </SidebarGroup>
-            <SidebarGroup>
-              <SidebarGroupLabel className="flex items-center gap-1">
-                <Library className="relative" />
-                Collections
-              </SidebarGroupLabel>
-              <Collections initialCollections={collections as CollectionWithFolders[]} />
-            </SidebarGroup>
+            </SidebarGroup> */}
+            <DraftFolders draft={draft as Collection & {folders: Folder[]}} />
+            <Collections initialCollections={collections as CollectionWithFolders[]} />
           </TabsContent>
           {/**--TAGS-- */}
           <TabsContent value={SidebarTab.Tags}>

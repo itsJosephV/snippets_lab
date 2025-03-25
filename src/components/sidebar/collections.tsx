@@ -2,11 +2,13 @@
 import type {CollectionWithFolders} from "@/types";
 
 import React from "react";
-import {ChevronRight, MoreHorizontal, Plus} from "lucide-react";
+import {ChevronRight, Library, MoreHorizontal, Plus} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 import {useSearchParams} from "next/navigation";
 
 import {
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
@@ -48,83 +50,91 @@ function Collections({initialCollections}: {initialCollections: CollectionWithFo
   };
 
   return (
-    <SidebarMenu className="">
-      {collectionsRQ.map((collection) => (
-        <Collapsible
-          key={collection.id}
-          asChild
-          className="group/collapsible"
-          defaultOpen={collectionId === collection.id}
-        >
-          <SidebarMenuItem className="">
-            <CollapsibleTrigger asChild>
-              <SidebarMenuButton
-                className={cn("", {
-                  "bg-muted": hasFolder(collection) || collection.id === collectionId,
-                })}
-                tooltip={collection.name}
-              >
-                <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                <span>{collection.name}</span>
-              </SidebarMenuButton>
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarMenuSub>
-                {collection.folders.length ? (
-                  collection.folders.map((folder) => <FolderItem key={folder.id} folder={folder} />)
-                ) : (
-                  <SidebarMenuSubItem>
-                    <CreateFolderForm
-                      collectionId={collection.id}
-                      renderTrigger={({openDialog}) => (
-                        <SidebarMenuSubButton
-                          className="text-muted-foreground [&>svg]:text-muted-foreground"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            openDialog();
-                          }}
-                        >
-                          <Plus />
-                          Create folder
-                        </SidebarMenuSubButton>
-                      )}
-                    />
-                  </SidebarMenuSubItem>
-                )}
-              </SidebarMenuSub>
-            </CollapsibleContent>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuAction showOnHover>
-                  <MoreHorizontal />
-                  <span className="sr-only">More</span>
-                </SidebarMenuAction>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-48 rounded-lg sm:w-56" side="right">
-                <CreateFolderForm
-                  collectionId={collection.id}
-                  renderTrigger={({openDialog}) => (
-                    <DropdownMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        openDialog();
-                      }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Plus className="text-muted-foreground" />
-                        <span>Create folder</span>
-                      </div>
-                    </DropdownMenuItem>
+    <SidebarGroup>
+      <SidebarGroupLabel className="flex items-center gap-1">
+        <Library className="relative" />
+        Collections
+      </SidebarGroupLabel>
+      <SidebarMenu>
+        {collectionsRQ?.map((collection) => (
+          <Collapsible
+            key={collection.id}
+            asChild
+            className="group/collapsible"
+            defaultOpen={collectionId === collection.id}
+          >
+            <SidebarMenuItem>
+              <CollapsibleTrigger asChild>
+                <SidebarMenuButton
+                  className={cn("", {
+                    "bg-muted": hasFolder(collection) || collection.id === collectionId,
+                  })}
+                  tooltip={collection.name}
+                >
+                  <ChevronRight className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  <span>{collection.name}</span>
+                </SidebarMenuButton>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarMenuSub>
+                  {collection.folders.length ? (
+                    collection.folders.map((folder) => (
+                      <FolderItem key={folder.id} folder={folder} />
+                    ))
+                  ) : (
+                    <SidebarMenuSubItem>
+                      <CreateFolderForm
+                        collectionId={collection.id}
+                        renderTrigger={({openDialog}) => (
+                          <SidebarMenuSubButton
+                            className="text-muted-foreground [&>svg]:text-muted-foreground"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              openDialog();
+                            }}
+                          >
+                            <Plus />
+                            Create folder
+                          </SidebarMenuSubButton>
+                        )}
+                      />
+                    </SidebarMenuSubItem>
                   )}
-                />
-                <DropdownMenuSeparator />
-                <DeleteCollectionButton collectionId={collection.id} />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </Collapsible>
-      ))}
-    </SidebarMenu>
+                </SidebarMenuSub>
+              </CollapsibleContent>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuAction showOnHover>
+                    <MoreHorizontal />
+                    <span className="sr-only">More</span>
+                  </SidebarMenuAction>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48 rounded-lg sm:w-56" side="right">
+                  <CreateFolderForm
+                    collectionId={collection.id}
+                    renderTrigger={({openDialog}) => (
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault();
+                          openDialog();
+                        }}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Plus className="text-muted-foreground" />
+                          <span>Create folder</span>
+                        </div>
+                      </DropdownMenuItem>
+                    )}
+                  />
+                  <DropdownMenuSeparator />
+                  <DeleteCollectionButton collectionId={collection.id} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </Collapsible>
+        ))}
+      </SidebarMenu>
+    </SidebarGroup>
   );
 }
 
