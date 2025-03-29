@@ -19,6 +19,17 @@ export async function updateSnippetLanguage(snippetId: string, language: Languag
       data: {
         language,
       },
+      include: {
+        folder: {
+          select: {
+            collection: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return snippet;

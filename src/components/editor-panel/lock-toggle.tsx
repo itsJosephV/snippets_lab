@@ -1,9 +1,10 @@
-import type {FolderWithSnippets} from "@/types";
+import type {FolderAndSnippets, SnippetsWithCollectionName} from "@/types";
 import type {Snippet} from "@prisma/client";
 
 import {Lock, Unlock} from "lucide-react";
 import {useQueryClient, useMutation} from "@tanstack/react-query";
 import {toast} from "sonner";
+import {useSearchParams} from "next/navigation";
 
 import {Toggle} from "../ui/toggle";
 import {buttonVariants} from "../ui/button";
@@ -17,6 +18,8 @@ function LockToggle() {
   const queryClient = useQueryClient();
 
   const key = "folder";
+  const params = useSearchParams();
+  const folderId = params.get("folderId") as string;
 
   const mutation = useMutation({
     mutationFn: async ({snippetId, isLocked}: {snippetId: string; isLocked: boolean}) => {
@@ -29,11 +32,11 @@ function LockToggle() {
     },
     onMutate: async ({isLocked}) => {
       if (!selectedSnippet) return;
-      await queryClient.cancelQueries({queryKey: [key, selectedSnippet.folderId]});
-      const previousFolder = queryClient.getQueryData([key, selectedSnippet.folderId]);
+      await queryClient.cancelQueries({queryKey: [key, folderId]});
+      const previousFolder = queryClient.getQueryData([key, folderId]);
       const updatedSnippet = {...selectedSnippet, isLocked};
 
-      queryClient.setQueryData([key, selectedSnippet.folderId], (old: FolderWithSnippets) => {
+      queryClient.setQueryData([key, folderId], (old: FolderAndSnippets) => {
         if (!old || !old.snippets) return old;
 
         return {
@@ -49,7 +52,7 @@ function LockToggle() {
     },
     onError: (err, variables, context) => {
       queryClient.setQueryData([key, selectedSnippet?.folderId], context?.previousFolder);
-      setSelectedSnippet(context?.previousSnippet as Snippet);
+      setSelectedSnippet(context?.previousSnippet as SnippetsWithCollectionName);
       toast.error("Failed to update lock");
     },
     onSuccess: (response) => {
@@ -59,7 +62,7 @@ function LockToggle() {
     },
     onSettled: () => {
       if (selectedSnippet) {
-        queryClient.invalidateQueries({queryKey: [key, selectedSnippet.folderId]});
+        queryClient.invalidateQueries({queryKey: [key, folderId]});
       }
     },
   });

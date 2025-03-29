@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import GitHub from "next-auth/providers/github";
 import {PrismaAdapter} from "@auth/prisma-adapter";
+import {ViewType} from "@prisma/client";
 
 import db from "./db";
 
@@ -15,7 +16,37 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
     error: "/auth/error",
   },
   events: {
-    async createUser({user}) {},
+    async createUser({user}) {
+      const collection = await db.collection.create({
+        data: {
+          name: "virtual folders",
+          description: "virtual folders",
+          isDefault: false,
+          userId: user.id as string,
+        },
+      });
+
+      await db.folder.createMany({
+        data: [
+          {
+            name: "All Snippets",
+            collectionId: collection.id,
+            isDefault: false,
+            type: ViewType.ALL,
+            filters: {},
+            isPinned: false,
+          },
+          {
+            name: "Favorites",
+            collectionId: collection.id,
+            isDefault: false,
+            type: ViewType.FAVORITES,
+            filters: {isFavorite: true},
+            isPinned: false,
+          },
+        ],
+      });
+    },
   },
   callbacks: {
     async jwt({token, user}) {
@@ -36,3 +67,18 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
     },
   },
 });
+
+/** // {
+          //   name: "All Snippets",
+          //   type: ViewType.ALL,
+          //   userId: user.id as string,
+          //   filters: {},
+          //   isPinned: true,
+          // },
+          // {
+          //   name: "Favorites",
+          //   type: ViewType.FAVORITES,
+          //   userId: user.id as string,
+          //   filters: {isFavorite: true},
+          //   isPinned: true,
+          // }, */

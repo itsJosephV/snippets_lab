@@ -34,6 +34,17 @@ export async function updateSnippetLock({
       data: {
         isLocked,
       },
+      include: {
+        folder: {
+          select: {
+            collection: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return response;

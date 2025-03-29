@@ -1,7 +1,5 @@
 "use server";
 
-import {revalidatePath} from "next/cache";
-
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
 
@@ -32,8 +30,11 @@ export async function createFolder({folder, collectionId}: {folder: string; coll
             id: collectionId,
           },
         },
+        type: "NORMAL",
       },
     });
+
+    console.log(newFolder);
 
     return newFolder;
   } catch (error) {

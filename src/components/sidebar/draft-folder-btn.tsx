@@ -1,36 +1,34 @@
 "use client";
-import type {Folder} from "@prisma/client";
-
+import React from "react";
+import {FolderCode, Star} from "lucide-react";
 import {useSearchParams} from "next/navigation";
-import {FolderCode} from "lucide-react";
+import {Folder} from "@prisma/client";
 
-import {SidebarMenuSubItem, SidebarMenuSubButton} from "../ui/sidebar";
+import {SidebarMenuButton, SidebarMenuSubItem} from "../ui/sidebar";
 
 import {useSnippet} from "@/context/useSnippetContext";
 import {cn} from "@/lib/utils";
-import {useLockerSP} from "@/hooks/use-locker";
 
-function FolderItem({folder}: {folder: Folder}) {
+function DraftFolderBtn({folder}: {folder: Folder}) {
   const searchParams = useSearchParams();
   const folderId = searchParams.get("folderId");
-  const {handleFolderClick} = useSnippet();
 
-  const isLocked = useLockerSP();
+  const {handleFolderClick} = useSnippet();
 
   return (
     <SidebarMenuSubItem>
-      <SidebarMenuSubButton
+      <SidebarMenuButton
         className={cn({
           "bg-muted": folderId === folder.id,
-          "pointer-events-none": isLocked,
         })}
         onClick={() => handleFolderClick(folder, "folderId")}
       >
-        <FolderCode />
+        {folder.type === "ALL" && <FolderCode />}
+        {folder.type === "FAVORITES" && <Star />}
         {folder.name}
-      </SidebarMenuSubButton>
+      </SidebarMenuButton>
     </SidebarMenuSubItem>
   );
 }
 
-export default FolderItem;
+export default DraftFolderBtn;

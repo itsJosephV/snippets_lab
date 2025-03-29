@@ -31,6 +31,17 @@ export async function updateSnippetContent({
       data: {
         content: newContent,
       },
+      include: {
+        folder: {
+          select: {
+            collection: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return updatedSnippet;

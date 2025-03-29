@@ -101,6 +101,9 @@ model Folder {
   updatedAt   DateTime  @updatedAt
   snippets     Snippet[]
   isDefault    Boolean @default(false)
+  type        ViewType @default(NORMAL)
+  filters     Json?
+  isPinned    Boolean   @default(false)
   @@index([collectionId])
   @@index([collectionId, name])
 }
@@ -121,6 +124,13 @@ model Snippet {
   @@index([folderId, isFavorite])
   @@index([folderId, language])
   // tags        Tag[]
+}
+
+// TESTING
+enum ViewType {
+  NORMAL
+  ALL
+  FAVORITES
 }
 //? TAGS WILL BE IMPLEMENTED LATER
 

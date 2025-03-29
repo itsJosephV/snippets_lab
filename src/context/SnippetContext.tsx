@@ -1,17 +1,24 @@
 "use client";
-import type {Snippet} from "@prisma/client";
+import type {Folder} from "@prisma/client";
 
 import {ReactCodeMirrorRef} from "@uiw/react-codemirror";
+import {usePathname, useSearchParams} from "next/navigation";
 import {createContext, useState, ReactNode, useRef, RefObject, useCallback} from "react";
+
+import {SnippetsWithCollectionName} from "@/types";
+
+type folderCtx = Folder;
 interface SnippetContextType {
-  selectedSnippet: Snippet | null;
-  setSelectedSnippet: (snippet: Snippet | null) => void;
   editorRef: RefObject<ReactCodeMirrorRef | null>;
-  setCursorPosition: (state: {ln: number; col: number}) => void;
+  selectedSnippet: SnippetsWithCollectionName | null;
   cursorPosition: {ln: number; col: number};
-  updateCursorPosition: (ln: number, col: number) => void;
   docLength: number;
+  setSelectedSnippet: (snippet: SnippetsWithCollectionName | null) => void;
+  setCursorPosition: (state: {ln: number; col: number}) => void;
   setDocLength: (length: number) => void;
+  handleFolderClick: (folderCtx: folderCtx, ctxParam: string) => void;
+  updateCursorPosition: (ln: number, col: number) => void;
+  clearEditor: () => void;
 }
 
 export const SnippetContext = createContext<SnippetContextType | undefined>(undefined);
@@ -21,13 +28,15 @@ interface SnippetProviderProps {
 }
 
 export function SnippetProvider({children}: SnippetProviderProps) {
-  const [selectedSnippet, setSelectedSnippet] = useState<Snippet | null>(null);
+  const [selectedSnippet, setSelectedSnippet] = useState<SnippetsWithCollectionName | null>(null);
   const [cursorPosition, setCursorPosition] = useState({
     ln: 0,
     col: 0,
   });
   const [docLength, setDocLength] = useState(0);
   const editorRef = useRef<ReactCodeMirrorRef>(null);
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const updateCursorPosition = useCallback(
     (ln: number, col: number) => {
@@ -38,6 +47,28 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     [cursorPosition.ln, cursorPosition.col],
   );
 
+  const clearEditor = () => {
+    setSelectedSnippet(null);
+    setCursorPosition({ln: 0, col: 0});
+  };
+
+  const handleFolderClick = (folder: Folder, param: string) => {
+    const folderId = searchParams.get(param);
+
+    if (folderId === folder.id) {
+      return;
+    }
+
+    const newParams = new URLSearchParams();
+
+    newParams.set(param, folder.id);
+    const newUrl = `${pathname}?${newParams.toString()}`;
+
+    history.pushState(null, "", newUrl);
+
+    clearEditor();
+  };
+
   const value = {
     editorRef,
     selectedSnippet,
@@ -47,6 +78,8 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     setCursorPosition,
     updateCursorPosition,
     setDocLength,
+    clearEditor,
+    handleFolderClick,
   };
 
   return <SnippetContext.Provider value={value}>{children}</SnippetContext.Provider>;

@@ -1,27 +1,24 @@
 "use client";
 import type {CollectionWithFolders} from "@/types";
 
-import {Star, Pin, Library} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
+import {Collection, Folder} from "@prisma/client";
 
 import CreateCollectionForm from "../forms/create-collection-form";
 
 import Collections from "./collections";
-import AllSnippetsButton from "./all-snippets-btn";
+import DraftFolders from "./draft-folders";
 
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import {getCollections} from "@/lib/db/data/get_collections";
+import {draftCollection} from "@/lib/db/data/get_all_views";
 
 enum SidebarTab {
   Collections = "collections",
@@ -33,6 +30,12 @@ export function AppSidebar() {
     queryKey: ["collections"],
     queryFn: getCollections,
   });
+
+  const {data: draft} = useQuery({
+    queryKey: ["draft"],
+    queryFn: draftCollection,
+  });
+
   const defaultTab = SidebarTab.Collections;
 
   return (
@@ -56,34 +59,19 @@ export function AppSidebar() {
         <SidebarContent className="">
           {/**--COLLECTIONS-- */}
           <TabsContent value={defaultTab}>
-            <SidebarGroup>
+            {/* <SidebarGroup>
               <SidebarGroupLabel className="flex items-center gap-1">
                 <Pin />
                 Pinned folders
               </SidebarGroupLabel>
               <SidebarMenu>
-                <SidebarMenuItem>
-                  {/* <SidebarMenuButton className="pl-3" tooltip="test">
-                    <FolderCode />
-                    <span>All Snippets</span>
-                  </SidebarMenuButton> */}
-                  <AllSnippetsButton />
-                </SidebarMenuItem>
-                <SidebarMenuItem>
-                  <SidebarMenuButton className="pl-3" tooltip="test">
-                    <Star />
-                    <span>Favorites</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {draft?.folders?.map((view) => {
+                  return <SavedViewButton key={view.id} view={view} />;
+                })}
               </SidebarMenu>
-            </SidebarGroup>
-            <SidebarGroup>
-              <SidebarGroupLabel className="flex items-center gap-1">
-                <Library className="relative" />
-                Collections
-              </SidebarGroupLabel>
-              <Collections initialCollections={collections as CollectionWithFolders[]} />
-            </SidebarGroup>
+            </SidebarGroup> */}
+            <DraftFolders draft={draft as Collection & {folders: Folder[]}} />
+            <Collections initialCollections={collections as CollectionWithFolders[]} />
           </TabsContent>
           {/**--TAGS-- */}
           <TabsContent value={SidebarTab.Tags}>
@@ -94,4 +82,8 @@ export function AppSidebar() {
       </Tabs>
     </Sidebar>
   );
+}
+
+{
+  /* <AllSnippetsButton /> */
 }
