@@ -1,17 +1,19 @@
 "use client";
-import type {Snippet, Folder} from "@prisma/client";
+import type {Folder} from "@prisma/client";
 
 import {ReactCodeMirrorRef} from "@uiw/react-codemirror";
 import {usePathname, useSearchParams} from "next/navigation";
 import {createContext, useState, ReactNode, useRef, RefObject, useCallback} from "react";
 
+import {SnippetsWithCollectionName} from "@/types";
+
 type folderCtx = Folder;
 interface SnippetContextType {
   editorRef: RefObject<ReactCodeMirrorRef | null>;
-  selectedSnippet: Snippet | null;
+  selectedSnippet: SnippetsWithCollectionName | null;
   cursorPosition: {ln: number; col: number};
   docLength: number;
-  setSelectedSnippet: (snippet: Snippet | null) => void;
+  setSelectedSnippet: (snippet: SnippetsWithCollectionName | null) => void;
   setCursorPosition: (state: {ln: number; col: number}) => void;
   setDocLength: (length: number) => void;
   handleFolderClick: (folderCtx: folderCtx, ctxParam: string) => void;
@@ -26,7 +28,7 @@ interface SnippetProviderProps {
 }
 
 export function SnippetProvider({children}: SnippetProviderProps) {
-  const [selectedSnippet, setSelectedSnippet] = useState<Snippet | null>(null);
+  const [selectedSnippet, setSelectedSnippet] = useState<SnippetsWithCollectionName | null>(null);
   const [cursorPosition, setCursorPosition] = useState({
     ln: 0,
     col: 0,

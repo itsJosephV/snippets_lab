@@ -19,6 +19,7 @@ export const getFolderAndSnippetsById = async ({
       throw new Error("Invalid folder ID");
     }
 
+    //TODO: check if the includes are correct
     const folderAndSnippets = await db.folder.findFirst({
       where: {
         id: folderId,
@@ -33,7 +34,6 @@ export const getFolderAndSnippetsById = async ({
           include: {
             folder: {
               select: {
-                name: true,
                 collection: {
                   select: {
                     name: true,

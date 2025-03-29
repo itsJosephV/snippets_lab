@@ -1,19 +1,66 @@
 "use server";
 import type {FolderAndSnippets} from "@/types";
+import type {Prisma} from "@prisma/client";
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
 
-export async function getDraftFolderAndSnippets({
-  draftId,
-  // type,
+const snippetInclude = {
+  folder: {
+    select: {
+      collection: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  },
+};
+
+const getQueryOptions = (
+  folderType: string,
+  baseConditions: Prisma.SnippetWhereInput,
+  folderFilters: Prisma.SnippetWhereInput,
+  folderId: string,
+): {
+  where: Prisma.SnippetWhereInput;
+  orderBy: Prisma.SnippetOrderByWithRelationInput;
+} => {
+  switch (folderType) {
+    case "ALL":
+      return {
+        where: baseConditions,
+        orderBy: {createdAt: "desc"},
+      };
+    case "FAVORITES":
+      return {
+        where: {...baseConditions, ...folderFilters},
+        orderBy: {updatedAt: "desc"},
+      };
+    default:
+      return {
+        where: {folderId},
+        orderBy: {createdAt: "desc"},
+      };
+  }
+};
+
+export async function getFolderAndSnippets({
+  folderId,
 }: {
-  draftId: string;
+  folderId: string;
 }): Promise<FolderAndSnippets | null> {
   try {
+    if (!folderId || typeof folderId !== "string") {
+      throw new Error("Invalid folder ID");
+    }
+
     const session = await auth();
     const userId = session?.user?.id;
-    const baseConditions = {
+
+    if (!userId) throw new Error("Unauthorized");
+
+    const baseConditions: Prisma.SnippetWhereInput = {
       folder: {
         collection: {
           userId,
@@ -21,85 +68,32 @@ export async function getDraftFolderAndSnippets({
       },
     };
 
-    if (!userId) {
-      throw new Error("Unauthorized");
-    }
-
-    const draftFolderSelected = await db.folder.findFirst({
+    const folderSelected = await db.folder.findFirst({
       where: {
-        id: draftId,
-        // type: type,
+        id: folderId,
+        collection: {userId},
       },
       include: {
-        collection: {
-          select: {
-            name: true,
-          },
-        },
+        collection: {select: {name: true}},
       },
     });
 
-    if (!draftFolderSelected) {
-      return null;
-    }
+    if (!folderSelected) return null;
 
-    const folderType = draftFolderSelected.type;
-    const folderFilters = draftFolderSelected.filters as object;
+    const {where, orderBy} = getQueryOptions(
+      folderSelected.type,
+      baseConditions,
+      folderSelected.filters as Prisma.SnippetWhereInput,
+      folderId,
+    );
 
-    const getSnippetsQuery = async () => {
-      switch (folderType) {
-        case "ALL":
-          return db.snippet.findMany({
-            where: baseConditions,
-            include: {
-              folder: {
-                select: {
-                  name: true,
-                  collection: {
-                    select: {
-                      name: true,
-                    },
-                  },
-                },
-              },
-            },
-            orderBy: {
-              createdAt: "desc",
-            },
-          });
-        case "FAVORITES":
-          return db.snippet.findMany({
-            where: {
-              ...baseConditions,
-              ...folderFilters,
-            },
-            include: {
-              folder: {
-                select: {
-                  name: true,
-                  collection: {
-                    select: {
-                      name: true,
-                    },
-                  },
-                },
-              },
-            },
-            orderBy: {
-              updatedAt: "desc",
-            },
-          });
-        default:
-          throw new Error("Invalid view id");
-      }
-    };
+    const snippets = await db.snippet.findMany({
+      where,
+      include: snippetInclude,
+      orderBy,
+    });
 
-    const snippets = await getSnippetsQuery();
-
-    return {
-      ...draftFolderSelected,
-      snippets,
-    };
+    return {...folderSelected, snippets};
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : "Unknown error");
   }

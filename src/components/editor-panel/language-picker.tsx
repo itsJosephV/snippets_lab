@@ -3,8 +3,9 @@ import type {Snippet} from "@prisma/client";
 import * as React from "react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {useSearchParams} from "next/navigation";
 
-import {FolderAndSnippets} from "@/types";
+import {FolderAndSnippets, SnippetsWithCollectionName} from "@/types";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,8 @@ export function LanguagePicker() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();
   const queryClient = useQueryClient();
   const key = "folder";
+  const params = useSearchParams();
+  const folderId = params.get("folderId") as string;
 
   const mutation = useMutation({
     mutationFn: ({snippetId, language}: {snippetId: string; language: Language}) =>
@@ -28,13 +31,13 @@ export function LanguagePicker() {
     onMutate: async ({language}) => {
       if (!selectedSnippet) return;
 
-      await queryClient.cancelQueries({queryKey: [key, selectedSnippet.folderId]});
+      await queryClient.cancelQueries({queryKey: [key, folderId]});
 
-      const previousFolder = queryClient.getQueryData([key, selectedSnippet.folderId]);
+      const previousFolder = queryClient.getQueryData([key, folderId]);
 
       const updatedSnippet = {...selectedSnippet, language};
 
-      queryClient.setQueryData([key, selectedSnippet.folderId], (old: FolderAndSnippets) => {
+      queryClient.setQueryData([key, folderId], (old: FolderAndSnippets) => {
         if (!old || !old.snippets) return old;
 
         return {
@@ -50,8 +53,8 @@ export function LanguagePicker() {
       return {previousFolder, previousSnippet: selectedSnippet};
     },
     onError: (err, variables, context) => {
-      queryClient.setQueryData([key, selectedSnippet?.folderId], context?.previousFolder);
-      setSelectedSnippet(context?.previousSnippet as Snippet);
+      queryClient.setQueryData([key, folderId], context?.previousFolder);
+      setSelectedSnippet(context?.previousSnippet as SnippetsWithCollectionName);
       toast.error("Failed to update language");
     },
     onSuccess: (response) => {
@@ -60,8 +63,7 @@ export function LanguagePicker() {
     },
     onSettled: () => {
       if (selectedSnippet) {
-        queryClient.invalidateQueries({queryKey: [key, selectedSnippet.folderId]});
-        // queryClient.invalidateQueries({queryKey: ["view"]});
+        queryClient.invalidateQueries({queryKey: [key, folderId]});
       }
     },
   });

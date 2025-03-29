@@ -11,7 +11,7 @@ import {cn} from "@/lib/utils";
 
 function DraftFolderBtn({folder}: {folder: Folder}) {
   const searchParams = useSearchParams();
-  const draftFolderId = searchParams.get("draftId");
+  const folderId = searchParams.get("folderId");
 
   const {handleFolderClick} = useSnippet();
 
@@ -19,9 +19,9 @@ function DraftFolderBtn({folder}: {folder: Folder}) {
     <SidebarMenuSubItem>
       <SidebarMenuButton
         className={cn({
-          "bg-muted": draftFolderId === folder.id,
+          "bg-muted": folderId === folder.id,
         })}
-        onClick={() => handleFolderClick(folder, "draftId")}
+        onClick={() => handleFolderClick(folder, "folderId")}
       >
         {folder.type === "ALL" && <FolderCode />}
         {folder.type === "FAVORITES" && <Star />}

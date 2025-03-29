@@ -16,42 +16,29 @@ import {Skeleton} from "../ui/skeleton";
 import SnippetsLits from "./snippets-list";
 import ResizablePanelBP from "./resizable-panel-bp";
 
-import {getFolderAndSnippetsById} from "@/lib/db/data/get_folder_and_snippets";
 import {cn} from "@/lib/utils";
-import {getDraftFolderAndSnippets} from "@/lib/db/data/get_draft_folder_and_snippets";
+import {getFolderAndSnippets} from "@/lib/db/data/get_draft_folder_and_snippets";
 
 function SnippetsPanel() {
   const params = useSearchParams();
 
   const folderId = params.get("folderId") as string;
-  const draftId = params.get("draftId") as string;
 
   const panelHeight = "h-[calc(100vh-var(--snippets-header-height))]";
 
   const {
-    data: folderWithSnippets,
-    isLoading: isFolderLoading,
-    // error: folderError,
+    data,
+    isLoading,
+    // error: allSnippetsError,
   } = useQuery({
     queryKey: ["folder", folderId],
-    queryFn: () => getFolderAndSnippetsById({folderId}),
+    queryFn: () => getFolderAndSnippets({folderId}),
     enabled: !!folderId,
   });
 
-  const {
-    data: folderWithAllSnippets,
-    isLoading: isAllSnippetsLoading,
-    // error: allSnippetsError,
-  } = useQuery({
-    queryKey: ["draft", draftId],
-    queryFn: () => getDraftFolderAndSnippets({draftId}),
-    enabled: !!draftId,
-  });
-  const isLoading = isFolderLoading || isAllSnippetsLoading;
-
   const renderContent = () => {
     //TODO: IMRPOVE THIS CONDITION
-    if (!folderId && !draftId) {
+    if (!folderId) {
       return (
         <div className={cn("text-muted-foreground grid place-items-center", panelHeight)}>
           <div className="flex flex-col items-center gap-2">
@@ -66,18 +53,10 @@ function SnippetsPanel() {
 
     if (isLoading) return <SnippetCardSkeleton />;
 
-    if (folderWithSnippets?.snippets?.length) {
+    if (data?.snippets?.length) {
       return (
         <ScrollArea className={panelHeight}>
-          <SnippetsLits folder={folderWithSnippets} />
-        </ScrollArea>
-      );
-    }
-
-    if (folderWithAllSnippets?.snippets?.length) {
-      return (
-        <ScrollArea className={panelHeight}>
-          <SnippetsLits folder={folderWithAllSnippets} />
+          <SnippetsLits folder={data} />
         </ScrollArea>
       );
     }
@@ -106,10 +85,10 @@ function SnippetsPanel() {
             ) : (
               <p
                 className={cn("text-sm", {
-                  "text-muted-foreground": !folderWithSnippets || !folderWithAllSnippets,
+                  "text-muted-foreground": !data,
                 })}
               >
-                {folderWithSnippets?.name || folderWithAllSnippets?.name || "No folder selected"}
+                {data?.name || "No folder selected"}
               </p>
             )}
           </div>
@@ -126,11 +105,7 @@ function SnippetsPanel() {
         </div>
         <div className="border-border relative border-b p-2">
           <Search className="text-muted-foreground absolute top-1/2 left-5 h-4 w-4 -translate-y-1/2" />
-          <Input
-            className="pl-8"
-            disabled={!folderWithSnippets && !folderWithAllSnippets}
-            placeholder="Search for a snippet..."
-          />
+          <Input className="pl-8" disabled={!data} placeholder="Search for a snippet..." />
         </div>
       </header>
       {renderContent()}

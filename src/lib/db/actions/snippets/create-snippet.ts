@@ -53,6 +53,17 @@ export async function createSnippet({
         isLocked: false,
         isFavorite: false,
       },
+      include: {
+        folder: {
+          select: {
+            collection: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return newSnippet;

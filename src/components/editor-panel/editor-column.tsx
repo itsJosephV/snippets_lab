@@ -1,5 +1,5 @@
 "use client";
-import type {FolderAndSnippets} from "@/types";
+import type {FolderAndSnippets, SnippetsWithCollectionName} from "@/types";
 
 import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
@@ -93,7 +93,7 @@ function EditorColumn() {
         });
         updateSnippetState((snippet) => {
           setSelectedSnippet({
-            ...(snippet as Snippet),
+            ...(snippet as SnippetsWithCollectionName),
             content: data.content,
             updatedAt: data.updatedAt,
           });

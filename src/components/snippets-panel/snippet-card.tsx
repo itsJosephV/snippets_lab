@@ -11,7 +11,7 @@ function SnippetCard({snippet}: {snippet: SnippetsWithCollectionName}) {
   const {setSelectedSnippet, selectedSnippet, setCursorPosition} = useSnippet();
 
   const isLocked = useLockerSP();
-  const collectionName = snippet.folder.collection?.name;
+  const collectionName = snippet.folder.collection.name;
 
   const handleSnippetSelection = () => {
     if (selectedSnippet?.id === snippet.id) {

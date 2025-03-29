@@ -5,40 +5,6 @@ import {ViewType} from "@prisma/client";
 
 import db from "./db";
 
-/**
- * model Collection {
-  id          String    @id @default(uuid())
-  name        String
-  description String?
-  isDefault   Boolean   @default(false)
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  folders     Folder[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  @@index([userId])
-}
- */
-
-/**
- * model Folder {
-  id           String    @id @default(uuid())
-  name         String
-  description  String?
-  collectionId String
-  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  snippets     Snippet[]
-  isDefault    Boolean @default(false)
-  type        ViewType @default(NORMAL)
-  filters     Json?
-  isPinned    Boolean   @default(false)
-  @@index([collectionId])
-  @@index([collectionId, name])
-}
- */
-
 export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
   adapter: PrismaAdapter(db),
   session: {strategy: "jwt"},
