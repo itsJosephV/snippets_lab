@@ -4,8 +4,8 @@ import type {FolderAndSnippets, SnippetsWithCollectionName} from "@/types";
 import {useEffect, useRef, useState} from "react";
 import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {Snippet} from "@prisma/client";
 import debounce from "lodash.debounce";
+import {useSearchParams} from "next/navigation";
 
 import {ResizablePanel} from "../ui/resizable";
 
@@ -22,6 +22,8 @@ const DEBOUNCE_TIME = 1500;
 function EditorColumn() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const folderId = searchParams.get("folderId") as string;
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const saveVersionRef = useRef<number>(0);
@@ -48,15 +50,12 @@ function EditorColumn() {
       if (!selectedSnippet) return;
 
       await queryClient.cancelQueries({
-        queryKey: ["folder", selectedSnippet.folderId],
+        queryKey: ["folder", folderId],
       });
 
-      const previousFolder = queryClient.getQueryData<FolderAndSnippets>([
-        "folder",
-        selectedSnippet.folderId,
-      ]);
+      const previousFolder = queryClient.getQueryData<FolderAndSnippets>(["folder", folderId]);
 
-      queryClient.setQueryData<FolderAndSnippets>(["folder", selectedSnippet.folderId], (old) => {
+      queryClient.setQueryData<FolderAndSnippets>(["folder", folderId], (old) => {
         if (!old || !old.snippets) return old;
 
         return {
@@ -71,7 +70,7 @@ function EditorColumn() {
     },
     onError: (error, variables, context) => {
       if (selectedSnippet) {
-        queryClient.setQueryData(["folder", selectedSnippet.folderId], context?.previousFolder);
+        queryClient.setQueryData(["folder", folderId], context?.previousFolder);
       }
       toast.error(`Error saving changes: ${error}`);
       setIsSaving(false);
@@ -79,7 +78,7 @@ function EditorColumn() {
     },
     onSuccess: (data, variables) => {
       if (variables.version === saveVersionRef.current && selectedSnippet) {
-        queryClient.setQueryData<FolderAndSnippets>(["folder", selectedSnippet.folderId], (old) => {
+        queryClient.setQueryData<FolderAndSnippets>(["folder", folderId], (old) => {
           if (!old || !old.snippets) return old;
 
           return {
@@ -105,7 +104,7 @@ function EditorColumn() {
       SPEmitters.emit("UNLOCK_SNIPPETS_PANEL");
       if (selectedSnippet) {
         queryClient.invalidateQueries({
-          queryKey: ["folder", selectedSnippet.folderId],
+          queryKey: ["folder", folderId],
         });
       }
     },
