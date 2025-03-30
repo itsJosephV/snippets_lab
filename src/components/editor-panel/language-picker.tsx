@@ -1,8 +1,6 @@
-import type {Snippet} from "@prisma/client";
-
 import * as React from "react";
 import {toast} from "sonner";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {QueryClient, useMutation, useQueryClient} from "@tanstack/react-query";
 import {useSearchParams} from "next/navigation";
 
 import {FolderAndSnippets, SnippetsWithCollectionName} from "@/types";
@@ -23,47 +21,49 @@ export function LanguagePicker() {
   const queryClient = useQueryClient();
   const key = "folder";
   const params = useSearchParams();
-  const folderId = params.get("folderId") as string;
+  const currentFolderId = params.get("folderId") as string;
+  const snippetHomeFolderId = selectedSnippet?.folderId;
 
   const mutation = useMutation({
     mutationFn: ({snippetId, language}: {snippetId: string; language: Language}) =>
       updateSnippetLanguage(snippetId, language),
     onMutate: async ({language}) => {
-      if (!selectedSnippet) return;
+      if (!selectedSnippet) return null;
 
-      await queryClient.cancelQueries({queryKey: [key, folderId]});
+      await queryClient.cancelQueries({queryKey: ["folder"]});
 
-      const previousFolder = queryClient.getQueryData([key, folderId]);
+      updateAllRelevantFolders(queryClient, selectedSnippet.id, (snippet) => ({
+        ...snippet,
+        language,
+      }));
 
-      const updatedSnippet = {...selectedSnippet, language};
-
-      queryClient.setQueryData([key, folderId], (old: FolderAndSnippets) => {
-        if (!old || !old.snippets) return old;
-
-        return {
-          ...old,
-          snippets: old.snippets.map((snippet: Snippet) =>
-            snippet.id === selectedSnippet.id ? updatedSnippet : snippet,
-          ),
-        };
-      });
+      const previousSnippet = selectedSnippet;
+      const updatedSnippet = {
+        ...selectedSnippet,
+        language,
+      };
 
       setSelectedSnippet(updatedSnippet);
 
-      return {previousFolder, previousSnippet: selectedSnippet};
+      return {previousSnippet};
     },
     onError: (err, variables, context) => {
-      queryClient.setQueryData([key, folderId], context?.previousFolder);
+      queryClient.setQueryData([key, currentFolderId], context?.previousSnippet);
       setSelectedSnippet(context?.previousSnippet as SnippetsWithCollectionName);
       toast.error("Failed to update language");
     },
     onSuccess: (response) => {
+      updateAllRelevantFolders(queryClient, response.id, () => response);
       setSelectedSnippet(response);
       toast.success(`Language updated to ${response.language}`);
     },
     onSettled: () => {
-      if (selectedSnippet) {
-        queryClient.invalidateQueries({queryKey: [key, folderId]});
+      queryClient.invalidateQueries({queryKey: [key, currentFolderId], exact: true});
+      if (snippetHomeFolderId) {
+        queryClient.invalidateQueries({
+          queryKey: ["folder", snippetHomeFolderId],
+          exact: true,
+        });
       }
     },
   });
@@ -93,4 +93,28 @@ export function LanguagePicker() {
       </SelectContent>
     </Select>
   );
+}
+
+function updateAllRelevantFolders(
+  queryClient: QueryClient,
+  snippetId: string,
+  updater: (snippet: SnippetsWithCollectionName) => SnippetsWithCollectionName,
+) {
+  const queryCache = queryClient.getQueryCache();
+  const allFolderQueries = queryCache.findAll({queryKey: ["folder"]});
+
+  allFolderQueries.forEach((query) => {
+    const folderId = query.queryKey[1];
+
+    queryClient.setQueryData<FolderAndSnippets>(["folder", folderId], (old) => {
+      if (!old?.snippets) return old;
+
+      return {
+        ...old,
+        snippets: old.snippets.map((snippet) =>
+          snippet.id === snippetId ? updater(snippet) : snippet,
+        ),
+      };
+    });
+  });
 }

@@ -2,9 +2,12 @@
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
-import {Language} from "@/types";
+import {Language, SnippetsWithCollectionName} from "@/types";
 
-export async function updateSnippetLanguage(snippetId: string, language: Language) {
+export async function updateSnippetLanguage(
+  snippetId: string,
+  language: Language,
+): Promise<SnippetsWithCollectionName> {
   try {
     const session = await auth();
 
