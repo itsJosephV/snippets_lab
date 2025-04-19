@@ -31,8 +31,8 @@ import {
 import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "../ui/tooltip";
 
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
-import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
+import {languageExtension} from "@/lib/languages/language-extension";
 
 const snippetSchema = z.object({
   title: z
@@ -151,9 +151,9 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          {Object.entries(Language).map(([key, value]) => (
-                            <SelectItem key={key} className="capitalize" value={value}>
-                              {value}
+                          {Object.entries(languageExtension).map(([key]) => (
+                            <SelectItem key={key} className="capitalize" value={key}>
+                              {key}
                             </SelectItem>
                           ))}
                         </SelectGroup>

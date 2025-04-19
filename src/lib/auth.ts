@@ -26,7 +26,18 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
         },
       });
 
-      await db.folder.createMany({
+      const userUpdatePromise = db.user.update({
+        where: {id: user.id as string},
+        data: {
+          settings: {
+            theme: "dark",
+            defaultLanguage: "JavaScript",
+            editorTheme: "github-light",
+          },
+        },
+      });
+
+      const foldersCreatePromise = db.folder.createMany({
         data: [
           {
             name: "All Snippets",
@@ -46,6 +57,8 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
           },
         ],
       });
+
+      await Promise.all([userUpdatePromise, foldersCreatePromise]);
     },
   },
   callbacks: {

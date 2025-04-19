@@ -43,17 +43,6 @@ export function AppSidebar() {
         <SidebarContent>
           {/**--COLLECTIONS-- */}
           <TabsContent value={defaultTab}>
-            {/* <SidebarGroup>
-              <SidebarGroupLabel className="flex items-center gap-1">
-                <Pin />
-                Pinned folders
-              </SidebarGroupLabel>
-              <SidebarMenu>
-                {draft?.folders?.map((view) => {
-                  return <SavedViewButton key={view.id} view={view} />;
-                })}
-              </SidebarMenu>
-            </SidebarGroup> */}
             <DraftFolders />
             <Collections />
           </TabsContent>
@@ -66,8 +55,4 @@ export function AppSidebar() {
       </Tabs>
     </Sidebar>
   );
-}
-
-{
-  /* <AllSnippetsButton /> */
 }

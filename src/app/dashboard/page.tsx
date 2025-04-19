@@ -8,18 +8,24 @@ import {SidebarProvider} from "@/components/ui/sidebar";
 import {getQueryClient} from "@/lib/get-query-client";
 import {draftCollection} from "@/lib/db/data/get_all_views";
 import {getCollections} from "@/lib/db/data/get_collections";
+import {getUserSettings} from "@/lib/db/data/get_user_settings";
 
 async function DashboardPage() {
   const queryClient = getQueryClient();
 
   await Promise.all([
-    await queryClient.prefetchQuery({
+    queryClient.prefetchQuery({
       queryKey: ["collections"],
       queryFn: getCollections,
     }),
     queryClient.prefetchQuery({
       queryKey: ["draft"],
       queryFn: draftCollection,
+    }),
+
+    queryClient.prefetchQuery({
+      queryKey: ["settings"],
+      queryFn: getUserSettings,
     }),
   ]);
 

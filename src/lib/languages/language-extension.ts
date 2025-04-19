@@ -45,3 +45,5 @@ export const languageExtension = {
   Sass: sass(),
   Svelte: svelte(),
 };
+
+export type LanguageExtension = keyof typeof languageExtension;

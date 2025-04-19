@@ -16,7 +16,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   Authenticator Authenticator[]
-  collections Collection[]
+  collections   Collection[]
+  settings      Json?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,54 +77,56 @@ model Authenticator {
   @@id([userId, credentialID])
 }
 
-
 // Snippets Schema
 model Collection {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
-  isDefault   Boolean   @default(false)
+  isDefault   Boolean  @default(false)
   userId      String
-  user        User      @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
   folders     Folder[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   @@index([userId])
 }
 
 model Folder {
-  id           String    @id @default(uuid())
+  id           String     @id @default(uuid())
   name         String
   description  String?
   collectionId String
   collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
   snippets     Snippet[]
-  isDefault    Boolean @default(false)
-  type        ViewType @default(NORMAL)
-  filters     Json?
-  isPinned    Boolean   @default(false)
+  isDefault    Boolean    @default(false)
+  type         ViewType   @default(NORMAL)
+  filters      Json?
+  isPinned     Boolean    @default(false)
+
   @@index([collectionId])
   @@index([collectionId, name])
 }
 
 model Snippet {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   title       String
-  content     String    @db.Text
+  content     String   @db.Text
   language    String
   folderId    String
-  folder      Folder    @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folder      Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
   description String?
   isFavorite  Boolean
   isLocked    Boolean
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  // tags        Tag[]
+
   @@index([folderId])
   @@index([folderId, isFavorite])
   @@index([folderId, language])
-  // tags        Tag[]
 }
 
 // TESTING
@@ -132,6 +135,7 @@ enum ViewType {
   ALL
   FAVORITES
 }
+
 //? TAGS WILL BE IMPLEMENTED LATER
 
 // model Tag {
@@ -150,5 +154,3 @@ enum ViewType {
 //   tag       Tag     @relation(fields: [tagId], references: [id])
 //   @@id([snippetId, tagId])
 // }
-
-

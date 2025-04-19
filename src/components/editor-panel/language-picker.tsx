@@ -12,9 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {Language} from "@/types";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetLanguage} from "@/lib/db/actions/snippets/update-snippet-language";
+import {languageExtension, LanguageExtension} from "@/lib/languages/language-extension";
 
 export function LanguagePicker() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();
@@ -25,7 +25,7 @@ export function LanguagePicker() {
   const snippetHomeFolderId = selectedSnippet?.folderId;
 
   const mutation = useMutation({
-    mutationFn: ({snippetId, language}: {snippetId: string; language: Language}) =>
+    mutationFn: ({snippetId, language}: {snippetId: string; language: LanguageExtension}) =>
       updateSnippetLanguage(snippetId, language),
     onMutate: async ({language}) => {
       if (!selectedSnippet) return null;
@@ -68,7 +68,7 @@ export function LanguagePicker() {
     },
   });
 
-  const handleSelectChange = (value: Language) => {
+  const handleSelectChange = (value: LanguageExtension) => {
     if (!selectedSnippet) return;
     mutation.mutate({snippetId: selectedSnippet.id, language: value});
   };
@@ -84,9 +84,9 @@ export function LanguagePicker() {
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {Object.entries(Language).map(([key, value]) => (
-            <SelectItem key={key} className="capitalize" value={value}>
-              {value}
+          {Object.entries(languageExtension).map(([key]) => (
+            <SelectItem key={key} className="capitalize" value={key}>
+              {key}
             </SelectItem>
           ))}
         </SelectGroup>

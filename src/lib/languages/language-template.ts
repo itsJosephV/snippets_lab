@@ -1,26 +1,26 @@
-import {Language} from "@/types";
+import type {LanguageExtension} from "./language-extension";
 
-const languageTemplate: Record<Language, string> = {
-  [Language.JAVASCRIPT]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.TYPESCRIPT]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.YAML]: `# Title: {title}\n# Description: {description}\n# Language: {language}\n# -----------------------------\n# Add your snippet here 🚀`,
-  [Language.PYTHON]: `# Title: {title}\n# Description: {description}\n# Language: {language}\n# -----------------------------\n# Add your snippet here 🚀`,
-  [Language.RUST]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.GO]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.JAVA]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.CSHARP]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.PHP]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.ANGULAR]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
-  [Language.SQL]: `-- Title: {title}\n-- Description: {description}\n-- Language: {language}\n-- -----------------------------\n-- Add your snippet here 🚀`,
-  [Language.VUE]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
-  [Language.CSS]: `/* Title: {title} */\n/* Description: {description} */\n/* Language: {language} */\n/* ----------------------------- */\n/* Add your snippet here 🚀 */`,
-  [Language.HTML]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
-  [Language.MARKDOWN]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
-  [Language.JSON]: `{\n  "// Title": "{title}",\n  "// Description": "{description}",\n  "// Language": "{language}",\n  "// -----------------------------": "",\n  "// Add your snippet here 🚀": ""\n}`,
-  [Language.XML]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
-  [Language.CPP]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.SASS]: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
-  [Language.SVELTE]: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
-};
+const languageTemplate = {
+  JavaScript: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  TypeScript: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  YAML: `# Title: {title}\n# Description: {description}\n# Language: {language}\n# -----------------------------\n# Add your snippet here 🚀`,
+  Python: `# Title: {title}\n# Description: {description}\n# Language: {language}\n# -----------------------------\n# Add your snippet here 🚀`,
+  Rust: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  Go: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  Java: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  "C#": `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  PHP: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  Angular: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  SQL: `-- Title: {title}\n-- Description: {description}\n-- Language: {language}\n-- -----------------------------\n-- Add your snippet here 🚀`,
+  Vue: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  CSS: `/* Title: {title} */\n/* Description: {description} */\n/* Language: {language} */\n/* ----------------------------- */\n/* Add your snippet here 🚀 */`,
+  HTML: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  Markdown: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  JSON: `{\n  "// Title": "{title}",\n  "// Description": "{description}",\n  "// Language": "{language}",\n  "// -----------------------------": "",\n  "// Add your snippet here 🚀": ""\n}`,
+  XML: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+  "C++": `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  Sass: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,
+  Svelte: `<!-- Title: {title} -->\n<!-- Description: {description} -->\n<!-- Language: {language} -->\n<!-- ----------------------------- -->\n<!-- Add your snippet here 🚀 -->`,
+} satisfies Record<LanguageExtension, string>;
 
 export default languageTemplate;

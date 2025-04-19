@@ -1,15 +1,20 @@
 "use client";
 
+import type {EditorThemeId} from "@/lib/editor-themes";
+
 import CodeMirror, {ViewUpdate} from "@uiw/react-codemirror";
 import {useTheme} from "next-themes";
 // import {duotoneDark, duotoneLight} from "@uiw/codemirror-theme-duotone";
 // import {githubDark, githubLight} from "@uiw/codemirror-theme-github";
 import {basicDark, basicLight} from "@uiw/codemirror-theme-basic";
+import {useQuery} from "@tanstack/react-query";
 
 import {cn} from "@/lib/utils";
 import {useSnippet} from "@/context/useSnippetContext";
-import {Language} from "@/types";
 import {extensionFn} from "@/lib/languages/language-helpers";
+import {getUserSettings} from "@/lib/db/data/get_user_settings";
+import {editorThemes} from "@/lib/editor-themes";
+import {LanguageExtension} from "@/lib/languages/language-extension";
 
 type EditorProps = {
   handleContentChange: (value: string) => void;
@@ -23,6 +28,11 @@ function Editor({handleContentChange}: EditorProps) {
   const codeMirrorTheme = theme === "dark" ? basicDark : basicLight;
 
   const {selectedSnippet, editorRef, updateCursorPosition} = useSnippet();
+
+  const {data: settings} = useQuery({
+    queryKey: ["settings"],
+    queryFn: getUserSettings,
+  });
 
   const handleEditorUpdate = (viewUpdate: ViewUpdate) => {
     if (!viewUpdate.selectionSet) return;
@@ -41,10 +51,10 @@ function Editor({handleContentChange}: EditorProps) {
       ref={editorRef}
       basicSetup
       className={cn(`overflow-y-scroll`, "h-[var(--editor-height)]")}
-      extensions={[extensionFn(selectedSnippet?.language as Language)]}
+      extensions={[extensionFn(selectedSnippet?.language as LanguageExtension)]}
       height="100%"
       readOnly={selectedSnippet?.isLocked || !selectedSnippet}
-      theme={codeMirrorTheme}
+      theme={editorThemes[settings?.theme as EditorThemeId] || codeMirrorTheme}
       value={selectedSnippet?.content || defaultValue}
       onChange={(value) => handleContentChange(value)}
       onUpdate={handleEditorUpdate}

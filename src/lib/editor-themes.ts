@@ -3,10 +3,12 @@ import {duotoneDark, duotoneLight} from "@uiw/codemirror-theme-duotone";
 import {basicDark, basicLight} from "@uiw/codemirror-theme-basic";
 
 export const editorThemes = {
-  githubDark,
-  githubLight,
-  duotoneDark,
-  duotoneLight,
-  basicDark,
-  basicLight,
-};
+  "github-dark": githubDark,
+  "github-light": githubLight,
+  "duotone-dark": duotoneDark,
+  "duotone-light": duotoneLight,
+  "basic-dark": basicDark,
+  "basic-light": basicLight,
+} as const;
+
+export type EditorThemeId = keyof typeof editorThemes;

@@ -1,14 +1,12 @@
 import {capitalize} from "../utils";
 
 import languageTemplate from "./language-template";
-import {languageExtension} from "./language-extension";
-
-import {Language} from "@/types";
+import {LanguageExtension, languageExtension} from "./language-extension";
 
 export const languageTemplateFn = (
   title: string,
   description: string,
-  language: Language,
+  language: LanguageExtension,
 ): string => {
   const template = languageTemplate[language];
 
@@ -18,6 +16,6 @@ export const languageTemplateFn = (
     .replace("{language}", language);
 };
 
-export const extensionFn = (language: Language) => {
+export const extensionFn = (language: LanguageExtension) => {
   return languageExtension[language] || languageExtension.Markdown;
 };
