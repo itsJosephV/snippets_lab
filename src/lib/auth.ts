@@ -67,18 +67,3 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
     },
   },
 });
-
-/** // {
-          //   name: "All Snippets",
-          //   type: ViewType.ALL,
-          //   userId: user.id as string,
-          //   filters: {},
-          //   isPinned: true,
-          // },
-          // {
-          //   name: "Favorites",
-          //   type: ViewType.FAVORITES,
-          //   userId: user.id as string,
-          //   filters: {isFavorite: true},
-          //   isPinned: true,
-          // }, */

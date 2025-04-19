@@ -1,5 +1,4 @@
 "use server";
-
 import {Collection, Folder} from "@prisma/client";
 
 import {auth} from "@/lib/auth";

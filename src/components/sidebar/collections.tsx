@@ -1,4 +1,3 @@
-"use client";
 import type {CollectionWithFolders} from "@/types";
 
 import React from "react";
@@ -33,7 +32,7 @@ import FolderItem from "./folder-item";
 import {getCollections} from "@/lib/db/data/get_collections";
 import {cn} from "@/lib/utils";
 
-function Collections({initialCollections}: {initialCollections: CollectionWithFolders[]}) {
+function Collections() {
   const params = useSearchParams();
 
   const folderId = params.get("folderId");
@@ -42,7 +41,7 @@ function Collections({initialCollections}: {initialCollections: CollectionWithFo
   const {data: collectionsRQ} = useQuery({
     queryKey: ["collections"],
     queryFn: getCollections,
-    initialData: initialCollections,
+    // initialData: initialCollections,
   });
 
   const hasFolder = (collection: CollectionWithFolders) => {

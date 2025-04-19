@@ -1,5 +1,4 @@
 "use server";
-
 import type {CollectionWithFolders} from "@/types";
 
 import {auth} from "@/lib/auth";

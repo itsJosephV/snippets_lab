@@ -1,8 +1,4 @@
 "use client";
-import type {CollectionWithFolders} from "@/types";
-
-import {useQuery} from "@tanstack/react-query";
-import {Collection, Folder} from "@prisma/client";
 
 import CreateCollectionForm from "../forms/create-collection-form";
 
@@ -17,8 +13,6 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import {getCollections} from "@/lib/db/data/get_collections";
-import {draftCollection} from "@/lib/db/data/get_all_views";
 
 enum SidebarTab {
   Collections = "collections",
@@ -26,16 +20,6 @@ enum SidebarTab {
 }
 
 export function AppSidebar() {
-  const {data: collections} = useQuery({
-    queryKey: ["collections"],
-    queryFn: getCollections,
-  });
-
-  const {data: draft} = useQuery({
-    queryKey: ["draft"],
-    queryFn: draftCollection,
-  });
-
   const defaultTab = SidebarTab.Collections;
 
   return (
@@ -56,7 +40,7 @@ export function AppSidebar() {
             <CreateCollectionForm />
           </div>
         </SidebarHeader>
-        <SidebarContent className="">
+        <SidebarContent>
           {/**--COLLECTIONS-- */}
           <TabsContent value={defaultTab}>
             {/* <SidebarGroup>
@@ -70,8 +54,8 @@ export function AppSidebar() {
                 })}
               </SidebarMenu>
             </SidebarGroup> */}
-            <DraftFolders draft={draft as Collection & {folders: Folder[]}} />
-            <Collections initialCollections={collections as CollectionWithFolders[]} />
+            <DraftFolders />
+            <Collections />
           </TabsContent>
           {/**--TAGS-- */}
           <TabsContent value={SidebarTab.Tags}>

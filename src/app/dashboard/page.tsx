@@ -5,10 +5,9 @@ import EditorColumn from "@/components/editor-panel/editor-column";
 import SnippetsPanel from "@/components/snippets-panel/snippets-panel";
 import {ResizableHandle, ResizablePanelGroup} from "@/components/ui/resizable";
 import {SidebarProvider} from "@/components/ui/sidebar";
-import {getCollections} from "@/lib/db/data/get_collections";
 import {getQueryClient} from "@/lib/get-query-client";
 import {draftCollection} from "@/lib/db/data/get_all_views";
-// import {getAllViews} from "@/lib/db/data/get_all_views";
+import {getCollections} from "@/lib/db/data/get_collections";
 
 async function DashboardPage() {
   const queryClient = getQueryClient();
