@@ -1,7 +1,9 @@
+import type {LanguageExtension} from "@/types";
+
 import {capitalize} from "../utils";
 
 import languageTemplate from "./language-template";
-import {LanguageExtension, languageExtension} from "./language-extension";
+import {languageExtension} from "./language-extension";
 
 export const languageTemplateFn = (
   title: string,

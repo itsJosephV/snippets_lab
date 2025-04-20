@@ -1,3 +1,5 @@
+import type {LanguageExtension} from "@/types";
+
 import * as React from "react";
 import {toast} from "sonner";
 import {QueryClient, useMutation, useQueryClient} from "@tanstack/react-query";
@@ -14,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetLanguage} from "@/lib/db/actions/snippets/update-snippet-language";
-import {languageExtension, LanguageExtension} from "@/lib/languages/language-extension";
+import {languageExtension} from "@/lib/languages/language-extension";
 
 export function LanguagePicker() {
   const {selectedSnippet, setSelectedSnippet} = useSnippet();

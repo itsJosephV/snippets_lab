@@ -30,7 +30,6 @@ export const {auth, handlers, signIn, signOut, unstable_update} = NextAuth({
         where: {id: user.id as string},
         data: {
           settings: {
-            theme: "dark",
             defaultLanguage: "JavaScript",
             editorTheme: "github-light",
           },

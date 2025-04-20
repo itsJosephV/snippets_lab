@@ -1,4 +1,4 @@
-import type {LanguageExtension} from "./language-extension";
+import type {LanguageExtension} from "@/types";
 
 const languageTemplate = {
   JavaScript: `// Title: {title}\n// Description: {description}\n// Language: {language}\n// -----------------------------\n// Add your snippet here 🚀`,

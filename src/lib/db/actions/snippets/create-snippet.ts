@@ -1,8 +1,9 @@
 "use server";
 
+import type {LanguageExtension} from "@/types";
+
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
-import {LanguageExtension} from "@/lib/languages/language-extension";
 import {languageTemplateFn} from "@/lib/languages/language-helpers";
 
 const defaultLanguage: LanguageExtension = "TypeScript";

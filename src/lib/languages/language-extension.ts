@@ -44,6 +44,4 @@ export const languageExtension = {
   "C++": cpp(),
   Sass: sass(),
   Svelte: svelte(),
-};
-
-export type LanguageExtension = keyof typeof languageExtension;
+} as const;

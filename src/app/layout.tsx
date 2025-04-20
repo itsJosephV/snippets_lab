@@ -9,6 +9,7 @@ import ToasterComponent from "@/components/layout/toaster-component";
 import Header from "@/components/layout/header";
 import {ThemeProvider} from "@/components/providers/theme-provider";
 import {auth} from "@/lib/auth";
+import RQueryProvider from "@/components/providers/query-provider";
 
 const interVariable = localFont({
   variable: "--font-sans",
@@ -42,19 +43,21 @@ export default async function RootLayout({children}: {children: React.ReactNode}
           "grid grid-rows-[var(--layout-header-height)_1fr]",
         )}
       >
-        <SessionProvider session={session}>
-          <ThemeProvider
-            disableTransitionOnChange
-            enableSystem
-            attribute="class"
-            defaultTheme="system"
-          >
-            <Header />
-            {children}
+        <RQueryProvider>
+          <SessionProvider session={session}>
+            <ThemeProvider
+              disableTransitionOnChange
+              enableSystem
+              attribute="class"
+              defaultTheme="system"
+            >
+              <Header />
+              {children}
 
-            <ToasterComponent />
-          </ThemeProvider>
-        </SessionProvider>
+              <ToasterComponent />
+            </ThemeProvider>
+          </SessionProvider>
+        </RQueryProvider>
       </body>
     </html>
   );

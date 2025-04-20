@@ -1,12 +1,9 @@
 "use client";
 
-import type {EditorThemeId} from "@/lib/editor-themes";
+import type {LanguageExtension} from "@/types";
 
 import CodeMirror, {ViewUpdate} from "@uiw/react-codemirror";
 import {useTheme} from "next-themes";
-// import {duotoneDark, duotoneLight} from "@uiw/codemirror-theme-duotone";
-// import {githubDark, githubLight} from "@uiw/codemirror-theme-github";
-import {basicDark, basicLight} from "@uiw/codemirror-theme-basic";
 import {useQuery} from "@tanstack/react-query";
 
 import {cn} from "@/lib/utils";
@@ -14,7 +11,6 @@ import {useSnippet} from "@/context/useSnippetContext";
 import {extensionFn} from "@/lib/languages/language-helpers";
 import {getUserSettings} from "@/lib/db/data/get_user_settings";
 import {editorThemes} from "@/lib/editor-themes";
-import {LanguageExtension} from "@/lib/languages/language-extension";
 
 type EditorProps = {
   handleContentChange: (value: string) => void;
@@ -23,9 +19,7 @@ type EditorProps = {
 const defaultValue = `<- SELECT A SNIPPET TO START EDITING`;
 
 function Editor({handleContentChange}: EditorProps) {
-  const {theme} = useTheme();
-
-  const codeMirrorTheme = theme === "dark" ? basicDark : basicLight;
+  const {theme, resolvedTheme} = useTheme();
 
   const {selectedSnippet, editorRef, updateCursorPosition} = useSnippet();
 
@@ -33,6 +27,11 @@ function Editor({handleContentChange}: EditorProps) {
     queryKey: ["settings"],
     queryFn: getUserSettings,
   });
+
+  const appliedTheme = theme === "system" ? resolvedTheme : theme;
+  const baseTheme = settings?.editorTheme ?? "github";
+  const editorThemeKey = `${baseTheme}-${appliedTheme}` as keyof typeof editorThemes;
+  const editorTheme = editorThemes[editorThemeKey];
 
   const handleEditorUpdate = (viewUpdate: ViewUpdate) => {
     if (!viewUpdate.selectionSet) return;
@@ -54,7 +53,7 @@ function Editor({handleContentChange}: EditorProps) {
       extensions={[extensionFn(selectedSnippet?.language as LanguageExtension)]}
       height="100%"
       readOnly={selectedSnippet?.isLocked || !selectedSnippet}
-      theme={editorThemes[settings?.theme as EditorThemeId] || codeMirrorTheme}
+      theme={editorTheme}
       value={selectedSnippet?.content || defaultValue}
       onChange={(value) => handleContentChange(value)}
       onUpdate={handleEditorUpdate}

@@ -10,5 +10,3 @@ export const editorThemes = {
   "basic-dark": basicDark,
   "basic-light": basicLight,
 } as const;
-
-export type EditorThemeId = keyof typeof editorThemes;

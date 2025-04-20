@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "../../ui/dropdown-menu";
 import {SignOut} from "../sign-out";
+import EditorTheme from "../editor-theme";
 
 import {auth} from "@/lib/auth";
 
@@ -32,35 +33,34 @@ export default async function UserButton() {
     );
   }
 
-  if (session?.user) {
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className={buttonVariants({
-            variant: "ghost",
-            size: "icon",
-            className: "cursor-pointer",
-          })}
-          name={session.user.name ?? "User Menu"}
-        >
-          {session.user.name && (
-            <Avatar className="size-8">
-              <AvatarImage alt={session.user.name} src={String(session.user.image)} />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-          )}
-        </DropdownMenuTrigger>
-        <DropdownMenuContent forceMount align="end">
-          <DropdownMenuLabel className="font-normal">
-            <div className="flex flex-col space-y-1.5">
-              <p className="text-sm leading-none font-medium">{session.user.name}</p>
-              <p className="text-muted-foreground text-xs leading-none">{session.user.email}</p>
-            </div>
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <SignOut />
-        </DropdownMenuContent>
-      </DropdownMenu>
-    );
-  }
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className={buttonVariants({
+          variant: "ghost",
+          size: "icon",
+          className: "cursor-pointer",
+        })}
+        name={session.user.name ?? "User Menu"}
+      >
+        {session.user.name && (
+          <Avatar className="size-8">
+            <AvatarImage alt={session.user.name} src={String(session.user.image)} />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        )}
+      </DropdownMenuTrigger>
+      <DropdownMenuContent forceMount align="end" className="">
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1.5">
+            <p className="text-sm leading-none font-medium">{session.user.name}</p>
+            <p className="text-muted-foreground text-xs leading-none">{session.user.email}</p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <EditorTheme />
+        <SignOut />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
