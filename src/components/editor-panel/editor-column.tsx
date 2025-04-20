@@ -6,16 +6,20 @@ import {toast} from "sonner";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import debounce from "lodash.debounce";
 import {useSearchParams} from "next/navigation";
+import dynamic from "next/dynamic";
 
 import {ResizablePanel} from "../ui/resizable";
 
-import Editor from "./editor";
 import EditorHeader from "./editor-header";
 import EditorFooter from "./editor-footer";
 
 import {SPEmitters} from "@/lib/events";
 import {useSnippet} from "@/context/useSnippetContext";
 import {updateSnippetContent} from "@/lib/db/actions/snippets/update-snippet-content";
+
+const Editor = dynamic(() => import("./editor"), {
+  ssr: false,
+});
 
 const DEBOUNCE_TIME = 1500;
 
