@@ -12,6 +12,7 @@ import {
 } from "../../ui/dropdown-menu";
 import {SignOut} from "../sign-out";
 import EditorTheme from "../editor-theme";
+import DefaultLanguage from "../default-language";
 
 import {auth} from "@/lib/auth";
 
@@ -58,6 +59,7 @@ export default async function UserButton() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DefaultLanguage />
         <EditorTheme />
         <SignOut />
       </DropdownMenuContent>

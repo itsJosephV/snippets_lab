@@ -2,7 +2,9 @@
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
 
-export async function updateEditorTheme(theme: string): Promise<{editorTheme: string}> {
+export async function updateDefaultLanguage(
+  defaultLanguage: string,
+): Promise<{defaultLanguage: string}> {
   try {
     const session = await auth();
 
@@ -20,15 +22,15 @@ export async function updateEditorTheme(theme: string): Promise<{editorTheme: st
       data: {
         settings: {
           ...(currentUser?.settings as Record<string, unknown>),
-          editorTheme: theme,
+          defaultLanguage: defaultLanguage,
         },
       },
     });
 
-    const updatedSettings = userUpdate.settings as {editorTheme: string};
+    const updatedSettings = userUpdate.settings as {defaultLanguage: string};
 
     return {
-      editorTheme: updatedSettings.editorTheme,
+      defaultLanguage: updatedSettings.defaultLanguage,
     };
   } catch (error) {
     //TODO: Handle error appropriately

@@ -48,7 +48,11 @@ function Editor({handleContentChange}: EditorProps) {
   return (
     <CodeMirror
       ref={editorRef}
-      basicSetup
+      basicSetup={{
+        lineNumbers: false,
+        foldGutter: false,
+        tabSize: 2,
+      }}
       className={cn(`overflow-y-scroll`, "h-[var(--editor-height)]")}
       extensions={[extensionFn(selectedSnippet?.language as LanguageExtension)]}
       height="100%"

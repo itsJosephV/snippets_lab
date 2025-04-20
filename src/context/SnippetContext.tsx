@@ -16,7 +16,7 @@ interface SnippetContextType {
   setSelectedSnippet: (snippet: SnippetsWithCollectionName | null) => void;
   setCursorPosition: (state: {ln: number; col: number}) => void;
   setDocLength: (length: number) => void;
-  handleFolderClick: (folderCtx: folderCtx, ctxParam: string) => void;
+  handleFolderClick: (folderCtx: folderCtx, ctxParam: string, includeType?: boolean) => void;
   updateCursorPosition: (ln: number, col: number) => void;
   clearEditor: () => void;
 }
@@ -52,7 +52,7 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     setCursorPosition({ln: 0, col: 0});
   };
 
-  const handleFolderClick = (folder: Folder, param: string) => {
+  const handleFolderClick = (folder: Folder, param: string, includeType = false) => {
     const folderId = searchParams.get(param);
 
     if (folderId === folder.id) {
@@ -62,6 +62,7 @@ export function SnippetProvider({children}: SnippetProviderProps) {
     const newParams = new URLSearchParams();
 
     newParams.set(param, folder.id);
+    if (includeType) newParams.set("type", folder.type);
     const newUrl = `${pathname}?${newParams.toString()}`;
 
     history.pushState(null, "", newUrl);

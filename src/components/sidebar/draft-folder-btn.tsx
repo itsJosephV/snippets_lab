@@ -21,7 +21,7 @@ function DraftFolderBtn({folder}: {folder: Folder}) {
         className={cn({
           "bg-muted": folderId === folder.id,
         })}
-        onClick={() => handleFolderClick(folder, "folderId")}
+        onClick={() => handleFolderClick(folder, "folderId", true)}
       >
         {folder.type === "ALL" && <FolderCode />}
         {folder.type === "FAVORITES" && <Star />}

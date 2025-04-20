@@ -1,12 +1,13 @@
 "use client";
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useForm} from "react-hook-form";
 import {z} from "zod";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Info, LoaderIcon, Plus} from "lucide-react";
 import {toast} from "sonner";
-import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useSearchParams} from "next/navigation";
 
 import {
   Dialog,
@@ -33,6 +34,7 @@ import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger} from "../ui/to
 import {createSnippet} from "@/lib/db/actions/snippets/create-snippet";
 import {useSnippet} from "@/context/useSnippetContext";
 import {languageExtension} from "@/lib/languages/language-extension";
+import {getUserSettings} from "@/lib/db/data/get_user_settings";
 
 const snippetSchema = z.object({
   title: z
@@ -53,13 +55,22 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const {setSelectedSnippet, setCursorPosition} = useSnippet();
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+
+  const type = searchParams.get("type");
+
+  const invalidFolderTypes = type === "ALL" || type === "FAVORITES";
+
+  const {data: settings} = useQuery({
+    queryKey: ["settings"],
+    queryFn: getUserSettings,
+  });
 
   const form = useForm<z.infer<typeof snippetSchema>>({
     resolver: zodResolver(snippetSchema),
     defaultValues: {
       title: "",
       description: "",
-      language: "",
     },
   });
 
@@ -80,7 +91,11 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
       setSelectedSnippet(response);
       setCursorPosition({ln: 0, col: 0});
       toast.success("Snippet created! 🎉");
-      form.reset();
+      form.reset({
+        title: "",
+        description: "",
+        language: settings?.defaultLanguage,
+      });
     },
   });
 
@@ -91,9 +106,19 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
   const handleOpenChange = (isOpen: boolean) => {
     setDialogOpen(isOpen);
     if (!isOpen) {
-      form.reset();
+      form.reset({
+        title: "",
+        description: "",
+        language: settings?.defaultLanguage,
+      });
     }
   };
+
+  useEffect(() => {
+    if (settings?.defaultLanguage) {
+      form.setValue("language", settings.defaultLanguage);
+    }
+  }, [settings, form]);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
@@ -102,7 +127,8 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
           size: "icon",
           variant: "secondary",
         })}
-        disabled={!folderId}
+        disabled={!folderId || invalidFolderTypes}
+        id="button-test"
       >
         <Plus />
       </DialogTrigger>
@@ -139,7 +165,7 @@ export function CreateSnippetForm({folderId}: {folderId: string}) {
                           <Info className="text-muted-foreground relative top-px" size={14} />
                         </TooltipTrigger>
                         <TooltipContent className="" side="right">
-                          <p>The default language is TypeScript</p>
+                          <span>The default language can be modified in your settings</span>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
