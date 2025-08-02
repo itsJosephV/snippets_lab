@@ -2,11 +2,11 @@
 
 import {auth} from "@/lib/auth";
 import db from "@/lib/db";
-import {Language, SnippetsWithCollectionName} from "@/types";
+import {LanguageExtension, SnippetsWithCollectionName} from "@/types";
 
 export async function updateSnippetLanguage(
   snippetId: string,
-  language: Language,
+  language: LanguageExtension,
 ): Promise<SnippetsWithCollectionName> {
   try {
     const session = await auth();

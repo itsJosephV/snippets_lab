@@ -51,7 +51,7 @@ export default async function UserButton() {
           </Avatar>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent forceMount align="end" className="">
+      <DropdownMenuContent forceMount align="end" className="w-[280px]">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1.5">
             <p className="text-sm leading-none font-medium">{session.user.name}</p>
@@ -61,6 +61,8 @@ export default async function UserButton() {
         <DropdownMenuSeparator />
         <DefaultLanguage />
         <EditorTheme />
+        <DropdownMenuSeparator />
+
         <SignOut />
       </DropdownMenuContent>
     </DropdownMenu>

@@ -27,12 +27,18 @@ function DefaultLanguage() {
     },
   });
 
+  {
+    /* {isPending && <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />} */
+  }
+
   return (
-    <DropdownMenuLabel className="flex items-center justify-between font-normal">
-      {isPending && <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />}
-      Default language
+    <DropdownMenuLabel className="flex flex-col gap-1 text-xs font-normal">
+      <span className="text-muted-foreground flex items-center gap-1">
+        Default language
+        {isPending && <LoaderIcon className="relative top-px size-3 animate-spin" />}
+      </span>
       <Select value={settings?.defaultLanguage} onValueChange={(value) => mutate(value)}>
-        <SelectTrigger className="w-44 capitalize" disabled={isPending}>
+        <SelectTrigger className="capitalize" disabled={isPending}>
           <SelectValue placeholder="Select a theme" />
         </SelectTrigger>
         <SelectContent>
